@@ -3,3 +3,7 @@
 .vscode
 .gitattributes
 .git
+/Arbitre/x64
+/Arbitre/Arbitre/x64
+/Arbitre/Debug
+/Arbitre/Arbitre/Debug
