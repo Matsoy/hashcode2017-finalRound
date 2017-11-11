@@ -1,15 +1,21 @@
-#include <iostream>
-#include <sstream>
-#include <fstream>
-#include <string>
+#include "Header.h"
+#include "Matrix.h"
+#include "Backbone.h"
 
 using namespace std;
 
 int main()
 {
 
-	cout << "Dans le main" << endl;
-
+	int nbLignes;
+	int nbColonnes;
+	int rayonRouteurs;
+	int prixCable;
+	int prixRouteur;
+	int budgetMax;
+	Backbone backbone;
+	//Matrix<2, 3> map = { 1,2,3,4,5,6 };	//Servira pour produit matriciel; // matrice qui est une simple représentation immuable de la carte (contient des objets Void, Wall, Celle et Backbone)
+	//Matrix<2, 3> solution = { 1,2,3,4,5,6 }; // matrice de meme dimension que map sur laquelle nous representons les routeurs et les cables (contient des objets Router et Wire)
 
 	ifstream input("../../inputs/simple_example.in");
 	string line; //ligne courante
@@ -18,18 +24,19 @@ int main()
 	{
 
 		istringstream iss(line);
+		string word; //mot courant
+		unsigned int wordIndex = 1; //numéro du mot
 
 		if (lineIndex == 1) //1ere ligne: nb de lignes / nombre de colonnes / rayon des routeurs
 		{
-			string word; //mot courant
-			unsigned int wordIndex = 1; //numéro du mot
-
+			wordIndex = 1;
 			while (iss >> word) //pour chaque mot
 			{
 
 				if (wordIndex == 1)
 				{
 					cout << "Nombre de lignes: " << word << endl;
+
 				}
 				else if (wordIndex == 2)
 				{
@@ -45,8 +52,7 @@ int main()
 		}
 		else if (lineIndex == 2) //2eme ligne: prix d'un cable / prix d'un routeur / budget maximum
 		{
-			string word; //mot courant
-			unsigned int wordIndex = 1; //numéro du mot
+			wordIndex = 1;
 
 			while (iss >> word) //pour chaque mot
 			{
@@ -69,8 +75,7 @@ int main()
 		}
 		else if (lineIndex == 3) //3eme ligne: coordonnée X de l'antenne / coordonnée Y de l'antenne
 		{
-			string word; //mot courant
-			unsigned int wordIndex = 1; //numéro du mot
+			wordIndex = 1;
 
 			while (iss >> word) //pour chaque mot
 			{
