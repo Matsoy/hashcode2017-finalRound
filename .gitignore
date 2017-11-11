@@ -1,2 +1,5 @@
 .vs/
 /Test/Test.VC.VC.opendb
+.vscode
+.gitattributes
+.git
