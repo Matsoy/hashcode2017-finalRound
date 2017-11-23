@@ -4,7 +4,8 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <map>
 
 std::vector<int> infoMap(const char * mapName);
-bool checkSolution(const char* solutionName);
-bool checkTest();
+std::map<int, std::vector<int>> detectMurs(const char * mapName);
+bool checkTest(const char* solutionName);
