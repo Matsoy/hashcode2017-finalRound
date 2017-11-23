@@ -36,7 +36,7 @@ template<int R, int C> Matrix<R, C>::Matrix(std::initializer_list<Element> liste
 
 	for (const Element &elem : liste)
 	{
-		i = cpt / C;	//Formules qui evite la double boucle de remplissage
+		i = cpt / C;	//Formules qui evitent la double boucle de remplissage
 		j = cpt % C;
 		tab[i][j] = elem;
 		cpt++;

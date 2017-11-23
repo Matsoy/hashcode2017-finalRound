@@ -2,7 +2,7 @@
 
 // un element (classe mère)
 
-Element::Element(int x, int y): x(), y()
+Element::Element(int x, int y, int value): x(), y(), value()
 {
 }
 
@@ -20,4 +20,9 @@ void Element::setXY(int newX, int newY)
 {
 	x = newX;
 	y = newY;
+}
+
+int Element::getValue()
+{
+	return value;
 }
