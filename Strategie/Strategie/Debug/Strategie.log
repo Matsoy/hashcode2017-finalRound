@@ -1,9 +1,0 @@
-﻿  main.cpp
-d:\docs\4a\c++\projet\router-placement\strategie\strategie\main.cpp(14): warning C4101: 'prixRouteur' : variable locale non référencée
-d:\docs\4a\c++\projet\router-placement\strategie\strategie\main.cpp(11): warning C4101: 'nbColonnes' : variable locale non référencée
-d:\docs\4a\c++\projet\router-placement\strategie\strategie\main.cpp(13): warning C4101: 'prixCable' : variable locale non référencée
-d:\docs\4a\c++\projet\router-placement\strategie\strategie\main.cpp(12): warning C4101: 'rayonRouteurs' : variable locale non référencée
-d:\docs\4a\c++\projet\router-placement\strategie\strategie\main.cpp(15): warning C4101: 'budgetMax' : variable locale non référencée
-d:\docs\4a\c++\projet\router-placement\strategie\strategie\main.cpp(10): warning C4101: 'nbLignes' : variable locale non référencée
-  Strategie.vcxproj -> D:\Docs\4A\c++\projet\router-placement\Strategie\Debug\Strategie.exe
-  Strategie.vcxproj -> D:\Docs\4A\c++\projet\router-placement\Strategie\Debug\Strategie.pdb (Full PDB)
