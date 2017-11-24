@@ -1,8 +1,8 @@
 #include "Element.h"
 
-// un element (classe mère)
+// un element (classe mere)
 
-Element::Element(int x, int y, int value): x(), y(), value()
+Element::Element(int x, int y, int value) : x(), y(), value()
 {
 }
 

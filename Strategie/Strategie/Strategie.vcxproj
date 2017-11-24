@@ -146,26 +146,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Backbone.cpp" />
-    <ClCompile Include="Cell.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Element.cpp" />
-    <ClCompile Include="Matrix.cpp" />
-    <ClCompile Include="Router.cpp" />
-    <ClCompile Include="Void.cpp" />
-    <ClCompile Include="Wall.cpp" />
-    <ClCompile Include="Wire.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Backbone.h" />
-    <ClInclude Include="Cell.h" />
     <ClInclude Include="Element.h" />
     <ClInclude Include="Header.h" />
     <ClInclude Include="Matrix.h" />
-    <ClInclude Include="Router.h" />
-    <ClInclude Include="Void.h" />
-    <ClInclude Include="Wall.h" />
-    <ClInclude Include="Wire.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
