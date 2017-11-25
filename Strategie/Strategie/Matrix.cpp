@@ -35,9 +35,6 @@ std::ostream & operator<<(std::ostream & os, const Matrix &mat)
 		m = cpt / mat.mCols;
 		n = cpt % mat.mCols;
 
-		//std::cout << "m = " << m << std::endl;
-		//std::cout << "n = " << n << std::endl;
-
 		if(n == 0) os << "[ "; // si 1er elem
 
 		if ((n == mat.mCols - 1)) // si dernier elem

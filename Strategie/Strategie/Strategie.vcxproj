@@ -146,16 +146,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Algo.cpp" />
+    <ClCompile Include="IO.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Element.cpp" />
     <ClCompile Include="Matrix.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Algo.h" />
     <ClInclude Include="Cell.h" />
-    <ClInclude Include="Element.h" />
     <ClInclude Include="Header.h" />
+    <ClInclude Include="IO.h" />
     <ClInclude Include="Matrix.h" />
-    <ClInclude Include="MatrixTmp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

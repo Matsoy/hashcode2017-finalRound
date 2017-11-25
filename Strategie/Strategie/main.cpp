@@ -1,134 +1,28 @@
 #include "Header.h"
 #include "Matrix.h"
-#include "Cell.h"
-
-/*
-* renvoie un tableau avec les donnees des 3 1eres lignes du fichier d'input
-*
-*@param fichierInput le nom du fichier d'input a lire
-*@return [nbLignes, nbColonnes, rayonRouteurs, prixCable, prixRouteur, budgetMax, xBackbone, yBackbone]
-*/
-int* initializeData(std::string fichierInput) {
-	int retDatas[8] = {};
-
-	std::ifstream input(fichierInput);
-	std::string line; //ligne courante
-	unsigned int lineIndex = 1; //numero de la ligne
-
-	while (std::getline(input, line)) //pour chaque ligne
-	{
-		std::istringstream iss(line);
-		std::string word; //mot courant
-		unsigned int wordIndex = 1; //numero du mot
-
-		if (lineIndex == 1) //1ere ligne: nb de lignes / nombre de colonnes / rayon des routeurs
-		{
-			while (iss >> word) //pour chaque mot
-			{
-				if (wordIndex == 1)	retDatas[0] = std::stoi(word); // nombre de lignes
-				else if (wordIndex == 2) retDatas[1] = std::stoi(word); // nombre de colonnes
-				else retDatas[2] = std::stoi(word); // rayon des routeurs
-
-				wordIndex++;
-			}
-		}
-		else if (lineIndex == 2) //2eme ligne: prix d'un cable / prix d'un routeur / budget maximum
-		{
-			while (iss >> word) //pour chaque mot
-			{
-				if (wordIndex == 1)	retDatas[3] = std::stoi(word); // prix d'un cable
-				else if (wordIndex == 2) retDatas[4] = std::stoi(word); // prix d'un routeur
-				else retDatas[5] = std::stoi(word); // budget maximum
-
-				wordIndex++;
-			}
-		}
-		else if (lineIndex == 3) //3eme ligne: coordonnee X de l'antenne / coordonnee Y de l'antenne
-		{
-			while (iss >> word) //pour chaque mot
-			{
-				if (wordIndex == 1)	retDatas[6] = std::stoi(word); // coordonnee X de l'antenne --> = index ligne
-				else retDatas[7] = std::stoi(word); // coordonnee Y de l'antenne --> = index colonne
-
-				wordIndex++;
-			}
-		}
-		else break; //sinon, c'est la carte
-
-		wordIndex = 1;
-		lineIndex++;
-	}
-
-	return retDatas;
-}
-
-
-
-/*
-* Rempli la matrice d'entiers
-* - -> -1
-* # -> 0
-* . -> 1
-*
-*@param la reference de la matrice
-*@param fichierInput le nom du fichier d'input a lire
-*/
-void initializeMap(Matrix & m, std::string fichierInput) {
-	int cpt = 0;
-
-	std::ifstream input(fichierInput);
-	std::string line; //ligne courante
-	unsigned int lineIndex = 1; //numero de la ligne
-	while (getline(input, line)) //pour chaque ligne
-	{
-		std::istringstream iss(line);
-
-		if (lineIndex > 3) // si on arrive à la carte
-		{
-			// initialisation de la matrice
-			for (unsigned int i = 0; i<line.length(); i++)
-			{
-				switch (line.at(i)) {
-				case '-': // une cellule vide
-					m(lineIndex - 4, i) = Cell::Void; // -1
-					break;
-				case '#': // mur
-					m(lineIndex - 4, i) = Cell::Wall; // 0
-					break;
-				default: // sinon cellule cible
-					m(lineIndex - 4, i) = Cell::Wireless; // 1
-					break;
-				}
-			}
-		}
-		lineIndex++;
-	}
-}
-
-
+#include "IO.h"
+#include "Algo.h"
 
 int main()
 {
-	std::string fichierInput = "../../inputs/simple_example.in";
+	std::string fichierInput = "../../inputs/extra_simple_example.in"; // fichier d'input
+	IO io; // objet pour les I/O
 
-	int * datas = initializeData(fichierInput); // tableau de la forme [nbLignes, nbColonnes, rayonRouteurs, prixCable, prixRouteur, budgetMax, xBackbone, yBackbone]
+	int * datas = io.initializeData(fichierInput); // datas = tableau de la forme [nbLignes, nbColonnes, rayonRouteurs, prixCable, prixRouteur, budgetMax, xBackbone, yBackbone]
 
-	// initialisation des donnees
-	int nbLignes = datas[0];
-	int nbColonnes = datas[1];
-	int rayonRouteurs = datas[2];
-	int prixCable = datas[3];
-	int prixRouteur = datas[4];
-	int budget = datas[5]; // buget courant
-	int budgetOriginal = datas[5]; // budget max
-	int backbone[2] = { datas[5] , datas[7] }; // coordonnes [x, y] de l'emetteur
+	Matrix mapOriginale(datas[0], datas[1]); // matrice originale nbLignes x nbColonnes
+	Matrix map(datas[0], datas[1]); // matrice nbLignes x nbColonnes
 
-	Matrix map(nbLignes, nbColonnes);
+	int * xyBackbone = new int[2]{ datas[6], datas[7] };
+
+	Algo algo("theoreme_de_soyer", map, datas[2], datas[3], datas[4], datas[5], datas[5], xyBackbone); // type, rayonRouteurs, prixCable, prixRouteur, budgetMax, budgetOriginal, [xBackbone, yBackbone]
 	
-	// initialisation de la matrice
-	initializeMap(map, fichierInput);
+	// remplissage de la matrice
+	io.initializeMap(map, fichierInput);
 
 	// impression de la matrice
-	//std::cout << map << std::endl;
+	std::cout << map << std::endl;
+
+	algo.run(); // lancemet de l'algo
 									
 }
