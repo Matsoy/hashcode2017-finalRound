@@ -2,6 +2,12 @@
 #include "Matrix.h"
 #include "Cell.h"
 
+/*
+* renvoie un tableau avec les donnees des 3 1eres lignes du fichier d'input
+*
+*@param fichierInput le nom du fichier d'input a lire
+*@return [nbLignes, nbColonnes, rayonRouteurs, prixCable, prixRouteur, budgetMax, xBackbone, yBackbone]
+*/
 int* initializeData(std::string fichierInput) {
 	int retDatas[8] = {};
 
@@ -58,11 +64,17 @@ int* initializeData(std::string fichierInput) {
 
 
 
-
+/*
+* Rempli la matrice d'entiers
+* - -> -1
+* # -> 0
+* . -> 1
+*
+*@param la reference de la matrice
+*@param fichierInput le nom du fichier d'input a lire
+*/
 void initializeMap(Matrix & m, std::string fichierInput) {
 	int cpt = 0;
-
-	std::cout << "dans initializeMap" << std::endl;
 
 	std::ifstream input(fichierInput);
 	std::string line; //ligne courante
@@ -97,36 +109,26 @@ void initializeMap(Matrix & m, std::string fichierInput) {
 
 int main()
 {
-	std::string fichierInput = "../../inputs/extra_simple_example.in";
+	std::string fichierInput = "../../inputs/simple_example.in";
 
-	int* datas = initializeData(fichierInput); // tableau de la forme [nbLignes, nbColonnes, rayonRouteurs, prixCable, prixRouteur, budgetMax, xBackbone, yBackbone]
+	int * datas = initializeData(fichierInput); // tableau de la forme [nbLignes, nbColonnes, rayonRouteurs, prixCable, prixRouteur, budgetMax, xBackbone, yBackbone]
 
-											   // initialisation des donnees constantes
+	// initialisation des donnees
 	int nbLignes = datas[0];
 	int nbColonnes = datas[1];
 	int rayonRouteurs = datas[2];
 	int prixCable = datas[3];
 	int prixRouteur = datas[4];
-	int budgetMax = datas[5];
-	int xBackbone = datas[6];
-	int yBackbone = datas[7];
-	std::cout << nbLignes << std::endl;
-	std::cout << nbColonnes << std::endl;
+	int budget = datas[5]; // buget courant
+	int budgetOriginal = datas[5]; // budget max
+	int backbone[2] = { datas[5] , datas[7] }; // coordonnes [x, y] de l'emetteur
+
 	Matrix map(nbLignes, nbColonnes);
 	
 	// initialisation de la matrice
 	initializeMap(map, fichierInput);
 
-	std::cout << map << std::endl;
-
-	//std::cout << "apres initialisationd de la matrice" << std::endl;
-	//std::cout << map(1, 11) << std::endl;
-	//std::cout << map(2, 7) << std::endl;
-	//std::cout << map(6, 20) << std::endl;
-
-	//std::cout << map(2, 2) << std::endl;
-
+	// impression de la matrice
 	//std::cout << map << std::endl;
-	
 									
 }
