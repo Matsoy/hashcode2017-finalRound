@@ -1,5 +1,6 @@
 #include "Header.h"
 #include "Matrix.h"
+#include "Cell.h"
 
 int* initializeData(std::string fichierInput) {
 	int retDatas[8] = {};
@@ -56,9 +57,47 @@ int* initializeData(std::string fichierInput) {
 }
 
 
+
+
+void initializeMap(Matrix & m, std::string fichierInput) {
+	int cpt = 0;
+
+	std::cout << "dans initializeMap" << std::endl;
+
+	std::ifstream input(fichierInput);
+	std::string line; //ligne courante
+	unsigned int lineIndex = 1; //numero de la ligne
+	while (getline(input, line)) //pour chaque ligne
+	{
+		std::istringstream iss(line);
+
+		if (lineIndex > 3) // si on arrive à la carte
+		{
+			// initialisation de la matrice
+			for (unsigned int i = 0; i<line.length(); i++)
+			{
+				switch (line.at(i)) {
+				case '-': // une cellule vide
+					m(lineIndex - 4, i) = Cell::Void; // -1
+					break;
+				case '#': // mur
+					m(lineIndex - 4, i) = Cell::Wall; // 0
+					break;
+				default: // sinon cellule cible
+					m(lineIndex - 4, i) = Cell::Wireless; // 1
+					break;
+				}
+			}
+		}
+		lineIndex++;
+	}
+}
+
+
+
 int main()
 {
-	std::string fichierInput = "../../inputs/simple_example.in";
+	std::string fichierInput = "../../inputs/extra_simple_example.in";
 
 	int* datas = initializeData(fichierInput); // tableau de la forme [nbLignes, nbColonnes, rayonRouteurs, prixCable, prixRouteur, budgetMax, xBackbone, yBackbone]
 
@@ -71,89 +110,23 @@ int main()
 	int budgetMax = datas[5];
 	int xBackbone = datas[6];
 	int yBackbone = datas[7];
-
+	std::cout << nbLignes << std::endl;
+	std::cout << nbColonnes << std::endl;
+	Matrix map(nbLignes, nbColonnes);
+	
 	// initialisation de la matrice
-	//Matrix<nbLignes, nbColonnes> map;// = initializeMap(fichierInput);
+	initializeMap(map, fichierInput);
 
-									 //Matrix<2, 3> map = { 1,2,3,4,5,6 };	//Servira pour produit matriciel; // matrice qui est une simple representation immuable de la carte (contient des objets Void, Wall, Celle et Backbone)
-									 //Matrix<2, 3> solution = { 1,2,3,4,5,6 }; // matrice de meme dimension que map sur laquelle nous representons les routeurs et les cables (contient des objets Router et Wire)
+	std::cout << map << std::endl;
 
+	//std::cout << "apres initialisationd de la matrice" << std::endl;
+	//std::cout << map(1, 11) << std::endl;
+	//std::cout << map(2, 7) << std::endl;
+	//std::cout << map(6, 20) << std::endl;
+
+	//std::cout << map(2, 2) << std::endl;
+
+	//std::cout << map << std::endl;
+	
+									
 }
-
-/*
-Matrix<int,int> & initializeMap(std::string fichierInput) {
-std::ifstream input("../../inputs/simple_example.in");
-std::string line; //ligne courante
-unsigned int lineIndex = 1; //numero de la ligne
-while (getline(input, line)) //pour chaque ligne
-{
-
-std::istringstream iss(line);
-std::string word; //mot courant
-unsigned int wordIndex = 1; //numero du mot
-
-if (lineIndex == 1) //1ere ligne: nb de lignes / nombre de colonnes / rayon des routeurs
-{
-while (iss >> word) //pour chaque mot
-{
-if (wordIndex == 1)	nbLignes = std::stoi(word); // nombre de lignes
-else if (wordIndex == 2) nbColonnes = std::stoi(word); // nombre de colonnes
-else rayonRouteurs = std::stoi(word); // rayon des routeurs
-
-wordIndex++;
-}
-}
-else if (lineIndex == 2) //2eme ligne: prix d'un cable / prix d'un routeur / budget maximum
-{
-while (iss >> word) //pour chaque mot
-{
-if (wordIndex == 1)	prixCable = std::stoi(word); // prix d'un cable
-else if (wordIndex == 2) prixRouteur = std::stoi(word); // prix d'un routeur
-else budgetMax = std::stoi(word); // budget maximum
-
-wordIndex++;
-}
-}
-else if (lineIndex == 3) //3eme ligne: coordonnee X de l'antenne / coordonnee Y de l'antenne
-{
-while (iss >> word) //pour chaque mot
-{
-int xAntenne, yAntenne;
-
-if (wordIndex == 1)	xAntenne = std::stoi(word); // coordonnee X de l'antenne --> = index ligne
-else yAntenne = stoi(word); // coordonnee Y de l'antenne --> = index colonne
-
-wordIndex++;
-}
-}
-else //sinon, c'est la carte
-{
-// initialisation de la matrice d'elements
-
-while (iss >> word) //pour chaque element de la carte
-{
-
-for (char& caracElement : word) {
-switch (caracElement) {
-case '-': // une cellule vide
-
-break;
-case '.': // cellule cible
-break;
-case '#': // mur
-break;
-default:
-throw std::string("Caractere inconnu");
-}
-}
-
-wordIndex++;
-}
-}
-
-wordIndex = 1;
-lineIndex++;
-}
-}
-
-*/
