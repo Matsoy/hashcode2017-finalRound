@@ -2,11 +2,11 @@
 
 int main()
 {
-	checkTest("../../inputs/simple_example.in", "../../solutions/solutionTestOk.txt");
+	checkSolution("../../inputs/simple_example.in", "../../solutions/solutionTestPasOk.txt");
 	return(EXIT_SUCCESS);
 }
 
-std::vector<int> infoMap(const char * mapName)
+std::vector<int> infoMap(std::string mapName)
 {
 	std::vector<int> data;
 	std::ifstream file(mapName);
@@ -52,7 +52,7 @@ bool cableOrdered(const int & xCable, const int & yCable, const std::vector<std:
 }
 
 
-std::vector<std::vector<bool>> detectWalls(const char * mapName, const int & row, const int & column)
+std::vector<std::vector<bool>> detectWalls(std::string mapName, const int & row, const int & column)
 {
 	int coordX = 0;
 	int coordY = 0;
@@ -84,9 +84,12 @@ std::vector<std::vector<bool>> detectWalls(const char * mapName, const int & row
 }
 
 
-bool checkTest(const char* input, const char* solutionName)
+bool checkSolution(std::string mapFile, std::string solutionFile)
 {
-	std::vector<int> data = infoMap(input);	//Contient les informations liées à la map
+	std::cout << "Test de la solution : " << solutionFile.substr(16) << std::endl;
+	std::cout << "Sur la map : " << mapFile.substr(13) << std::endl << std::endl;
+
+	std::vector<int> data = infoMap(mapFile);	//Contient les informations liées à la map
 	const int row = data[0];
 	const int column = data[1];
 	const int radius = data[2];
@@ -96,7 +99,7 @@ bool checkTest(const char* input, const char* solutionName)
 	const int xBackbone = data[6];
 	const int yBackbone = data[7];
 	
-	std::ifstream solution(solutionName, std::ios::in);
+	std::ifstream solution(solutionFile, std::ios::in);
 	if (solution)	//On test si le fichier est bien ouvert
 	{
 		//Parser le fichier de solution
@@ -117,7 +120,6 @@ bool checkTest(const char* input, const char* solutionName)
 			{
 				std::getline(solution, line);
 				std::istringstream iss(line);
-
 				if (iss >> a >> b)
 				{
 					if (0 <= a && 0 <= b && a < row && b < column)
@@ -128,20 +130,22 @@ bool checkTest(const char* input, const char* solutionName)
 						}
 						else
 						{
-							//Pas de cables connectés autour, problème d'ordre
+							std::cout << "La solution proposee n'est pas valide pour la raison suivante : " << std::endl;
+							std::cout << "Probleme dans l'ordre des cables pour le cable de coordonnees (" << a << ',' << b << ')' << std::endl;
 							return false;
 						}
 					}
 					else
 					{
-						//Il y a un problème avec les coordonnées des cables (valeurs)
+						std::cout << "La solution proposee n'est pas valide pour la raison suivante : " << std::endl;
+						std::cout << "Coordonnees hors limite pour le cable de coordonnees (" << a << ',' << b << ')' << std::endl;
 						return false;
 					}
-
 				}
 				else
 				{
-					//Il y a un problème avec les coordonnées des cables (forme)
+					std::cout << "La solution proposee n'est pas valide pour la raison suivante : " << std::endl;
+					std::cout << "Mauvaise forme des coordonnees pour le cable en position " << i << std::endl;
 					return false;
 				}
 			}
@@ -150,15 +154,13 @@ bool checkTest(const char* input, const char* solutionName)
 			nbRouteurs = stoi(line);
 
 			if ((nbCable * cableCost + nbRouteurs * routerCost) > budget)	//Test du budget
-			//On test le budget maintenant, car si pas bon, cela évite de lire la suite du fichier pour rien
 			{
-				return false;
+				throw std::exception("Le budget a ete depasse");
 			}
 
 			if (0 <= nbRouteurs && nbRouteurs < row*column)
 			{
-				std::vector<std::vector<bool>> walls = detectWalls(input, row, column);
-
+				std::vector<std::vector<bool>> walls = detectWalls(mapFile, row, column);
 				int a, b;
 				for (int i = 0; i < nbRouteurs; i++)
 				{
@@ -174,43 +176,47 @@ bool checkTest(const char* input, const char* solutionName)
 							}
 							else
 							{
-								//Problème : la case du routeur n'est pas câblée, routeur pas connecté au backbone, ou routeur sur mur
+								std::cout << "La solution proposee n'est pas valide pour la raison suivante : " << std::endl;
+								std::cout << "Le routeur (" << a << ',' << b << ") est sur un mur ou n'est pas cable" << std::endl;
 								return false;
 							}
 						}
 						else
 						{
-							//Il y a un problème avec les coordonnées des routeurs (valeurs)
+							std::cout << "La solution proposee n'est pas valide pour la raison suivante : " << std::endl;
+							std::cout << "Coordonnes hors limite pour le routeur de coordonnes (" << a << ',' << b << ')' << std::endl;
 							return false;
 						}
 					}
 					else
 					{
-						//Il y a un problème avec les coordonnées des routeurs (forme)
+						std::cout << "La solution proposee n'est pas valide pour la raison suivante : " << std::endl;
+						std::cout << "Mauvaise forme des coordonnees pour le routeur en position " << i << std::endl;
 						return false;
 					}
 				}
 			}
 			else
 			{
-				//Il y a trop de routeurs
+				std::cout << "La solution proposee n'est pas valide pour la raison suivante : " << std::endl;
+				std::cout << "Il y a plus de routeurs que de cases sur la map" << std::endl;
 				return false;
 			}
 		}
 		else
 		{
-			//Il y a trop de cables
+			std::cout << "La solution proposee n'est pas valide pour la raison suivante : " << std::endl;
+			std::cout << "Il y a plus de cables que de cases sur la map" << std::endl;
 			return false;
 		}
 
-		//Ici, on a les coordonnées des cables et des routeurs dans les vecteurs
-		std::cout << "On est bon" << std::endl;
+		std::cout << "La solution est valide" << std::endl;
 		solution.close();
 		return true;
 	}
 	else
 	{
-		std::cerr << "File of the solution can not be opened" << std::endl;
-		return false;	//Faire exception dans le futur
+		std::cout << "File of the solution can not be opened" << std::endl;
+		return false;
 	}
 }
