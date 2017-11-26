@@ -30,9 +30,13 @@ int main()
 	Matrix mapRouteursTest(datas[0], datas[1]); // matrice nbLignes x nbColonnes
 	// remplissage de la matrice
 	io.initializeMap(mapRouteursTest, fichierInput);
+	// placement de l'emetteur
+	mapRouteursTest(2, 7) = -2;
 	// placement des 2 routeurs
 	mapRouteursTest(3, 6) = 3;
 	mapRouteursTest(3, 9) = 3;
+	// placement des cables. /!\ il y a un cable sous les routeurs aussi ! Du coup il ya un cable à (3, 6) et (3, 9)
+	mapRouteursTest(3, 8) = 4;
 
 	io.generateInput(mapRouteursTest);
 
