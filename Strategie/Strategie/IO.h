@@ -11,4 +11,5 @@ public:
 
 	int* initializeData(std::string fichierInput);
 	void initializeMap(Matrix & m, std::string fichierInput);
+	void generateInput(Matrix & mapRouteurs);
 };

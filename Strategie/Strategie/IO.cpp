@@ -10,7 +10,8 @@ IO::IO()
 *@param fichierInput le nom du fichier d'input a lire
 *@return [nbLignes, nbColonnes, rayonRouteurs, prixCable, prixRouteur, budgetMax, xBackbone, yBackbone]
 */
-int* IO::initializeData(std::string fichierInput) {
+int* IO::initializeData(std::string fichierInput)
+{
 	int * retDatas = new int[8];
 
 	std::ifstream input(fichierInput);
@@ -75,7 +76,8 @@ int* IO::initializeData(std::string fichierInput) {
 *@param la reference de la matrice
 *@param fichierInput le nom du fichier d'input a lire
 */
-void IO::initializeMap(Matrix & m, std::string fichierInput) {
+void IO::initializeMap(Matrix & m, std::string fichierInput)
+{
 	int cpt = 0;
 
 	std::ifstream input(fichierInput);
@@ -105,4 +107,9 @@ void IO::initializeMap(Matrix & m, std::string fichierInput) {
 		}
 		lineIndex++;
 	}
+}
+
+void IO::generateInput(Matrix & mapRouteurs)
+{
+
 }

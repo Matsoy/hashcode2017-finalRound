@@ -5,7 +5,7 @@
 
 int main()
 {
-	std::string fichierInput = "../../inputs/extra_simple_example.in"; // fichier d'input
+	std::string fichierInput = "../../inputs/simple_example.in"; // fichier d'input
 	IO io; // objet pour les I/O
 
 	int * datas = io.initializeData(fichierInput); // datas = tableau de la forme [nbLignes, nbColonnes, rayonRouteurs, prixCable, prixRouteur, budgetMax, xBackbone, yBackbone]
@@ -25,4 +25,16 @@ int main()
 
 	algo.run(); // lancemet de l'algo
 									
+
+	// ###################### CREATION INPUT ######################
+	Matrix mapRouteursTest(datas[0], datas[1]); // matrice nbLignes x nbColonnes
+	// remplissage de la matrice
+	io.initializeMap(mapRouteursTest, fichierInput);
+	// placement des 2 routeurs
+	mapRouteursTest(3, 6) = 3;
+	mapRouteursTest(3, 9) = 3;
+
+	io.generateInput(mapRouteursTest);
+
+
 }
