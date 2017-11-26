@@ -1,10 +1,8 @@
-//Ajout de la solution
 #include "arbitre.h"
 
 int main()
 {
-	checkTest("../../solutions/solutionTestPasOk.txt");
-	//checkTest("../../solutions/solutionTestPasOk.txt");
+	checkTest("../../inputs/simple_example.in", "../../solutions/solutionTestOk.txt");
 	return(EXIT_SUCCESS);
 }
 
@@ -28,70 +26,6 @@ std::vector<int> infoMap(const char * mapName)
 }
 
 
-std::map<int, std::vector<int>> detectMurs(const char * mapName)
-{
-	int coordX = 0;
-	int coordY;
-	std::map<int, std::vector<int>> murs;
-
-	std::ifstream file(mapName);
-	std::string line = "";	//ligne courante
-
-	//Il faut passer les 3 premières lignes pour ensuite lire la map
-	for (int i = 1; i < 4; i++)
-	{
-		getline(file, line);
-	}
-	while (getline(file, line))
-	{
-		coordY = 0;
-		for (const char& charElement : line)
-		{
-			if (charElement == '#')
-			{
-				if (murs.find(coordX) == murs.end())	//Si on n'avait pas de murs sur la ligne, il faut "créer" le vecteur
-				{
-					murs.emplace(coordX, std::vector<int>());
-				}
-				murs.at(coordX).push_back(coordY);
-			}
-			coordY += 1;
-		}
-		coordX += 1;
-	}
-
-	return murs;
-}
-
-
-//bool cableOrdered(const int & xCable, const int & yCable, const std::vector<std::pair<int, int>>& cableVector)
-//{
-//	for (auto it = cableVector.begin(); it != cableVector.end(); it++)
-//	{
-//		if (distInf1(xCable, yCable, it->first, it->second))
-//		{
-//			return true;
-//		}
-//	}
-//	return false;
-//}
-
-bool cableOrdered2(const int & xCable, const int & yCable, const std::map<int, std::vector<int>>& cablesMap)
-{
-	for (auto it1 = cablesMap.begin(); it1 != cablesMap.end(); it1++)
-	{
-		for (auto it2 = it1->second.begin(); it2 != it1->second.end(); it2++)
-		{
-			if (distInf1(xCable, yCable, it1->first, (*it2)))
-			{
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-
 bool distInf1(const int & xCable, const int & yCable, const int & xConnected, const int & yConnected)
 {
 	if (abs(xCable - xConnected) <= 1 && abs(yCable - yConnected) <= 1)
@@ -102,9 +36,57 @@ bool distInf1(const int & xCable, const int & yCable, const int & xConnected, co
 }
 
 
-bool checkTest(const char* solutionName)	//Prévoir un second param pour le fichier .in
+bool cableOrdered(const int & xCable, const int & yCable, const std::vector<std::vector<bool>>& cablesVector)
 {
-	std::vector<int> data = infoMap("../../inputs/simple_example.in");	//Contient les informations liées à la map
+	for (int i = xCable - 1; i < xCable + 2; i++)
+	{
+		for (int j = yCable - 1; j < yCable + 2; j++)
+		{
+			if ((i != xCable || j != yCable) && cablesVector[i][j] == true)
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+
+std::vector<std::vector<bool>> detectWalls(const char * mapName, const int & row, const int & column)
+{
+	int coordX = 0;
+	int coordY = 0;
+	std::vector<std::vector<bool>> wallsMatrix(row, std::vector<bool>(column));
+	std::ifstream file(mapName);
+	std::string line = "";	//ligne courante
+
+	//Il faut passer les 3 premières lignes pour ensuite lire la map
+	for (int i = 1; i < 4; i++)
+	{
+		getline(file, line);
+	}
+
+	while (getline(file, line))
+	{
+		coordY = 0;
+		for (const char& charElement : line)
+		{
+			if (charElement == '#')
+			{
+				wallsMatrix[coordX][coordY] = true;
+			}
+			coordY += 1;
+		}
+		coordX += 1;
+	}
+
+	return wallsMatrix;
+}
+
+
+bool checkTest(const char* input, const char* solutionName)
+{
+	std::vector<int> data = infoMap(input);	//Contient les informations liées à la map
 	const int row = data[0];
 	const int column = data[1];
 	const int radius = data[2];
@@ -113,7 +95,6 @@ bool checkTest(const char* solutionName)	//Prévoir un second param pour le fichi
 	const int budget = data[5];
 	const int xBackbone = data[6];
 	const int yBackbone = data[7];
-	std::map<int, std::vector<int>> murs = detectMurs("../../inputs/simple_example.in");
 	
 	std::ifstream solution(solutionName, std::ios::in);
 	if (solution)	//On test si le fichier est bien ouvert
@@ -121,11 +102,9 @@ bool checkTest(const char* solutionName)	//Prévoir un second param pour le fichi
 		//Parser le fichier de solution
 		int nbCable = 0;
 		int nbRouteurs = 0;
-		//std::vector<std::pair<int, int>> cableCoord;
-		std::map<int, std::vector<int>> cables;
-		std::vector<std::pair<int, int>> routeurCoord;
-		bool cable = false;
 
+		std::vector<std::vector<bool>> cablesMatrix(row, std::vector<bool>(column));
+		std::vector<std::pair<int, int>> routeurCoord;
 
 		std::string line = "";
 		std::getline(solution, line);
@@ -143,13 +122,9 @@ bool checkTest(const char* solutionName)	//Prévoir un second param pour le fichi
 				{
 					if (0 <= a && 0 <= b && a < row && b < column)
 					{
-						if (cableOrdered2(a, b, cables) || distInf1(a, b, xBackbone, yBackbone))
+						if (cableOrdered(a, b, cablesMatrix) || distInf1(a, b, xBackbone, yBackbone))
 						{
-							if (cables.find(a) == cables.end())
-							{
-								cables.emplace(a, std::vector<int>());
-							}
-							cables.at(a).push_back(b);
+							cablesMatrix[a][b] = true;
 						}
 						else
 						{
@@ -170,8 +145,8 @@ bool checkTest(const char* solutionName)	//Prévoir un second param pour le fichi
 					return false;
 				}
 			}
-			
-			std::getline(solution, line);
+
+			std::getline(solution, line);	//Pour avoir le nombre de routeurs
 			nbRouteurs = stoi(line);
 
 			if ((nbCable * cableCost + nbRouteurs * routerCost) > budget)	//Test du budget
@@ -182,6 +157,8 @@ bool checkTest(const char* solutionName)	//Prévoir un second param pour le fichi
 
 			if (0 <= nbRouteurs && nbRouteurs < row*column)
 			{
+				std::vector<std::vector<bool>> walls = detectWalls(input, row, column);
+
 				int a, b;
 				for (int i = 0; i < nbRouteurs; i++)
 				{
@@ -191,37 +168,13 @@ bool checkTest(const char* solutionName)	//Prévoir un second param pour le fichi
 					{
 						if (0 <= a && 0 <= b && a < row && b < column)
 						{
-							if (murs.find(a) != murs.end())	//Il y a des murs sur la ligne
+							if (cablesMatrix[a][b] == true && walls[a][b] == false)
 							{
-								for (auto it = murs.at(a).begin(); it != murs.at(a).end(); it++)
-								{
-									//On regarde si le routeur est sur un mur
-									if (b == (*it))
-									{
-										//Routeur sur un mur (de coordonnées (a,b))
-										return false;
-									}
-								}
-							}
-							else if (cables.find(a) != cables.end())
-							{
-								cable = false;
-								for (auto it = cables.at(a).begin(); it != cables.at(a).end(); it++)
-								{
-									if ((*it) == b)
-									{
-										cable = true;
-									}
-								}
-							}
-							if (cable == true)
-							{
-								cable = false;
 								routeurCoord.push_back(std::pair<int, int>(a, b));	//Ajouté car pas sur un mur et cablé
 							}
 							else
 							{
-								//Problème : la case du routeur n'est pas câblée, routeur pas connecté au backbone
+								//Problème : la case du routeur n'est pas câblée, routeur pas connecté au backbone, ou routeur sur mur
 								return false;
 							}
 						}
@@ -233,13 +186,17 @@ bool checkTest(const char* solutionName)	//Prévoir un second param pour le fichi
 					}
 					else
 					{
-						//Il y a un problème avec les coordonnées des routeurs (formes)
+						//Il y a un problème avec les coordonnées des routeurs (forme)
 						return false;
 					}
 				}
 			}
+			else
+			{
+				//Il y a trop de routeurs
+				return false;
+			}
 		}
-
 		else
 		{
 			//Il y a trop de cables
