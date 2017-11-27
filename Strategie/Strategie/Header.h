@@ -5,3 +5,4 @@
 #include <string>
 #include <exception>
 #include <vector>
+#include <algorithm>

@@ -28,4 +28,11 @@ public:
 	int * getBackbone(); // coordonnes [x, y] de l'emetteur
 
 	void run();
+	void kruskal(Matrix & m, int * newRouteurs, std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists);
+	int chessboardDist(int*  routeur, int * newrouteur);
+	int quasiEuclideanDist(int*  routeur, int * newrouteur);
+	Matrix & csrMatrix(std::vector<int> & dists, std::vector<int> & idx, std::vector<int> & idy, int dim);
+	Matrix & minimumSpanningTree(Matrix & mat);
+	int minKey(std::vector<int> key, std::vector<bool> mstSet, int dim);
+	void random();
 };

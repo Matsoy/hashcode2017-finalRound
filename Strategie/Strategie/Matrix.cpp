@@ -1,3 +1,4 @@
+#include "Header.h"
 #include "Matrix.h"
 
 Matrix::Matrix(int rows, int cols) : mRows(rows), mCols(cols), mData(rows * cols)
@@ -6,11 +7,13 @@ Matrix::Matrix(int rows, int cols) : mRows(rows), mCols(cols), mData(rows * cols
 
 int& Matrix::operator()(int i, int j)
 {
+	if ((i * mCols + j) >= (mRows * mCols)) throw std::out_of_range("Depassement des bornes");
 	return mData[i * mCols + j];
 }
 
 int Matrix::operator()(int i, int j) const
 {
+	if((i * mCols + j) >= (mRows * mCols)) throw std::out_of_range("Depassement des bornes");
 	return mData[i * mCols + j];
 }
 
@@ -23,6 +26,39 @@ int Matrix::getRows()
 int Matrix::getCols()
 {
 	return mCols;
+}
+
+/*
+* test si la matrice est vide
+*
+* @return true si la matrice remplie de 0
+*			false sinon
+*/
+bool Matrix::isEmpty()
+{
+	for (int i = 0; i < mData.size(); i++)
+	{
+		if (mData[i] != 0) return false;
+	}
+
+	return true;
+}
+
+/*
+* calcule la somme des valeurs de la matrice
+*
+* @return la somme des valeurs de la matrice
+*/
+int Matrix::sum()
+{
+	int sum = 0;
+
+	for (int i = 0; i < mData.size(); i++)
+	{
+		sum += mData[i];
+	}
+
+	return sum;
 }
 
 //Pour afficher une matrice
@@ -47,3 +83,4 @@ std::ostream & operator<<(std::ostream & os, const Matrix &mat)
 
 	return os;
 }
+
