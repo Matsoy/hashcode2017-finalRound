@@ -13,8 +13,20 @@ int& Matrix::operator()(int i, int j)
 
 int Matrix::operator()(int i, int j) const
 {
-	if((i * mCols + j) >= (mRows * mCols)) throw std::out_of_range("Depassement des bornes");
+	if ((i * mCols + j) >= (mRows * mCols)) throw std::out_of_range("Depassement des bornes");
 	return mData[i * mCols + j];
+}
+
+int& Matrix::operator()(int k)
+{
+	if (k >= (mRows * mCols)) throw std::out_of_range("Depassement des bornes");
+	return mData[k];
+}
+
+int Matrix::operator()(int k) const
+{
+	if (k >= (mRows * mCols)) throw std::out_of_range("Depassement des bornes");
+	return mData[k];
 }
 
 // Accesseurs
@@ -61,12 +73,31 @@ int Matrix::sum()
 	return sum;
 }
 
+/*
+* renvoie la coordonnees matrix[x][y] correspondant au vector[z]
+*
+* @param z index dans le vecteur
+* @return matrix[x][x] <==> vector[z]
+*/
+int * Matrix::xy(int z)
+{
+	int * xy = new int[2];
+
+	int x = z / mCols;  // indice ligne
+	int y = z - x * mCols; // indice colonne
+
+	xy[0] = x;
+	xy[1] = y;
+
+	return xy;
+}
+
 //Pour afficher une matrice
 std::ostream & operator<<(std::ostream & os, const Matrix &mat)
 {
 	int m = 0, n = 0, cpt = 0;
 
-	for (unsigned int j = 0; j < mat.mRows*mat.mCols; j++)
+	for (int j = 0; j <( mat.mRows * mat.mCols); j++)
 	{
 		m = cpt / mat.mCols;
 		n = cpt % mat.mCols;

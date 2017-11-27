@@ -31,8 +31,9 @@ public:
 	void kruskal(Matrix & m, int * newRouteurs, std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists);
 	int chessboardDist(int*  routeur, int * newrouteur);
 	int quasiEuclideanDist(int*  routeur, int * newrouteur);
-	Matrix & csrMatrix(std::vector<int> & dists, std::vector<int> & idx, std::vector<int> & idy, int dim);
-	Matrix & minimumSpanningTree(Matrix & mat);
+	void toCsrMatrix(Matrix & mat, std::vector<int> & dists, std::vector<int> & idx, std::vector<int> & idy, int dim);
+	void toMinimumSpanningTree(Matrix & csrMat, Matrix & mstMat);
 	int minKey(std::vector<int> key, std::vector<bool> mstSet, int dim);
 	void random();
+	void wirelessAccess(int x, int y, int radius, Matrix & mat, Matrix & mask);
 };

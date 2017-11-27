@@ -5,7 +5,7 @@
 
 int main()
 {
-	std::string fichierInput = "../../inputs/extra_simple_example.in"; // fichier d'input
+	std::string fichierInput = "../../inputs/lets_go_higher.in"; // fichier d'input
 	IO io; // objet pour les I/O
 
 	int * datas = io.initializeData(fichierInput); // datas = tableau de la forme [nbLignes, nbColonnes, rayonRouteurs, prixCable, prixRouteur, budgetMax, xBackbone, yBackbone]
@@ -21,7 +21,7 @@ int main()
 	io.initializeMap(map, fichierInput);
 
 	// impression de la matrice
-	std::cout << map << std::endl;
+	//std::cout << map << std::endl;
 
 	algo.run(); // lancemet de l'algo
 									
