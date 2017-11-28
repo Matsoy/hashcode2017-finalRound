@@ -2,11 +2,12 @@
 
 int main()
 {
-	checkSolution("../../inputs/simple_example.in", "../../solutions/solutionTestPasOk.txt");
+	checkSolution("../../inputs/simple_example.in", "../../solutions/solutionTestOk.txt");
 	return(EXIT_SUCCESS);
 }
 
-std::vector<int> infoMap(std::string mapName)
+
+std::vector<int> infoMap(const std::string & mapName)
 {
 	std::vector<int> data;
 	std::ifstream file(mapName);
@@ -52,7 +53,7 @@ bool cableOrdered(const int & xCable, const int & yCable, const std::vector<std:
 }
 
 
-std::vector<std::vector<bool>> detectWalls(std::string mapName, const int & row, const int & column)
+std::vector<std::vector<bool>> detectWalls(const std::string & mapName, const int & row, const int & column)
 {
 	int coordX = 0;
 	int coordY = 0;
@@ -84,7 +85,52 @@ std::vector<std::vector<bool>> detectWalls(std::string mapName, const int & row,
 }
 
 
-bool checkSolution(std::string mapFile, std::string solutionFile)
+int scoreRouter(const std::vector<std::vector<bool>>& walls, const std::vector<std::pair<int, int>>& routerCoord, const int & routerRadius, const int & row, const int & column)
+{
+	std::vector<std::vector<bool>> connectedMatrix(row, std::vector<bool>(column));
+	int score = 0;
+
+	for (auto it = routerCoord.begin(); it != routerCoord.end(); it++)
+	{
+		for (int i = (it->first - routerRadius); i <= (it->first + routerRadius); i++)
+		{
+			for (int j = (it->second - routerRadius); j <= (it->second + routerRadius); j++)
+			{
+				//Rajouter un test pour le vide
+				if (connectedMatrix[i][j] == false && wallPresence(walls, it->first, it->second, i, j) == false)
+				{
+					connectedMatrix[i][j] = true;
+					score += 1000;
+				}
+				else {
+					std::cout << "murs" << std::endl;
+				}
+			}
+		}
+	}
+	return score;
+}
+
+
+bool wallPresence(const std::vector<std::vector<bool>>& walls, const int & xRouter, const int & yRouter, const int & xCell, const int & yCell)
+{
+	//Selon si le routeur est plus haut ou bas, plus à gauche ou à droite, alors il faudra aller dans un sens ou un autre.
+	//C'est pour cela qu'il y a la condition d'arrêt et l'incrémentation/décrémentation avec les conditions ternaires.
+	for (int i = xRouter; ((xRouter - xCell) < 0) ? i <= xCell : i >= xCell; ((xRouter - xCell) < 0) ? i++ : i--)
+	{
+		for (int j = yRouter; ((yRouter - yCell) < 0) ? j <= yCell : j >= yCell; ((yRouter - yCell) < 0) ? j++ : j--)
+		{
+			if (walls[i][j] == true)
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+
+bool checkSolution(const std::string & mapFile, const std::string & solutionFile)
 {
 	std::cout << "Test de la solution : " << solutionFile.substr(16) << std::endl;
 	std::cout << "Sur la map : " << mapFile.substr(13) << std::endl << std::endl;
@@ -104,10 +150,12 @@ bool checkSolution(std::string mapFile, std::string solutionFile)
 	{
 		//Parser le fichier de solution
 		int nbCable = 0;
-		int nbRouteurs = 0;
+		int nbRouters = 0;
 
+		std::vector<std::vector<bool>> walls = detectWalls(mapFile, row, column);
 		std::vector<std::vector<bool>> cablesMatrix(row, std::vector<bool>(column));
-		std::vector<std::pair<int, int>> routeurCoord;
+		std::vector<std::pair<int, int>> routerCoord;
+		//std::vector<std::vector<bool>> routerMatrix(row, std::vector<bool>(column));
 
 		std::string line = "";
 		std::getline(solution, line);
@@ -151,18 +199,17 @@ bool checkSolution(std::string mapFile, std::string solutionFile)
 			}
 
 			std::getline(solution, line);	//Pour avoir le nombre de routeurs
-			nbRouteurs = stoi(line);
+			nbRouters = stoi(line);
 
-			if ((nbCable * cableCost + nbRouteurs * routerCost) > budget)	//Test du budget
+			if ((nbCable * cableCost + nbRouters * routerCost) > budget)	//Test du budget
 			{
 				throw std::exception("Le budget a ete depasse");
 			}
 
-			if (0 <= nbRouteurs && nbRouteurs < row*column)
+			if (0 <= nbRouters && nbRouters < row*column)
 			{
-				std::vector<std::vector<bool>> walls = detectWalls(mapFile, row, column);
 				int a, b;
-				for (int i = 0; i < nbRouteurs; i++)
+				for (int i = 0; i < nbRouters; i++)
 				{
 					std::getline(solution, line);
 					std::istringstream iss(line);
@@ -172,7 +219,7 @@ bool checkSolution(std::string mapFile, std::string solutionFile)
 						{
 							if (cablesMatrix[a][b] == true && walls[a][b] == false)
 							{
-								routeurCoord.push_back(std::pair<int, int>(a, b));	//Ajouté car pas sur un mur et cablé
+								routerCoord.push_back(std::pair<int, int>(a, b));	//Ajouté car pas sur un mur et cablé
 							}
 							else
 							{
@@ -212,6 +259,11 @@ bool checkSolution(std::string mapFile, std::string solutionFile)
 
 		std::cout << "La solution est valide" << std::endl;
 		solution.close();
+
+		int score = scoreRouter(walls, routerCoord, radius, row, column) + budget - (nbCable * cableCost + nbRouters * routerCost);
+		std::cout << "Score : " << score << std::endl;
+		//return le score et non plus un booléen
+
 		return true;
 	}
 	else
