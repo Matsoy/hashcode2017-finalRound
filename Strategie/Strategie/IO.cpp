@@ -50,8 +50,14 @@ int* IO::initializeData(std::string fichierInput)
 		{
 			while (iss >> word) //pour chaque mot
 			{
-				if (wordIndex == 1)	retDatas[6] = std::stoi(word); // coordonnee X de l'antenne --> = index ligne
-				else retDatas[7] = std::stoi(word); // coordonnee Y de l'antenne --> = index colonne
+				if (wordIndex == 1) {
+					retDatas[6] = std::stoi(word); // coordonnee X de l'antenne --> = index ligne
+					backboneX = retDatas[6];
+				}
+				else {
+					retDatas[7] = std::stoi(word); // coordonnee Y de l'antenne --> = index colonne
+					backboneY = retDatas[7];
+				}
 
 				wordIndex++;
 			}
@@ -109,7 +115,48 @@ void IO::initializeMap(Matrix & m, std::string fichierInput)
 	}
 }
 
-void IO::generateInput(Matrix & mapRouteurs)
+void IO::generateOutput(Matrix & mapRouteurs)
 {
+	
+	connectedCells(mapRouteurs, backboneX, backboneY);
+	std::string out = std::to_string(counterConnectedCells)+"\n";
+	out.append(connectedcelltxt);
+	out.append(std::to_string(counterRouter) + "\n");
+	out.append(routeurtxt);
+	std::cout << out << std::endl;
+}
+
+void IO::connectedCells(Matrix & mapRouteurs, int x, int y)
+{
+	//Si c'est une case valide
+	if (mapRouteurs(x, y) == 3 || mapRouteurs(x, y) == 4 || mapRouteurs(x, y) == -2) {
+		//Si c'est un routeur cablé
+		if (mapRouteurs(x, y) == 3) {
+			counterConnectedCells++;
+			counterRouter++;
+			connectedcelltxt.append(std::to_string(x) + " " + std::to_string(y)+"\n");
+			routeurtxt.append(std::to_string(x) + " " + std::to_string(y) + "\n");
+		}
+		//Si c'est un cable
+		else if (mapRouteurs(x, y) == 4) {
+			counterConnectedCells++;
+			connectedcelltxt.append(std::to_string(x) + " " + std::to_string(y) + "\n");
+		}
+
+		//on efface la cellule et on regarde ensuite les cellules voisines
+		mapRouteurs(x, y) = -9;
+		connectedCells(mapRouteurs, x - 1, y);
+		connectedCells(mapRouteurs, x + 1, y);
+		connectedCells(mapRouteurs, x, y - 1);
+		connectedCells(mapRouteurs, x, y + 1);
+		connectedCells(mapRouteurs, x - 1, y - 1);
+		connectedCells(mapRouteurs, x - 1, y + 1);
+		connectedCells(mapRouteurs, x + 1, y - 1);
+		connectedCells(mapRouteurs, x + 1, y + 1);
+	}
+
+
 
 }
+
+
