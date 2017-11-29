@@ -123,6 +123,8 @@ int Algo::minKey(std::vector<int> key, std::vector<bool> mstSet, int dim)
 */
 void Algo::toMinimumSpanningTree(Matrix & mat, Matrix & mst)
 {
+	std::cout << "entree toMinimumSpanningTree" << std::endl;
+
 	// dimension de la matrice
 	int dim = mat.getRows(); 
 
@@ -168,6 +170,8 @@ void Algo::toMinimumSpanningTree(Matrix & mat, Matrix & mst)
 	{
 		mst(parent[i], i) = mat(i, parent[i]);
 	}
+
+	std::cout << "sortie toMinimumSpanningTree" << std::endl;
 }
 
 /*
@@ -177,9 +181,16 @@ void Algo::toMinimumSpanningTree(Matrix & mat, Matrix & mst)
 * @param idx tableau des x
 * @param idy tableau des y
 * @param dist tableau d'entier des distance inter-routeurs
+* @param idy tableau des y
+* @param dist tableau d'entier des distance inter-routeurs
+* @param succ true si on ne depasse pas le budget
+*				false sinon
+* @param cost cout courant utilise pour placer les routeurs et les cables
 */
-void Algo::kruskal(Matrix & m, int * newRouteurs, std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists)
+void Algo::kruskal(Matrix & m, int * newRouteurs, std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, bool ** succ, int ** cost)
 {
+	std::cout << "sortie kruskal" << std::endl;
+
 	int new_id = routeurs.size();
 
 	int cpt = 0;
@@ -212,8 +223,14 @@ void Algo::kruskal(Matrix & m, int * newRouteurs, std::vector<int *> & routeurs,
 	// poids de l'arbre couvrant minimum. i.e le nombre d'aretes
 	int mstMatWeight = mstMat.sum();
 
-	int cost = mstMatWeight * aPrixCable + (routeurs.size() - 1) * aPrixRouteur;
-	bool succ = cost <= aBudgetOriginal; // si on ne dépasse par le budget
+	int intCost = mstMatWeight * aPrixCable + (routeurs.size() - 1) * aPrixRouteur;
+	*cost = &intCost;
+
+	bool boolSucc= intCost <= aBudgetOriginal;
+	*succ = &boolSucc; // si on ne dépasse par le budget
+
+	std::cout << "sortie kruskal" << std::endl;
+
 }
 /*
 * @param x du routeur
@@ -224,16 +241,21 @@ void Algo::kruskal(Matrix & m, int * newRouteurs, std::vector<int *> & routeurs,
 */
 void Algo::wirelessAccess(int x, int y, int radius, Matrix & mat, Matrix & mask)
 {
+	std::cout << "#####################entree wirelessAccess" << std::endl;
+
 	// remplissage de mask
 	for (int maskIndex= 0; maskIndex < mask.getCols() * mask.getRows(); maskIndex++)
 	{
 		mask(maskIndex) = INT_MIN;
 	}
-
-	for (int dw = -radius; dw < radius+1; dw++)
+	
+	// on parcour le perimetre de de gauche a droite et de haut en bas
+	for (int dh = -radius; dh <= radius; dh++) // decalage en lignes
 	{
-		for (int dh = -radius; dh < radius + 1; dh++)
+		for (int dw = -radius; dw <= radius; dw++) // decalage en colonnes
 		{
+			std::cout << "dans for : dw = " << dw << ", dh = " << dh << std::endl;
+
 			// on passe la cellule du routeur
 			if (dh == 0 && dw == 0)
 			{
@@ -241,37 +263,49 @@ void Algo::wirelessAccess(int x, int y, int radius, Matrix & mat, Matrix & mask)
 				continue;
 			}
 
+			std::cout << "apres if 1" << std::endl;
+
 			// transforme les coordonnees
 			int xt = x + dh;
 			int yt = y + dw;
 
+			std::cout << "x = " << x << std::endl;
+			std::cout << "y = " << y << std::endl;
+			std::cout << "xt = " << xt << std::endl;
+			std::cout << "yt = " << yt << std::endl;
+			std::cout << "dh = " << dh << std::endl;
+			std::cout << "dw = " << dw << std::endl;
+			std::cout << "mat.getRows() = " << mat.getRows() << std::endl;
+			std::cout << "mat.getCols() = " << mat.getCols() << std::endl;
+
 			// on check les bordures
-			if (xt > mat.getRows() || yt > mat.getCols())
+			if (xt >= mat.getRows() || xt < 0 || yt >= mat.getCols() || yt < 0)
 				continue;
 
-			// si il y a une cellule cible
-			if (mat(xt, yt) == Cell::Wireless)
+			// si pas une cellule cible
+			if (mat(xt, yt) != Cell::Wireless)
 			{
 				// on met les autres champs a 0
 				mask(dh + radius, dw + radius) = 0;
+
 				continue;
 			}
 
-			// on construit le + petit rectangle corrspondant au cellules dans le rayon du routeur (tout type de cellules comprises)
-			int * rows = new int[2];
-			rows[0] = std::min(x, xt);
-			rows[1] = std::max(x, xt)+1;
-			int * cols = new int[2];
-			cols[0] = std::min(y, yt);
-			cols[1] = std::max(y, yt) + 1;
+			// on construit la + petite rectangle contenant le routeur et la cellule pour pouvoir savoir si la portee du routeur est coupee par un mur
+			// coordonnees des 4 sommets du rectangle
+			int fromX = std::min(x, xt);
+			int toX = std::max(x, xt);
+			int fromY = std::min(y, yt);
+			int toY = std::max(y, yt);
 
-			Matrix rect(rows[1] - rows[0] + 1, cols[1] - cols[0] + 1);
+			Matrix rect(toX - fromX + 1, toY - fromY + 1);
+
 			// prochain index de rect a remplir
 			int nextRectIndex = 0;
 			// remplissage de rect avec les valeurs de mat correspondantes
-			for (int r = rows[0]; r <= rows[1]; r++)
+			for (int r = fromX; r <= toX; r++)
 			{
-				for (int c = cols[0]; c <= cols[1]; c++)
+				for (int c = fromY; c <= toY; c++)
 				{
 					rect(nextRectIndex) = mat(r, c);
 					nextRectIndex++;
@@ -288,8 +322,13 @@ void Algo::wirelessAccess(int x, int y, int radius, Matrix & mat, Matrix & mask)
 
 			if (walls.sum()) mask(dh + radius, dw + radius) = 0; // si il a au moins 1 mur
 			else mask(dh + radius, dw + radius) = 1; // si aucun mur
+
+			std::cout << mask << std::endl;
 		}
 	}
+	std::cout << mask << std::endl;
+	std::cout << "#####################sortie wirelessAccess" << std::endl;
+
 }
 
 /*
@@ -315,11 +354,11 @@ void Algo::random()
 	std::vector<int> idx;
 	std::vector<int> idy;
 	std::vector<int> dists;
-	int cost = 0;
-	bool succ = false;
+	int * cost = 0;
+	bool * succ = false;
 
 	// placement de l'emetteur en tant que routeur
-	kruskal(aMap, aBackbone, routeurs, idx, idy, dists); // modifie cost, succ, routeurs, idx, idy et dists
+	kruskal(aMap, aBackbone, routeurs, idx, idy, dists, &succ, &cost); // modifie cost, succ, routeurs, idx, idy et dists
 
 	for (int currentRouterId = 0; currentRouterId < maxNumRouters; currentRouterId++)
 	{
@@ -342,20 +381,28 @@ void Algo::random()
 			auto random_integer = uni(rng) % targetCellsCoords.size();
 
 			int * xyNewRouter = targetCellsCoords[random_integer];
+			
+			// on garde en memoire l'etat de la case avant d'y mettre un routeur
+			int tmp = aMap(xyNewRouter[0], xyNewRouter[1]);
 
 			aMap(xyNewRouter[0], xyNewRouter[1]) = Cell::Router; // Cell::Router = 2
 
 			// tentative de placement de ce routeur
-			kruskal(aMap, xyNewRouter, routeurs, idx, idy, dists); // modifie cost, succ, routeurs, idx, idy et dists
+			kruskal(aMap, xyNewRouter, routeurs, idx, idy, dists, &succ, &cost); // modifie cost, succ, routeurs, idx, idy et dists
 			if (routeurs.size() % 10 == 0) std::cout << routeurs.size() << " routeurs " << std::endl;
 
-			//std::cout << "Nouveau routeur en [" << xyNewRouter[0] << "," << xyNewRouter[1] << "]" << std::endl;
+			std::cout << "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Nouveau routeur en [" << xyNewRouter[0] << "," << xyNewRouter[1] << "]" << std::endl;
 
-			if (succ)
+			if (succ) // && currentRouterId < 10
 			{
+				std::cout << "entree if (succ)" << std::endl;
 				// recuperation du masque du perimetre du routeur
 				Matrix mask(2 * aRayonRouteurs + 1, 2 * aRayonRouteurs + 1);
+
 				wirelessAccess(xyNewRouter[0], xyNewRouter[1], aRayonRouteurs, aMap, mask);
+			
+				std::cout << "apres wirelessAccess" << std::endl;
+
 				//targetCells[(xyNewRouter[0] - radius) : (xyNewRouter[0] + radius + 1), (xyNewRouter[1] - radius) : (xyNewRouter[0] + radius + 1)] |= mask.astype(np.bool)
 
 				// on ne garde que les cellules ciblees dans le perimetre du routeur en fonction des murs
@@ -366,6 +413,18 @@ void Algo::random()
 						//targetCells(xTargetCell, yTargetCell) |= mask.astype(np.bool)
 					}
 				}
+
+				std::cout << "sortie if (succ)" << std::endl;
+			}
+			else // plus de budget
+			{ 
+				std::cout << "succ == false" << std::endl;
+				// on enleve le dernier routeur
+				aMap(xyNewRouter[0], xyNewRouter[1]) = tmp; // on retabli l'etat de la case
+				// d = _place_mst_paths(d, routers, idx, idy, dists)
+
+				std::cout << "Plus de budget !!" << std::endl;
+
 			}
 		}
 

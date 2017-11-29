@@ -28,7 +28,7 @@ public:
 	int * getBackbone(); // coordonnes [x, y] de l'emetteur
 
 	void run();
-	void kruskal(Matrix & m, int * newRouteurs, std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists);
+	void kruskal(Matrix & m, int * newRouteurs, std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, bool ** succ, int ** cost);
 	int chessboardDist(int*  routeur, int * newrouteur);
 	int quasiEuclideanDist(int*  routeur, int * newrouteur);
 	void toCsrMatrix(Matrix & mat, std::vector<int> & dists, std::vector<int> & idx, std::vector<int> & idy, int dim);

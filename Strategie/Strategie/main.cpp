@@ -5,7 +5,7 @@
 
 int main()
 {
-	std::string fichierInput = "../../inputs/lets_go_higher.in"; // fichier d'input
+	std::string fichierInput = "../../inputs/simple_example.in"; // fichier d'input
 	IO io; // objet pour les I/O
 
 	int * datas = io.initializeData(fichierInput); // datas = tableau de la forme [nbLignes, nbColonnes, rayonRouteurs, prixCable, prixRouteur, budgetMax, xBackbone, yBackbone]
