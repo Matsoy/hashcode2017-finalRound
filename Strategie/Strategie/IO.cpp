@@ -115,18 +115,46 @@ void IO::initializeMap(Matrix & m, std::string fichierInput)
 	}
 }
 
-void IO::generateOutput(Matrix & mapRouteurs)
+/*
+*Génère le fichier output, en provocant le premier appel de la méthode récursive ioBrowser
+*et enregistre le résultat dans un fichier donné en paramètre.
+*/
+void IO::generateOutput(Matrix & mapRouteurs, std::string file)
 {
 	
-	connectedCells(mapRouteurs, backboneX, backboneY);
+	ioBrowser(mapRouteurs, backboneX, backboneY);
 	std::string out = std::to_string(counterConnectedCells)+"\n";
 	out.append(connectedcelltxt);
 	out.append(std::to_string(counterRouter) + "\n");
 	out.append(routeurtxt);
 	std::cout << out << std::endl;
+
+	/*
+
+	//##################################
+	//###  Enregistrement du fichier ###
+	//##################################
+
+	//Ecrase le fichier s'il existe
+	std::remove(file.c_str());
+	//Créer le fichier
+	std::ofstream write(file);
+	//Insère les données
+	write << out;
+	//on ferme le fichier
+	write.close();
+
+	//##################################
+	//##################################
+
+
+	*/
 }
 
-void IO::connectedCells(Matrix & mapRouteurs, int x, int y)
+/*
+* Parcours les chemins cablés de manière récursive pour retenir l'ordre et l'emplacement des cables et routeurs
+*/
+void IO::ioBrowser(Matrix & mapRouteurs, int x, int y)
 {
 	//Si c'est une case valide
 	if (mapRouteurs(x, y) == 3 || mapRouteurs(x, y) == 4 || mapRouteurs(x, y) == -2) {
@@ -145,14 +173,14 @@ void IO::connectedCells(Matrix & mapRouteurs, int x, int y)
 
 		//on efface la cellule et on regarde ensuite les cellules voisines
 		mapRouteurs(x, y) = -9;
-		connectedCells(mapRouteurs, x - 1, y);
-		connectedCells(mapRouteurs, x + 1, y);
-		connectedCells(mapRouteurs, x, y - 1);
-		connectedCells(mapRouteurs, x, y + 1);
-		connectedCells(mapRouteurs, x - 1, y - 1);
-		connectedCells(mapRouteurs, x - 1, y + 1);
-		connectedCells(mapRouteurs, x + 1, y - 1);
-		connectedCells(mapRouteurs, x + 1, y + 1);
+		ioBrowser(mapRouteurs, x - 1, y);
+		ioBrowser(mapRouteurs, x + 1, y);
+		ioBrowser(mapRouteurs, x, y - 1);
+		ioBrowser(mapRouteurs, x, y + 1);
+		ioBrowser(mapRouteurs, x - 1, y - 1);
+		ioBrowser(mapRouteurs, x - 1, y + 1);
+		ioBrowser(mapRouteurs, x + 1, y - 1);
+		ioBrowser(mapRouteurs, x + 1, y + 1);
 	}
 
 

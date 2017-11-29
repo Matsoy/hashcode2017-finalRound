@@ -5,7 +5,13 @@
 
 int main()
 {
-	std::string fichierInput = "../../inputs/simple_example.in"; // fichier d'input
+	//Chemin
+	std::string path = "../../inputs/";
+	//Nom du fichier
+	std::string filename = "simple_example";
+
+	std::string fichierInput = path+filename+".in"; // fichier d'input
+	std::string fichierOutput = path + filename + ".out"; // fichier d'output
 	IO io; // objet pour les I/O
 
 	int * datas = io.initializeData(fichierInput); // datas = tableau de la forme [nbLignes, nbColonnes, rayonRouteurs, prixCable, prixRouteur, budgetMax, xBackbone, yBackbone]
@@ -24,11 +30,12 @@ int main()
 	//std::cout << map << std::endl;
 
 	algo.run(); // lancemet de l'algo
+
 	std::cout << map << std::endl;
-	io.generateOutput(map);
+	//io.generateOutput(map, fichierOutput);
 									
 
-	/*// ###################### CREATION OUTPUT ######################
+	// ###################### CREATION OUTPUT ######################
 	Matrix mapRouteursTest(datas[0], datas[1]); // matrice nbLignes x nbColonnes
 	// remplissage de la matrice
 	io.initializeMap(mapRouteursTest, fichierInput);
@@ -39,9 +46,9 @@ int main()
 	mapRouteursTest(3, 9) = 3;
 	// placement des cables. /!\ il y a un cable sous les routeurs aussi ! Du coup il ya un cable à (3, 6) et (3, 9)
 	mapRouteursTest(3, 8) = 4;
-
-	io.generateOutput(mapRouteursTest);
-	*/
+	std::string fichierOutputTest = path + "test.out"; // fichier d'output
+	io.generateOutput(mapRouteursTest, fichierOutputTest);
+	
 
 	return 0;
 }
