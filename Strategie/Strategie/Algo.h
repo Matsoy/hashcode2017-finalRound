@@ -28,12 +28,15 @@ public:
 	int * getBackbone(); // coordonnes [x, y] de l'emetteur
 
 	void run();
-	void kruskal(Matrix & m, int * newRouteurs, std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, bool ** succ, int ** cost);
-	int chessboardDist(int*  routeur, int * newrouteur);
-	int quasiEuclideanDist(int*  routeur, int * newrouteur);
+	void kruskal(Matrix & m, int * newRouteurs, std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, bool & succ, int & cost);
+	int chessboardDist(int * routeur, int * newrouteur);
+	int quasiEuclideanDist(int * routeur, int * newrouteur);
 	void toCsrMatrix(Matrix & mat, std::vector<int> & dists, std::vector<int> & idx, std::vector<int> & idy, int dim);
 	void toMinimumSpanningTree(Matrix & csrMat, Matrix & mstMat);
 	int minKey(std::vector<int> key, std::vector<bool> mstSet, int dim);
 	void random();
 	void wirelessAccess(int x, int y, int radius, Matrix & mat, Matrix & mask);
+	void placeMstPaths(std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists);
+	int argMin(int * tab, int size);
+	void findChessConnection(int * Routerfrom, int * RouterTo, std::vector<int *> & cables);
 };

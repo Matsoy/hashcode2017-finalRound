@@ -22,6 +22,7 @@ public:
 	bool isEmpty();
 	int sum();
 	int * xy(int z);
+	void reverse();
 
 	friend std::ostream & operator<<(std::ostream &os, const Matrix &mat);
 };

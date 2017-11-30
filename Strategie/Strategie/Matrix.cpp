@@ -92,17 +92,36 @@ int * Matrix::xy(int z)
 	return xy;
 }
 
+/*
+* retourne les entrees dans chaque colonne dans le sens haut / bas.
+* Les lignes sont conservees, mais apparaissent dans un ordre different de celui d'avant.
+*/
+void Matrix::reverse()
+{
+	for (int c = 0; c < mCols; c++) // pour chaque colonne
+	{
+		for (int r = 0; r < (mRows / 2); r++) // on parcourt seulement la moitie des lignes
+		{
+			// on inverse les lignes
+			int tmp = mData[r * mCols + c];
+
+			mData[r * mCols + c] = mData[(mRows - r - 1) * mCols + c];
+			mData[(mRows - r - 1) * mCols + c] = tmp;
+		}
+	}
+}
+
 //Pour afficher une matrice
 std::ostream & operator<<(std::ostream & os, const Matrix &mat)
 {
 	int m = 0, n = 0, cpt = 0;
 
-	for (int j = 0; j <( mat.mRows * mat.mCols); j++)
+	for (int j = 0; j <(mat.mRows * mat.mCols); j++)
 	{
 		m = cpt / mat.mCols;
 		n = cpt % mat.mCols;
 
-		if(n == 0) os << "[ "; // si 1er elem
+		if (n == 0) os << "[ "; // si 1er elem
 
 		if ((n == mat.mCols - 1)) // si dernier elem
 		{

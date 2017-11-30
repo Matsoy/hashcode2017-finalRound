@@ -1,7 +1,7 @@
 #include "Algo.h"
 #include "Cell.h"
 
-Algo::Algo(std::string type, Matrix & map, int rayonRouteurs, int prixCable, int prixRouteur, int budget, int budgetOriginal, int * xyBackbone) : aType(type), aMap(map), aRayonRouteurs(rayonRouteurs),  aPrixCable(prixCable),  aPrixRouteur(prixRouteur), aBudget(budget),  aBudgetOriginal(budgetOriginal), aBackbone(xyBackbone)
+Algo::Algo(std::string type, Matrix & map, int rayonRouteurs, int prixCable, int prixRouteur, int budget, int budgetOriginal, int * xyBackbone) : aType(type), aMap(map), aRayonRouteurs(rayonRouteurs), aPrixCable(prixCable), aPrixRouteur(prixRouteur), aBudget(budget), aBudgetOriginal(budgetOriginal), aBackbone(xyBackbone)
 {
 }
 
@@ -66,6 +66,114 @@ int Algo::quasiEuclideanDist(int*  routeur, int * newrouteur)
 }
 
 /*
+* Renvoie l'indice la valeur minimale
+* En cas d'occurrences multiples des valeurs minimales, l'indice correspondant a la premiere occurrence est renvoyee.
+*
+* @param tab tableau d'entiers
+* @param size la taille du tableau
+* @return argmin
+*/
+int Algo::argMin(int * tab, int size)
+{
+	int argmin = 0; // indice de l'argmin
+	int argminValue = INT_MAX; // valeur de l'argmin
+
+	for (int i = 0; i < size; i++)
+	{
+		if (tab[i] < argminValue)
+		{
+			argmin = i;
+			argminValue = tab[i];
+		}
+	}
+
+	return argmin;
+}
+
+
+
+void Algo::findChessConnection(int * Routerfrom, int * RouterTo, std::vector<int *> & cables)
+{
+	//std::cout << "_________________________________dans findChessConnection" << std::endl;
+
+	// vecteur des cables entre les 2 routeurs aux positions Routerfrom et RouterTo
+	int dx = abs(Routerfrom[0] - RouterTo[0]) + 1;
+	int dy = abs(Routerfrom[1] - RouterTo[1]) + 1;
+
+	int xmin = std::min(Routerfrom[0], RouterTo[0]);
+	int ymin = std::min(Routerfrom[1], RouterTo[1]);
+
+	// matrice de booleens (0 -> false, 1 -> true)
+	Matrix path(dx, dy);
+
+	path(Routerfrom[0] - xmin, Routerfrom[1] - ymin) = 1;
+	path(RouterTo[0] - xmin, RouterTo[1] - ymin) = 1;
+
+	int r[2] = { dx, dy };
+	int amin = argMin(r, 2);
+
+
+	// true si la matrice path a ete renversee, false sinon
+	bool reversed = false;
+
+
+	if (!path(0, 0))
+	{
+		// on renverse la matrice dans le sens haut / bas
+		path.reverse();
+
+		// on indique que la matrice a ete renversee
+		reversed = true;
+	}
+
+	// on defini les diagonales
+	for (int i = 0; i < r[amin]; i++)
+	{
+		path(i, i) = 1;
+	}
+
+
+	// on defini les elements droits restants
+	if (amin == 0)
+	{
+		for (int i = 0; i < abs(dx - dy); i++)
+		{
+			path(path.getRows() - 1, r[amin] + i) = 1; // passe a true
+		}
+
+	}
+	else if (amin == 1)
+	{
+		for (int i = 0; i < abs(dx - dy); i++)
+		{
+			path(r[amin] + i, path.getCols() - 1) = 1; // passe a true
+		}
+	}
+
+	// si la matrice a ete retournee, on la remet a l'endroit
+	if (reversed) path.reverse();
+
+
+	// on selectionne les cables
+	for (int r = 0; r < path.getRows(); r++)
+	{
+
+		for (int c = 0; c < path.getCols(); c++)
+		{
+
+			// si true dans path, on place un cable a cette coordonnees
+			if (path(r, c) == 1)
+			{
+				//std::cout << "cables. = " <<r << "c = "<<c << std::endl;
+
+				cables.push_back(new int[2]{ r + xmin, c + ymin });
+			}
+		}
+	}
+}
+
+
+/*
 * transforme la matrice en une matrice CSR (Compressed Sparse Row Matrix) i.e matrice symetrique des distances
 * ou data, row_ind et col_ind satisfont la relation
 * a[idx[k], idy[k]] = dists[k]
@@ -73,7 +181,7 @@ int Algo::quasiEuclideanDist(int*  routeur, int * newrouteur)
 * @param dist tableau d'entier des distance inter-routeurs
 * @param idx tableau des x
 * @param idy tableau des y
-* @param dim dimension de la matrice csr, soit nombre_de_routeurs x nombre_de_routeurs 
+* @param dim dimension de la matrice csr, soit nombre_de_routeurs x nombre_de_routeurs
 */
 void Algo::toCsrMatrix(Matrix & mat, std::vector<int> & dists, std::vector<int> & idx, std::vector<int> & idy, int dim)
 {
@@ -83,7 +191,7 @@ void Algo::toCsrMatrix(Matrix & mat, std::vector<int> & dists, std::vector<int> 
 		{
 			mat(idx[k], idy[k]) = dists[k];
 		}
-		catch (std::exception const& ) { }
+		catch (std::exception const&) {}
 	}
 }
 
@@ -98,11 +206,15 @@ void Algo::toCsrMatrix(Matrix & mat, std::vector<int> & dists, std::vector<int> 
 int Algo::minKey(std::vector<int> key, std::vector<bool> mstSet, int dim)
 {
 	// initialise la valeur minimum
-	int min = INT_MAX, min_index;
+	int min = INT_MAX;
+	int min_index = 0;
 
 	for (int v = 0; v < dim; v++)
 		if (mstSet[v] == false && key[v] < min)
-			min = key[v], min_index = v;
+		{
+			min = key[v];
+			min_index = v;
+		}
 
 	return min_index;
 }
@@ -110,8 +222,8 @@ int Algo::minKey(std::vector<int> key, std::vector<bool> mstSet, int dim)
 
 /*
 * renvoie un arbre couvrant minimal d'un graphe non oriente
-* Un arbre recouvrant minimal est un graphe constitue du sous-ensemble d'aretes qui relient 
-* ensemble tous les nœuds connectes, tout en minimisant la somme totale des poids sur les aretes. 
+* Un arbre recouvrant minimal est un graphe constitue du sous-ensemble d'aretes qui relient
+* ensemble tous les noeuds connectes, tout en minimisant la somme totale des poids sur les aretes.
 * Ceci est calcule en utilisant l'algorithme de Kruskal.
 *
 * @param dist tableau d'entier des distance inter-routeurs
@@ -123,55 +235,102 @@ int Algo::minKey(std::vector<int> key, std::vector<bool> mstSet, int dim)
 */
 void Algo::toMinimumSpanningTree(Matrix & mat, Matrix & mst)
 {
-	std::cout << "entree toMinimumSpanningTree" << std::endl;
+	//std::cout << "                           entree toMinimumSpanningTree" << std::endl;
+
 
 	// dimension de la matrice
-	int dim = mat.getRows(); 
+	int dim = mat.getRows();
 
 	std::vector<int> parent(dim); // vecteur pour stocker l'arbre couvrant minimal
 	std::vector<int> key(dim);   // cles utilisees pour selectionner l'arete de poids minimum
 	std::vector<bool> mstSet(dim);  // pour representer un ensemble de sommets non encore inclus dans MST
 
-	// initialisation de toutes les cles a +infini
-	for (int keyI= 0; keyI < key.size(); keyI++)
+									// initialisation de toutes les cles a +infini et des ensembles de sommets a false
+	for (int i = 0; i < dim; i++)
 	{
-		key[keyI] = INT_MAX;
-		mstSet[keyI] = false;
+		key[i] = INT_MAX;
+		mstSet[i] = false;
 	}
+
 
 
 	// on inclue le premier 1er sommet dans le mst
 	key[0] = 0;     // cle a 0 pour que ce sommet soit choisi comme premier sommet
 	parent[0] = -1; // Le 1er noeud est toujours la racine du mst
 
-	// The mst aura "dim" sommets
+					// The mst aura "dim" sommets
 	for (int count = 0; count < dim - 1; count++)
 	{
 		// on choisie le sommet de cle minimum de l'ensemble des sommets par encore inclus dans le mst
 		int u = minKey(key, mstSet, dim);
+		//std::cout << "+ petit sommet = " << u << std::endl;
 
 		// Ajoute le sommet selectionne au mst
 		mstSet[u] = true;
 
-		// maj la valeur de cle et l'index parent des sommets adjacents du sommet sélectionne
+		// maj la valeur de cle et l'index parent des sommets adjacents du sommet selectionne
 		// on ne considere que les sommets qui ne sont pas encore inclus dans le mst
 		for (int v = 0; v < dim; v++)
+		{
 			if (mat(u, v) // mat[u][v] != 0 uniquement pour les sommets adjacents de m
 				&& mstSet[v] == false // mstSet[v] == false pour les sommets non encore inclus dans MST
 				&& mat(u, v) < key[v]) // maj la cle ssi mat[u][v] < key[v]
 			{
 				parent[v] = u;
 				key[v] = mat(u, v);
+				//std::cout << "on maj la cle pour v = " << v << std::endl;
 			}
+		}
 	}
 
 	// remplissage de la matrice mst en ne gardant que les arcs de poids minimum
 	for (int i = 1; i < dim; i++)
 	{
-		mst(parent[i], i) = mat(i, parent[i]);
+		mst(parent[i], i) = mat(parent[i], i);
 	}
+}
 
-	std::cout << "sortie toMinimumSpanningTree" << std::endl;
+void Algo::placeMstPaths(std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists)
+{
+	// calcul du mst
+	Matrix csrMat(routeurs.size(), routeurs.size());
+	toCsrMatrix(csrMat, dists, idx, idy, routeurs.size());
+
+	// arbre couvrant minimal
+	// i.e.  un graphe constitue du sous-ensemble d'aretes qui relient ensemble tous les noeuds connectes, tout en minimisant la somme totale des poids sur les aretes.
+	Matrix mstMat(routeurs.size(), routeurs.size());
+	toMinimumSpanningTree(csrMat, mstMat);
+
+	// algo calcul distance entre les routeurs. Parcours de l'arbre couvrant minimal
+	for (int r = 0; r < mstMat.getRows(); r++)
+	{
+		for (int c = 0; c < mstMat.getCols(); c++)
+		{
+			if (mstMat(r, c) > 0) // si [r, c] un somment de l'arbre couvrant minimal
+			{
+				std::vector<int *> cables;
+				findChessConnection(routeurs[r], routeurs[c], cables);
+
+				for (int *cable : cables) // pour chaque cable
+				{
+					if (cable[0] == aBackbone[0] && cable[1] == aBackbone[1]) // si le cable est sur l'emetteur
+						continue; // on passe
+
+					if (aMap(cable[0], cable[1]) == Cell::Router) // si le cable est sur un routeur
+						aMap(cable[0], cable[1]) = Cell::ConnectedRouter; // on passe la valeur de la coordonnee de 2 a 3 pour indiquer que le routeur est connecte au backbone
+					else
+						aMap(cable[0], cable[1]) = Cell::Cable; // sinon on place tout simplement le cable
+				}
+			}
+		}
+	}
+	for (int * rout : routeurs)
+	{
+		if (rout[0] == aBackbone[0] && rout[1] == aBackbone[1]) // si le cable est sur l'emetteur
+			continue; // on passe
+
+		aMap(rout[0], rout[1]) = Cell::ConnectedRouter; // on passe la valeur de la coordonnee de 2 a 3 pour indiquer que le routeur est connecte au backbone
+	}
 }
 
 /*
@@ -187,9 +346,9 @@ void Algo::toMinimumSpanningTree(Matrix & mat, Matrix & mst)
 *				false sinon
 * @param cost cout courant utilise pour placer les routeurs et les cables
 */
-void Algo::kruskal(Matrix & m, int * newRouteurs, std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, bool ** succ, int ** cost)
+void Algo::kruskal(Matrix & m, int * newRouteurs, std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, bool & succ, int & cost)
 {
-	std::cout << "sortie kruskal" << std::endl;
+	//std::cout << "sortie kruskal" << std::endl;
 
 	int new_id = routeurs.size();
 
@@ -213,24 +372,20 @@ void Algo::kruskal(Matrix & m, int * newRouteurs, std::vector<int *> & routeurs,
 
 	Matrix csrMat(routeurs.size(), routeurs.size());
 	toCsrMatrix(csrMat, dists, idx, idy, routeurs.size()); // d'apres l'ex avec les donnees ci-dessus, donnerait la matrice: 
-																		  // [0 x x 1]
-																		  // [0 0 x 7]
-																		  // [0 0 0 2]
-	// arbre couvrant minimal
+														   // [0 x x 1]
+														   // [0 0 x 7]
+														   // [0 0 0 2]
+
+														   // arbre couvrant minimal
 	Matrix mstMat(routeurs.size(), routeurs.size());
 	toMinimumSpanningTree(csrMat, mstMat);
 
 	// poids de l'arbre couvrant minimum. i.e le nombre d'aretes
 	int mstMatWeight = mstMat.sum();
 
-	int intCost = mstMatWeight * aPrixCable + (routeurs.size() - 1) * aPrixRouteur;
-	*cost = &intCost;
+	cost = mstMatWeight * aPrixCable + (routeurs.size() - 1) * aPrixRouteur; // routeur - 1 car on interprete le backbone comme un routeur dans l'algorithme
 
-	bool boolSucc= intCost <= aBudgetOriginal;
-	*succ = &boolSucc; // si on ne dépasse par le budget
-
-	std::cout << "sortie kruskal" << std::endl;
-
+	succ = cost <= aBudgetOriginal; // si on ne depasse par le budget
 }
 /*
 * @param x du routeur
@@ -241,21 +396,17 @@ void Algo::kruskal(Matrix & m, int * newRouteurs, std::vector<int *> & routeurs,
 */
 void Algo::wirelessAccess(int x, int y, int radius, Matrix & mat, Matrix & mask)
 {
-	std::cout << "#####################entree wirelessAccess" << std::endl;
-
 	// remplissage de mask
-	for (int maskIndex= 0; maskIndex < mask.getCols() * mask.getRows(); maskIndex++)
+	for (int maskIndex = 0; maskIndex < mask.getCols() * mask.getRows(); maskIndex++)
 	{
-		mask(maskIndex) = INT_MIN;
+		mask(maskIndex) = -1; // par defaut, on place des bordures partout
 	}
-	
-	// on parcour le perimetre de de gauche a droite et de haut en bas
+
+	// on parcourt le perimetre de de gauche a droite et de haut en bas
 	for (int dh = -radius; dh <= radius; dh++) // decalage en lignes
 	{
 		for (int dw = -radius; dw <= radius; dw++) // decalage en colonnes
 		{
-			std::cout << "dans for : dw = " << dw << ", dh = " << dh << std::endl;
-
 			// on passe la cellule du routeur
 			if (dh == 0 && dw == 0)
 			{
@@ -263,20 +414,9 @@ void Algo::wirelessAccess(int x, int y, int radius, Matrix & mat, Matrix & mask)
 				continue;
 			}
 
-			std::cout << "apres if 1" << std::endl;
-
 			// transforme les coordonnees
 			int xt = x + dh;
 			int yt = y + dw;
-
-			std::cout << "x = " << x << std::endl;
-			std::cout << "y = " << y << std::endl;
-			std::cout << "xt = " << xt << std::endl;
-			std::cout << "yt = " << yt << std::endl;
-			std::cout << "dh = " << dh << std::endl;
-			std::cout << "dw = " << dw << std::endl;
-			std::cout << "mat.getRows() = " << mat.getRows() << std::endl;
-			std::cout << "mat.getCols() = " << mat.getCols() << std::endl;
 
 			// on check les bordures
 			if (xt >= mat.getRows() || xt < 0 || yt >= mat.getCols() || yt < 0)
@@ -322,12 +462,8 @@ void Algo::wirelessAccess(int x, int y, int radius, Matrix & mat, Matrix & mask)
 
 			if (walls.sum()) mask(dh + radius, dw + radius) = 0; // si il a au moins 1 mur
 			else mask(dh + radius, dw + radius) = 1; // si aucun mur
-
-			std::cout << mask << std::endl;
 		}
 	}
-	std::cout << mask << std::endl;
-	std::cout << "#####################sortie wirelessAccess" << std::endl;
 
 }
 
@@ -354,85 +490,102 @@ void Algo::random()
 	std::vector<int> idx;
 	std::vector<int> idy;
 	std::vector<int> dists;
-	int * cost = 0;
-	bool * succ = false;
+	int cost = 0;
+	bool succ = false;
+	int testtest[2] = { 0, 1 };
 
 	// placement de l'emetteur en tant que routeur
-	kruskal(aMap, aBackbone, routeurs, idx, idy, dists, &succ, &cost); // modifie cost, succ, routeurs, idx, idy et dists
+	kruskal(aMap, aBackbone, routeurs, idx, idy, dists, succ, cost); // modifie cost, succ, routeurs, idx, idy et dists
 
 	for (int currentRouterId = 0; currentRouterId < maxNumRouters; currentRouterId++)
 	{
+		//std::cout << currentRouterId +1 << " routeurs" << std::endl;
 		// vecteur des coordonnees des cellules cibles n'ayant pas encore de routeur place dessus
 		std::vector<int *> targetCellsCoords;
 
 		for (int cellxy = 0; cellxy < targetCells.getRows() * targetCells.getCols(); cellxy++)
 		{
-				if (targetCells(cellxy) == 0) targetCellsCoords.push_back(targetCells.xy(cellxy));
+			if (targetCells(cellxy) == 0) targetCellsCoords.push_back(targetCells.xy(cellxy));
 		}
 
-
-		if (targetCellsCoords.size()) // si il y au moins 1 position dispo pour le prochain routeur
+		// si il y au moins 1 position dispo pour le prochain routeur
+		if (targetCellsCoords.size() == 0)
 		{
-			// methode mst
-			// on recupere une position random pour un prochain routeur
-			std::random_device rd;     // seulement utilisé une fois pour initialiser le moteur (semence)
-			std::mt19937 rng(rd());    // moteur à nombre aléatoire utilisé (Mersenne-Twister dans ce cas)
-			std::uniform_int_distribution<int> uni(0, aMap.getRows() * aMap.getCols()); // garantie sans biais
-			auto random_integer = uni(rng) % targetCellsCoords.size();
-
-			int * xyNewRouter = targetCellsCoords[random_integer];
-			
-			// on garde en memoire l'etat de la case avant d'y mettre un routeur
-			int tmp = aMap(xyNewRouter[0], xyNewRouter[1]);
-
-			aMap(xyNewRouter[0], xyNewRouter[1]) = Cell::Router; // Cell::Router = 2
-
-			// tentative de placement de ce routeur
-			kruskal(aMap, xyNewRouter, routeurs, idx, idy, dists, &succ, &cost); // modifie cost, succ, routeurs, idx, idy et dists
-			if (routeurs.size() % 10 == 0) std::cout << routeurs.size() << " routeurs " << std::endl;
-
-			std::cout << "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Nouveau routeur en [" << xyNewRouter[0] << "," << xyNewRouter[1] << "]" << std::endl;
-
-			if (succ) // && currentRouterId < 10
-			{
-				std::cout << "entree if (succ)" << std::endl;
-				// recuperation du masque du perimetre du routeur
-				Matrix mask(2 * aRayonRouteurs + 1, 2 * aRayonRouteurs + 1);
-
-				wirelessAccess(xyNewRouter[0], xyNewRouter[1], aRayonRouteurs, aMap, mask);
-			
-				std::cout << "apres wirelessAccess" << std::endl;
-
-				//targetCells[(xyNewRouter[0] - radius) : (xyNewRouter[0] + radius + 1), (xyNewRouter[1] - radius) : (xyNewRouter[0] + radius + 1)] |= mask.astype(np.bool)
-
-				// on ne garde que les cellules ciblees dans le perimetre du routeur en fonction des murs
-				for (int xTargetCell = xyNewRouter[0] - aRayonRouteurs; xTargetCell <= (xyNewRouter[0] + aRayonRouteurs + 1); xTargetCell++)
-				{
-					for (int yTargetCell = xyNewRouter[1] - aRayonRouteurs; (yTargetCell <= xyNewRouter[0] + aRayonRouteurs + 1); yTargetCell++)
-					{
-						//targetCells(xTargetCell, yTargetCell) |= mask.astype(np.bool)
-					}
-				}
-
-				std::cout << "sortie if (succ)" << std::endl;
-			}
-			else // plus de budget
-			{ 
-				std::cout << "succ == false" << std::endl;
-				// on enleve le dernier routeur
-				aMap(xyNewRouter[0], xyNewRouter[1]) = tmp; // on retabli l'etat de la case
-				// d = _place_mst_paths(d, routers, idx, idy, dists)
-
-				std::cout << "Plus de budget !!" << std::endl;
-
-			}
+			std::cout << "il n'y a plus de place pour placer des routeurs" << std::endl;
+			return; // on sort alors de l'algo
 		}
 
-		
+		// ########### methode mst ###########
+		// ###################################
+
+		// on recupere une position random pour un prochain routeur
+		std::random_device rd;     // seulement utilise une fois pour initialiser le moteur (semence)
+		std::mt19937 rng(rd());    // moteur a nombre aleatoire utilise (Mersenne-Twister dans ce cas)
+		std::uniform_int_distribution<int> uni(0, aMap.getRows() * aMap.getCols()); // garantie sans biais
+
+		auto random_integer = uni(rng) % targetCellsCoords.size();
+		int * xyNewRouter = targetCellsCoords[random_integer];
+
+		// on garde en memoire l'etat de la case avant d'y mettre un routeur au ca ou celui-ci ne conviendrait pas
+		int safeguardingInfo = aMap(xyNewRouter[0], xyNewRouter[1]);
+
+		aMap(xyNewRouter[0], xyNewRouter[1]) = Cell::Router; // Cell::Router = 2. On positionne le routeur sur la carte
+
+															 // tentative de placement de ce routeur
+		kruskal(aMap, xyNewRouter, routeurs, idx, idy, dists, succ, cost); // modifie cost, succ, routeurs, idx, idy et dists
+		if (routeurs.size() % 5 == 0)
+		{
+			std::cout << routeurs.size() << " routeurs " << std::endl;
+		}
+		//std::cout << "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Nouveau routeur en [" << xyNewRouter[0] << "," << xyNewRouter[1] << "]" << std::endl;
+
+		// si encore du budget et moins de 10 routeurs en attente d'etre relies
+		if (succ  && currentRouterId < 100) //  && currentRouterId < 10
+		{
+			//std::cout << "entree if (succ)" << std::endl;
+			// recuperation du masque du perimetre du routeur
+			Matrix mask(2 * aRayonRouteurs + 1, 2 * aRayonRouteurs + 1);
+
+			wirelessAccess(xyNewRouter[0], xyNewRouter[1], aRayonRouteurs, aMap, mask);
+
+			int indexMask = 0;
+			// dans la matrice targetCells, on met a 1 les cellules qui sont dans le perimetre du routeur, et on laisse a 0 les autres ou celles qui sont cachees pas un mur
+			for (int xTargetCell = xyNewRouter[0] - aRayonRouteurs; xTargetCell <= (xyNewRouter[0] + aRayonRouteurs); xTargetCell++)
+			{
+				for (int yTargetCell = xyNewRouter[1] - aRayonRouteurs; yTargetCell <= (xyNewRouter[1] + aRayonRouteurs); yTargetCell++)
+				{
+					if (mask(indexMask) == 1) targetCells(xTargetCell, yTargetCell) = 1;
+					indexMask++;
+				}
+			}
+
+			//std::cout << "sortie if (succ)" << std::endl;
+		}
+		else // plus de budget
+		{
+			//std::cout << "succ == false" << std::endl;
+			// on enleve le dernier routeur
+			aMap(xyNewRouter[0], xyNewRouter[1]) = safeguardingInfo; // on retabli l'etat de la case
+
+			placeMstPaths(routeurs, idx, idy, dists);
+
+			std::cout << "Plus de budget !!" << std::endl;
+
+			return;
+
+		}
 	}
+	// #################################################################################
+	// peut etre a enlever pr les grosses map
+	placeMstPaths(routeurs, idx, idy, dists);
+	// #################################################################################
 }
 
 void Algo::run()
 {
-	if (aType == "theoreme_de_soyer") random();
+	if (aType == "random") random();
+
+	// on remet le backbone
+	aMap(aBackbone[0], aBackbone[1]) = Cell::Backbone; // -2
+
 }

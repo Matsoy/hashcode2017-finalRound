@@ -6,7 +6,7 @@ struct Cell
 		Void = -1, // vide
 		Wall = 0, // mur
 		Wireless = 1, // cellule cible
-		Router = 2, // router
+		Router = 2, // routeur
 		ConnectedRouter = 3, // routeur connecte
 		Cable = 4 // cable
 	};
