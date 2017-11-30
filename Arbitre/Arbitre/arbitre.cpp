@@ -2,7 +2,7 @@
 
 int main()
 {
-	checkSolution("../../inputs/simple_example.in", "../../solutions/solutionTestOk.txt");
+	checkSolution("../../inputs/charleston_road.in", "../../solutions/charlestonTest1.out");
 	return(EXIT_SUCCESS);
 }
 
