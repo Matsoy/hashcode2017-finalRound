@@ -5,54 +5,48 @@
 
 int main()
 {
-	//Chemin
-	std::string path = "../../inputs/";
-	//Nom du fichier
-	std::string filename = "charleston_road";
+	try {
+		//Chemins
+		std::string pathInput = "../../inputs/";
+		std::string pathOutput = "../../solutions/";
 
-	std::string fichierInput = path+filename+".in"; // fichier d'input
-	std::string fichierOutput = path + filename + ".out"; // fichier d'output
-	IO io; // objet pour les I/O
+		//Nom de la carte
+		std::string mapName = "simple_example";
 
-	int * datas = io.initializeData(fichierInput); // datas = tableau de la forme [nbLignes, nbColonnes, rayonRouteurs, prixCable, prixRouteur, budgetMax, xBackbone, yBackbone]
+		std::string inputFile = pathInput + mapName +".in"; // fichier d'input
 
-	Matrix mapOriginale(datas[0], datas[1]); // matrice originale nbLignes x nbColonnes
-	Matrix map(datas[0], datas[1]); // matrice qu'on va manipuler nbLignes x nbColonnes
+		IO io; // objet pour les I/O
 
-	int * xyBackbone = new int[2]{ datas[6], datas[7] };
+		if (io.isFileExist(inputFile))
+		{
+			int * datas = io.initializeData(inputFile); // datas = tableau de la forme [nbLignes, nbColonnes, rayonRouteurs, prixCable, prixRouteur, budgetMax, xBackbone, yBackbone]
 
-	Algo algo("random", map, datas[2], datas[3], datas[4], datas[5], datas[5], xyBackbone); // type, rayonRouteurs, prixCable, prixRouteur, budgetMax, budgetOriginal, [xBackbone, yBackbone]
-	
-	// remplissage de la matrice
-	io.initializeMap(map, fichierInput);
+			Matrix mapOriginale(datas[0], datas[1]); // matrice originale nbLignes x nbColonnes
+			Matrix map(datas[0], datas[1]); // matrice qu'on va manipuler nbLignes x nbColonnes
 
-	// impression de la matrice
-	//std::cout << "map initiale" << std::endl;
-	//std::cout << map << std::endl;
+			int * xyBackbone = new int[2]{ datas[6], datas[7] };
 
-	algo.run(); // lancemet de l'algo
+			Algo algo("random", map, datas[2], datas[3], datas[4], datas[5], datas[5], xyBackbone); // type, rayonRouteurs, prixCable, prixRouteur, budgetMax, budgetOriginal, [xBackbone, yBackbone]
 
-	//std::cout << "map post algo" << std::endl;
-	//std::cout << map << std::endl;
+			// remplissage de la matrice
+			io.initializeMap(map, inputFile);
 
-	//io.generateOutput(map, fichierOutput);
-									
+			algo.run(); // lancement de l'algo
 
-	// ###################### CREATION OUTPUT ######################
-	//Matrix mapRouteursTest(datas[0], datas[1]); // matrice nbLignes x nbColonnes
-	// remplissage de la matrice
-	//io.initializeMap(mapRouteursTest, fichierInput);
-	// placement de l'emetteur
-	//mapRouteursTest(2, 7) = -2;
-	// placement des 2 routeurs
-	//mapRouteursTest(3, 6) = 3;
-	//mapRouteursTest(3, 9) = 3;
-	// placement des cables. /!\ il y a un cable sous les routeurs aussi ! Du coup il ya un cable à (3, 6) et (3, 9)
-	//mapRouteursTest(3, 8) = 4;
-	std::cout << std::endl;
-	std::string fichierOutputTest = path + "test.out"; // fichier d'output
-	io.generateOutput(map, fichierOutputTest);
-	
+			// ###################### CREATION OUTPUT ######################
+			std::cout << std::endl;
+			std::string pathBeginning = pathOutput + algo.getMethod() + "-" + mapName;
+			io.generateOutput(map, pathBeginning);
+		}
+		else std::cout << "ERREUR: Le fichier " << inputFile << " n'existe pas !" << std::endl;
+
+	}
+	catch (const std::exception& ex) {
+		std::cout << "EXCEPTION => " << ex.what() << std::endl;
+	}
+	catch (const std::string& ex) {
+		std::cout << "EXCEPTION => " << ex << std::endl;
+	}
 
 	return 0;
 }
