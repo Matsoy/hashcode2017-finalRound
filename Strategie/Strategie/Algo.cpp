@@ -1,14 +1,14 @@
 #include "Algo.h"
 #include "Cell.h"
 
-Algo::Algo(std::string type, Matrix & map, int rayonRouteurs, int prixCable, int prixRouteur, int budget, int budgetOriginal, int * xyBackbone) : aType(type), aMap(map), aRayonRouteurs(rayonRouteurs), aPrixCable(prixCable), aPrixRouteur(prixRouteur), aBudget(budget), aBudgetOriginal(budgetOriginal), aBackbone(xyBackbone)
+Algo::Algo(std::string method, Matrix & map, int rayonRouteurs, int prixCable, int prixRouteur, int budget, int budgetOriginal, int * xyBackbone) : aMethod(method), aMap(map), aRayonRouteurs(rayonRouteurs), aPrixCable(prixCable), aPrixRouteur(prixRouteur), aBudget(budget), aBudgetOriginal(budgetOriginal), aBackbone(xyBackbone)
 {
 }
 
 // Accesseurs
-std::string Algo::getType()
+std::string Algo::getMethod()
 {
-	return aType;
+	return aMethod;
 }
 
 Matrix & Algo::getMap()
@@ -42,6 +42,11 @@ int Algo::getBudgetOriginal()
 int * Algo::getBackbone()
 {
 	return aBackbone;
+}
+
+int Algo::getNbCellsOriginal()
+{
+	return aNbCellsOriginal;
 }
 
 int Algo::chessboardDist(int*  routeur, int * newrouteur)
@@ -88,6 +93,24 @@ int Algo::argMin(int * tab, int size)
 	}
 
 	return argmin;
+}
+
+/*
+* renvoie le pourcentage de cellules cibles couvertes. i.e. les '.' du fichier d'input
+*
+* @param targetCells matrice avec les cellules cibles restante
+* @return le pourcentage de cellules cibles couvertes
+*/
+int Algo::cellsCoveredPercentage(Matrix & targetCells)
+{
+	// nombre de cellules non couvertes
+	int nbCellsNotCovered = 0;
+	for (int k = 0; k < targetCells.getRows() * targetCells.getCols(); k++)
+	{
+		if (targetCells(k) == 0) nbCellsNotCovered++;
+	}
+
+	return ((aNbCellsOriginal - nbCellsNotCovered)*100) / aNbCellsOriginal;
 }
 
 
@@ -177,11 +200,12 @@ void Algo::findChessConnection(int * Routerfrom, int * RouterTo, std::vector<int
 * transforme la matrice en une matrice CSR (Compressed Sparse Row Matrix) i.e matrice symetrique des distances
 * ou data, row_ind et col_ind satisfont la relation
 * a[idx[k], idy[k]] = dists[k]
+* a[idy[k], idx[k]] = dists[k]
 *
 * @param dist tableau d'entier des distance inter-routeurs
 * @param idx tableau des x
 * @param idy tableau des y
-* @param dim dimension de la matrice csr, soit nombre_de_routeurs x nombre_de_routeurs
+* @param dim dimension de la matrice csr, i.e. le nombre de routeurs
 */
 void Algo::toCsrMatrix(Matrix & mat, std::vector<int> & dists, std::vector<int> & idx, std::vector<int> & idy, int dim)
 {
@@ -192,7 +216,36 @@ void Algo::toCsrMatrix(Matrix & mat, std::vector<int> & dists, std::vector<int> 
 			mat(idx[k], idy[k]) = dists[k];
 		}
 		catch (std::exception const&) {}
+		try
+		{
+			mat(idy[k], idx[k]) = dists[k];
+		}
+		catch (std::exception const&) {}
 	}
+}
+
+/*
+* check si un routeur est sur le backbone
+*
+* @param routeurs vecteur des coordonnees des routeurs
+* @return true si un routeur est sur le backbone
+*			false sinon
+*/
+bool Algo::routerOnBackbone(std::vector<int *> & routeurs)
+{
+	bool backbonePassed = false;
+	for (int * rout : routeurs)
+	{
+		if (!backbonePassed) // on passe le 1er routeur pcq il correspond au backbone
+		{
+			backbonePassed = true;
+			continue;
+		}
+
+		if (rout[0] == aBackbone[0] && rout[1] == aBackbone[1]) return true;
+	}
+
+	return false;
 }
 
 /*
@@ -216,6 +269,7 @@ int Algo::minKey(std::vector<int> key, std::vector<bool> mstSet, int dim)
 			min_index = v;
 		}
 
+	//std::cout << "min_index -> " << min_index << std::endl;
 	return min_index;
 }
 
@@ -258,7 +312,7 @@ void Algo::toMinimumSpanningTree(Matrix & mat, Matrix & mst)
 	key[0] = 0;     // cle a 0 pour que ce sommet soit choisi comme premier sommet
 	parent[0] = -1; // Le 1er noeud est toujours la racine du mst
 
-					// The mst aura "dim" sommets
+	// The mst aura "dim" sommets
 	for (int count = 0; count < dim - 1; count++)
 	{
 		// on choisie le sommet de cle minimum de l'ensemble des sommets par encore inclus dans le mst
@@ -272,6 +326,7 @@ void Algo::toMinimumSpanningTree(Matrix & mat, Matrix & mst)
 		// on ne considere que les sommets qui ne sont pas encore inclus dans le mst
 		for (int v = 0; v < dim; v++)
 		{
+			//std::cout << "on regarde mat(" << u << "," << v << ")" << std::endl;
 			if (mat(u, v) // mat[u][v] != 0 uniquement pour les sommets adjacents de m
 				&& mstSet[v] == false // mstSet[v] == false pour les sommets non encore inclus dans MST
 				&& mat(u, v) < key[v]) // maj la cle ssi mat[u][v] < key[v]
@@ -286,12 +341,16 @@ void Algo::toMinimumSpanningTree(Matrix & mat, Matrix & mst)
 	// remplissage de la matrice mst en ne gardant que les arcs de poids minimum
 	for (int i = 1; i < dim; i++)
 	{
+		//std::cout << "mat(" <<parent[i] << "," << i <<") = " << mat(parent[i], i) << std::endl;
+
 		mst(parent[i], i) = mat(parent[i], i);
 	}
 }
 
-void Algo::placeMstPaths(std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists)
+int Algo::numberOfCablesNeeded(std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists)
 {
+	int totalCables = 0;
+
 	// calcul du mst
 	Matrix csrMat(routeurs.size(), routeurs.size());
 	toCsrMatrix(csrMat, dists, idx, idy, routeurs.size());
@@ -316,6 +375,50 @@ void Algo::placeMstPaths(std::vector<int *> & routeurs, std::vector<int> & idx, 
 					if (cable[0] == aBackbone[0] && cable[1] == aBackbone[1]) // si le cable est sur l'emetteur
 						continue; // on passe
 
+					if (aMap(cable[0], cable[1]) != Cell::Router) // si le cable n'est pas sur un routeur
+						totalCables++; // on place le cable
+				}
+			}
+		}
+	}
+
+	return totalCables;
+}
+
+
+void Algo::placeMstPaths(std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists)
+{
+	//std::cout << "________________dans placeMstPaths________________" << std::endl;
+	// calcul du mst
+	Matrix csrMat(routeurs.size(), routeurs.size());
+	toCsrMatrix(csrMat, dists, idx, idy, routeurs.size());
+
+	//std::cout << "csrMat" << std::endl;
+	//std::cout << csrMat << std::endl;
+
+	// arbre couvrant minimal
+	// i.e.  un graphe constitue du sous-ensemble d'aretes qui relient ensemble tous les noeuds connectes, tout en minimisant la somme totale des poids sur les aretes.
+	Matrix mstMat(routeurs.size(), routeurs.size());
+	toMinimumSpanningTree(csrMat, mstMat);
+
+	//std::cout << "mstMat" << std::endl;
+	//std::cout << mstMat << std::endl;
+
+	// algo calcul distance entre les routeurs. Parcours de l'arbre couvrant minimal
+	for (int r = 0; r < mstMat.getRows(); r++)
+	{
+		for (int c = 0; c < mstMat.getCols(); c++)
+		{
+			if (mstMat(r, c) > 0) // si [r, c] un somment de l'arbre couvrant minimal
+			{
+				std::vector<int *> cables;
+				findChessConnection(routeurs[r], routeurs[c], cables);
+
+				for (int *cable : cables) // pour chaque cable
+				{
+					if (cable[0] == aBackbone[0] && cable[1] == aBackbone[1]) // si le cable est sur l'emetteur
+						continue; // on passe
+
 					if (aMap(cable[0], cable[1]) == Cell::Router) // si le cable est sur un routeur
 						aMap(cable[0], cable[1]) = Cell::ConnectedRouter; // on passe la valeur de la coordonnee de 2 a 3 pour indiquer que le routeur est connecte au backbone
 					else
@@ -324,17 +427,23 @@ void Algo::placeMstPaths(std::vector<int *> & routeurs, std::vector<int> & idx, 
 			}
 		}
 	}
+
+	bool backbonePassed = false;
 	for (int * rout : routeurs)
 	{
-		if (rout[0] == aBackbone[0] && rout[1] == aBackbone[1]) // si le cable est sur l'emetteur
-			continue; // on passe
+		if (!backbonePassed) // on passe le 1er routeur pcq il correspond au backbone
+		{
+			backbonePassed = true;
+			continue;
+		}
 
 		aMap(rout[0], rout[1]) = Cell::ConnectedRouter; // on passe la valeur de la coordonnee de 2 a 3 pour indiquer que le routeur est connecte au backbone
 	}
+
 }
 
 /*
-* @param m la matrice de base avec les murs, les cellules cibles et les cellules vides
+* @param m la matrice de la carte
 * @param newRouteurs tableau contenant les coordonnees du routeur a placer
 * @param newRouteurs tableau contenant les coordonnees des routeurs places
 * @param idx tableau des x
@@ -355,9 +464,9 @@ void Algo::kruskal(Matrix & m, int * newRouteurs, std::vector<int *> & routeurs,
 	int cpt = 0;
 
 	// algo calcul distance entre les routeurs
-	for (int * r : routeurs)
+	for (int * rout : routeurs)
 	{
-		int dist = chessboardDist(r, newRouteurs);
+		int dist = chessboardDist(rout, newRouteurs);
 		if (dist > 0)
 		{
 			idx.push_back(cpt); // ex: idx = [0, 1, 2]
@@ -376,16 +485,25 @@ void Algo::kruskal(Matrix & m, int * newRouteurs, std::vector<int *> & routeurs,
 														   // [0 0 x 7]
 														   // [0 0 0 2]
 
-														   // arbre couvrant minimal
+	//std::cout << "csrMat" << std::endl;
+	//std::cout << csrMat << std::endl;
+
+	// arbre couvrant minimal
 	Matrix mstMat(routeurs.size(), routeurs.size());
 	toMinimumSpanningTree(csrMat, mstMat);
 
 	// poids de l'arbre couvrant minimum. i.e le nombre d'aretes
 	int mstMatWeight = mstMat.sum();
 
+	//std::cout << "mstMat" << std::endl;
+	//std::cout << mstMat << std::endl;
+
 	cost = mstMatWeight * aPrixCable + (routeurs.size() - 1) * aPrixRouteur; // routeur - 1 car on interprete le backbone comme un routeur dans l'algorithme
 
 	succ = cost <= aBudgetOriginal; // si on ne depasse par le budget
+
+	//std::cout << mstMatWeight << " * " << aPrixCable << " + " << " (" << routeurs.size() << " - " << 1 << " ) * " << aPrixRouteur << " = " << cost << "  sur " << aBudgetOriginal << std::endl;
+	//std::cout << succ << std::endl;
 }
 /*
 * @param x du routeur
@@ -472,18 +590,23 @@ void Algo::wirelessAccess(int x, int y, int radius, Matrix & mat, Matrix & mask)
 */
 void Algo::random()
 {
-	std::cout << "Algo -> " << aType << std::endl;
-
 	// nb max de routeurs possibles
 	int maxNumRouters = aBudget / aPrixRouteur;
-	std::cout << "Nombre max de routeurs possibles -> " << maxNumRouters << std::endl;
+	std::cout << "  Budget / prix d'un routeur = " << maxNumRouters << " routeurs\n" << std::endl;
+	std::cout << "  Routeurs\t|\t% budget utilise\t|\t% cellules couvertes" << std::endl;
+
 
 	// matrice avec les cellules cibles a 0 et le reste a 1
 	Matrix targetCells(aMap.getRows(), aMap.getCols());
 
 	for (int k = 0; k < aMap.getRows() * aMap.getCols(); k++)
 	{
-		targetCells(k) = aMap(k) == Cell::Wireless ? 0 : 1;
+		if (aMap(k) == Cell::Wireless)
+		{
+			targetCells(k) = 0;
+			aNbCellsOriginal++;
+		}
+		else targetCells(k) = 1;
 	}
 
 	std::vector<int *> routeurs;
@@ -508,11 +631,15 @@ void Algo::random()
 			if (targetCells(cellxy) == 0) targetCellsCoords.push_back(targetCells.xy(cellxy));
 		}
 
-		// si il y au moins 1 position dispo pour le prochain routeur
+		// si il n'y a pas de position dispo pour le prochain routeur
 		if (targetCellsCoords.size() == 0)
 		{
-			std::cout << "il n'y a plus de place pour placer des routeurs" << std::endl;
-			return; // on sort alors de l'algo
+			//std::cout << "il n'y a plus de place pour placer de routeurs" << std::endl;
+
+			// on tire les cables
+			placeMstPaths(routeurs, idx, idy, dists);
+
+			return; // et on sort de l'algo
 		}
 
 		// ########### methode mst ###########
@@ -525,22 +652,26 @@ void Algo::random()
 
 		auto random_integer = uni(rng) % targetCellsCoords.size();
 		int * xyNewRouter = targetCellsCoords[random_integer];
+		//int * xyNewRouter = currentRouterId ? new int[2]{ 5, 5 } : new int[2]{ 4,3 };
+
 
 		// on garde en memoire l'etat de la case avant d'y mettre un routeur au ca ou celui-ci ne conviendrait pas
 		int safeguardingInfo = aMap(xyNewRouter[0], xyNewRouter[1]);
 
 		aMap(xyNewRouter[0], xyNewRouter[1]) = Cell::Router; // Cell::Router = 2. On positionne le routeur sur la carte
 
-															 // tentative de placement de ce routeur
+		// tentative de placement de ce routeur
+		// on sauvegarde l'etat des variables au cas ou on ne pourrait pas placer ce routeur
+		std::vector<int> idxTmp = idx;
+		std::vector<int> idyTmp = idy;
+		std::vector<int> distsTmp = dists;
+		int costTmp = cost;
 		kruskal(aMap, xyNewRouter, routeurs, idx, idy, dists, succ, cost); // modifie cost, succ, routeurs, idx, idy et dists
-		if (routeurs.size() % 5 == 0)
-		{
-			std::cout << routeurs.size() << " routeurs " << std::endl;
-		}
+
 		//std::cout << "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Nouveau routeur en [" << xyNewRouter[0] << "," << xyNewRouter[1] << "]" << std::endl;
 
-		// si encore du budget et moins de 10 routeurs en attente d'etre relies
-		if (succ  && currentRouterId < 100) //  && currentRouterId < 10
+		// si encore du budget
+		if (succ)
 		{
 			//std::cout << "entree if (succ)" << std::endl;
 			// recuperation du masque du perimetre du routeur
@@ -559,17 +690,40 @@ void Algo::random()
 				}
 			}
 
-			//std::cout << "sortie if (succ)" << std::endl;
+
+			if (routeurs.size() % 1 == 0)
+			{
+				std::cout << "  " << routeurs.size()-1 << "\t\t|\t" << (cost*100)/aBudgetOriginal << "%" << "\t\t\t|\t" << cellsCoveredPercentage(targetCells) << "%";
+				std::cout << '\r';
+
+			}
 		}
-		else // plus de budget
+		else // plus de budget, on enleve le routeur en trop
 		{
+			//std::cout << "\n\n\nPlus de budget !" << std::endl;
 			//std::cout << "succ == false" << std::endl;
-			// on enleve le dernier routeur
-			aMap(xyNewRouter[0], xyNewRouter[1]) = safeguardingInfo; // on retabli l'etat de la case
 
-			placeMstPaths(routeurs, idx, idy, dists);
+			// on retabli l'etat de la case dans la carte
+			aMap(xyNewRouter[0], xyNewRouter[1]) = safeguardingInfo; 
 
-			std::cout << "Plus de budget !!" << std::endl;
+			// on supprime le routeur de trop du vecteur
+			routeurs.erase(routeurs.begin() + routeurs.size() - 1);
+			
+			// on reduit la taille du vecteur au nombre d'elements dans le vecteur
+			routeurs.shrink_to_fit(); 
+
+			std::cout << " avant placeMstPaths " << std::endl;
+			// on tire les cables
+
+			placeMstPaths(routeurs, idxTmp, idyTmp, distsTmp);
+			std::cout << " apres placeMstPaths " << std::endl;
+
+
+			if (routeurs.size() % 1 == 0)
+			{
+				std::cout << "  " << routeurs.size() - 1 << "\t\t|\t" << (costTmp * 100) / aBudgetOriginal << "%" << "\t\t\t|\t" << cellsCoveredPercentage(targetCells) << "%";
+				std::cout << '\r';
+			}
 
 			return;
 
@@ -583,9 +737,9 @@ void Algo::random()
 
 void Algo::run()
 {
-	if (aType == "random") random();
-
-	// on remet le backbone
-	aMap(aBackbone[0], aBackbone[1]) = Cell::Backbone; // -2
-
+	if (aMethod == "random")
+	{
+		std::cout << "  Algo = " << aMethod << std::endl;
+		random();
+	}
 }

@@ -93,7 +93,7 @@ void IO::initializeMap(Matrix & m, std::string fichierInput)
 	{
 		std::istringstream iss(line);
 
-		if (lineIndex > 3) // si on arrive à la carte
+		if (lineIndex > 3) // si on arrive a la carte
 		{
 			// initialisation de la matrice
 			for (unsigned int i = 0; i<line.length(); i++)
@@ -116,54 +116,80 @@ void IO::initializeMap(Matrix & m, std::string fichierInput)
 }
 
 /*
-*Génère le fichier output, en provocant le premier appel de la méthode récursive ioBrowser
-*et enregistre le résultat dans un fichier donné en paramètre.
+*Genere le fichier output, en provocant le premier appel de la methode recursive ioBrowser
+*et enregistre le resultat dans un fichier donne en parametre.
 */
-void IO::generateOutput(Matrix & mapRouteurs, std::string file)
+void IO::generateOutput(Matrix & mapRouteurs, std::string pathBeginning)
 {
-	
-	ioBrowser(mapRouteurs, backboneX, backboneY);
-	std::string out = std::to_string(counterConnectedCells)+"\n";
-	out.append(connectedcelltxt);
-	out.append(std::to_string(counterRouter) + "\n");
-	out.append(routeurtxt);
-	std::cout << out << std::endl;
+	//std::cout << "dans generateOutput" << std::endl;
 
-	/*
+	ioBrowser(mapRouteurs, backboneX, backboneY);
+	//std::cout << "______1" << std::endl;
+
+	std::string out = std::to_string(counterConnectedCells)+"\n";
+	//std::cout << "______2" << std::endl;
+
+	out.append(connectedcelltxt);
+	//std::cout << "______3" << std::endl;
+
+	out.append(std::to_string(counterRouter) + "\n");
+	//std::cout << "______4" << std::endl;
+
+	out.append(routeurtxt);
 
 	//##################################
 	//###  Enregistrement du fichier ###
 	//##################################
+	//std::cout << "enregistrement fichier" << std::endl;
 
+	// timestamp
+	time_t  timev;
+	time(&timev);
+	std::stringstream timess;
+	timess << timev;
+	//chemin du fichier d'output de type ../solutions/<map>-<methode>-timestamp.out
+	std::string filePath = pathBeginning + "-" + timess.str() + ".out";
 	//Ecrase le fichier s'il existe
-	std::remove(file.c_str());
-	//Créer le fichier
-	std::ofstream write(file);
-	//Insère les données
+	//std::cout << "ecrase fichier" << std::endl;
+
+	std::remove(filePath.c_str());
+	//std::cout << "creer fichier" << std::endl;
+
+	//Creer le fichier
+	std::ofstream write(filePath);
+	//std::cout << "inserer fichier" << std::endl;
+
+	//Insere les donnees
 	write << out;
+	//std::cout << "ferme fichier" << std::endl;
+
 	//on ferme le fichier
 	write.close();
-
 	//##################################
 	//##################################
 
-
-	*/
+	std::cout << std::endl;
+	std::cout << "  " << filePath << "\n"<< std::endl;
 }
 
 /*
-* Parcours les chemins cablés de manière récursive pour retenir l'ordre et l'emplacement des cables et routeurs
+* Parcours les chemins cables de maniere recursive pour retenir l'ordre et l'emplacement des cables et routeurs
 */
 void IO::ioBrowser(Matrix & mapRouteurs, int x, int y)
 {
-	//Si c'est une case valide
-	if (mapRouteurs(x, y) == 3 || mapRouteurs(x, y) == 4 || mapRouteurs(x, y) == -2) {
-		//Si c'est un routeur cablé
+	//Si c'est une case valide. i.e. un routeur, un cable ou le backbone
+	if (mapRouteurs(x, y) == 3 || mapRouteurs(x, y) == 4 || (x == backboneX && y == backboneY)) {
+		//Si c'est un routeur cable
 		if (mapRouteurs(x, y) == 3) {
-			counterConnectedCells++;
 			counterRouter++;
-			connectedcelltxt.append(std::to_string(x) + " " + std::to_string(y)+"\n");
 			routeurtxt.append(std::to_string(x) + " " + std::to_string(y) + "\n");
+
+			//Si le routeur n'est pas sur le backbone
+			if (x != backboneX || y != backboneY)
+			{
+			counterConnectedCells++;
+			connectedcelltxt.append(std::to_string(x) + " " + std::to_string(y)+"\n");
+			}
 		}
 		//Si c'est un cable
 		else if (mapRouteurs(x, y) == 4) {
@@ -182,9 +208,19 @@ void IO::ioBrowser(Matrix & mapRouteurs, int x, int y)
 		ioBrowser(mapRouteurs, x + 1, y - 1);
 		ioBrowser(mapRouteurs, x + 1, y + 1);
 	}
+}
 
-
-
+/*
+* Check si le fichier existe
+*
+* @param le chemin du fichier
+* @return true si le fichier existe
+*			false sinon
+*/
+bool IO::isFileExist(std::string filePath)
+{
+	std::ifstream infile(filePath);
+	return infile.good();
 }
 
 
