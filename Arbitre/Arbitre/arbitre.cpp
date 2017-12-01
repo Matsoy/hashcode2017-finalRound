@@ -2,7 +2,7 @@
 
 int main()
 {
-	checkSolution("../../inputs/charleston_road.in", "../../solutions/charlestonOK1.out");
+	checkSolution("../../inputs/charleston_road.in", "../../solutions/random-charleston_road-1512092257-21953913.out");
 	return(EXIT_SUCCESS);
 }
 
