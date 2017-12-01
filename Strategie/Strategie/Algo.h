@@ -38,10 +38,11 @@ public:
 	int minKey(std::vector<int> key, std::vector<bool> mstSet, int dim);
 	void random();
 	void wirelessAccess(int x, int y, int radius, Matrix & mat, Matrix & mask);
-	int numberOfCablesNeeded(std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists);
 	void placeMstPaths(std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists);
 	int argMin(int * tab, int size);
 	void findChessConnection(int * Routerfrom, int * RouterTo, std::vector<int *> & cables);
 	bool routerOnBackbone(std::vector<int *> & routeurs);
 	int cellsCoveredPercentage(Matrix & targetCells);
+	bool isCyclical(Matrix & mat);
+	int nbCellsCovered(Matrix & targetCells);
 };

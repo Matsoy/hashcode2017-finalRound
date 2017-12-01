@@ -6,14 +6,16 @@
 int main()
 {
 	try {
+		//Nom de la carte
+		std::string mapName = "charleston_road";
+
+		std::cout << "  Carte =\t\t\t" << mapName << std::endl;
+
 		//Chemins
 		std::string pathInput = "../../inputs/";
-		std::string pathOutput = "../../solutions/";
+		std::string pathOutput = "../../solutions/" + mapName + "/";
 
-		//Nom de la carte
-		std::string mapName = "simple_example";
-
-		std::string inputFile = pathInput + mapName +".in"; // fichier d'input
+		std::string inputFile = pathInput + mapName + ".in"; // fichier d'input
 
 		IO io; // objet pour les I/O
 
@@ -28,12 +30,12 @@ int main()
 
 			Algo algo("random", map, datas[2], datas[3], datas[4], datas[5], datas[5], xyBackbone); // type, rayonRouteurs, prixCable, prixRouteur, budgetMax, budgetOriginal, [xBackbone, yBackbone]
 
-			// remplissage de la matrice
+																									// remplissage de la matrice
 			io.initializeMap(map, inputFile);
 
 			algo.run(); // lancement de l'algo
 
-			// ###################### CREATION OUTPUT ######################
+						// ###################### CREATION OUTPUT ######################
 			std::cout << std::endl;
 			std::string pathBeginning = pathOutput + algo.getMethod() + "-" + mapName;
 			io.generateOutput(map, pathBeginning);

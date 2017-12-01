@@ -70,6 +70,11 @@ int Algo::quasiEuclideanDist(int*  routeur, int * newrouteur)
 	return (sqrt(2) - 1) * abs(x1 - x2) + abs(y1 - y2);
 }
 
+bool Algo::isCyclical(Matrix & mat)
+{
+	return true;
+}
+
 /*
 * Renvoie l'indice la valeur minimale
 * En cas d'occurrences multiples des valeurs minimales, l'indice correspondant a la premiere occurrence est renvoyee.
@@ -110,7 +115,26 @@ int Algo::cellsCoveredPercentage(Matrix & targetCells)
 		if (targetCells(k) == 0) nbCellsNotCovered++;
 	}
 
-	return ((aNbCellsOriginal - nbCellsNotCovered)*100) / aNbCellsOriginal;
+	return ((aNbCellsOriginal - nbCellsNotCovered) * 100) / aNbCellsOriginal;
+}
+
+
+/*
+* renvoie le nombre de cellules couvertes
+*
+* @param targetCells matrice avec les cellules cibles restante
+* @return le nombre de cellules couvertes
+*/
+int Algo::nbCellsCovered(Matrix & targetCells)
+{
+	// nombre de cellules non couvertes
+	int nbCellsNotCovered = 0;
+	for (int k = 0; k < targetCells.getRows() * targetCells.getCols(); k++)
+	{
+		if (targetCells(k) == 0) nbCellsNotCovered++;
+	}
+
+	return aNbCellsOriginal - nbCellsNotCovered;
 }
 
 
@@ -312,7 +336,7 @@ void Algo::toMinimumSpanningTree(Matrix & mat, Matrix & mst)
 	key[0] = 0;     // cle a 0 pour que ce sommet soit choisi comme premier sommet
 	parent[0] = -1; // Le 1er noeud est toujours la racine du mst
 
-	// The mst aura "dim" sommets
+					// The mst aura "dim" sommets
 	for (int count = 0; count < dim - 1; count++)
 	{
 		// on choisie le sommet de cle minimum de l'ensemble des sommets par encore inclus dans le mst
@@ -345,44 +369,6 @@ void Algo::toMinimumSpanningTree(Matrix & mat, Matrix & mst)
 
 		mst(parent[i], i) = mat(parent[i], i);
 	}
-}
-
-int Algo::numberOfCablesNeeded(std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists)
-{
-	int totalCables = 0;
-
-	// calcul du mst
-	Matrix csrMat(routeurs.size(), routeurs.size());
-	toCsrMatrix(csrMat, dists, idx, idy, routeurs.size());
-
-	// arbre couvrant minimal
-	// i.e.  un graphe constitue du sous-ensemble d'aretes qui relient ensemble tous les noeuds connectes, tout en minimisant la somme totale des poids sur les aretes.
-	Matrix mstMat(routeurs.size(), routeurs.size());
-	toMinimumSpanningTree(csrMat, mstMat);
-
-	// algo calcul distance entre les routeurs. Parcours de l'arbre couvrant minimal
-	for (int r = 0; r < mstMat.getRows(); r++)
-	{
-		for (int c = 0; c < mstMat.getCols(); c++)
-		{
-			if (mstMat(r, c) > 0) // si [r, c] un somment de l'arbre couvrant minimal
-			{
-				std::vector<int *> cables;
-				findChessConnection(routeurs[r], routeurs[c], cables);
-
-				for (int *cable : cables) // pour chaque cable
-				{
-					if (cable[0] == aBackbone[0] && cable[1] == aBackbone[1]) // si le cable est sur l'emetteur
-						continue; // on passe
-
-					if (aMap(cable[0], cable[1]) != Cell::Router) // si le cable n'est pas sur un routeur
-						totalCables++; // on place le cable
-				}
-			}
-		}
-	}
-
-	return totalCables;
 }
 
 
@@ -485,10 +471,10 @@ void Algo::kruskal(Matrix & m, int * newRouteurs, std::vector<int *> & routeurs,
 														   // [0 0 x 7]
 														   // [0 0 0 2]
 
-	//std::cout << "csrMat" << std::endl;
-	//std::cout << csrMat << std::endl;
+														   //std::cout << "csrMat" << std::endl;
+														   //std::cout << csrMat << std::endl;
 
-	// arbre couvrant minimal
+														   // arbre couvrant minimal
 	Matrix mstMat(routeurs.size(), routeurs.size());
 	toMinimumSpanningTree(csrMat, mstMat);
 
@@ -502,8 +488,8 @@ void Algo::kruskal(Matrix & m, int * newRouteurs, std::vector<int *> & routeurs,
 
 	succ = cost <= aBudgetOriginal; // si on ne depasse par le budget
 
-	//std::cout << mstMatWeight << " * " << aPrixCable << " + " << " (" << routeurs.size() << " - " << 1 << " ) * " << aPrixRouteur << " = " << cost << "  sur " << aBudgetOriginal << std::endl;
-	//std::cout << succ << std::endl;
+									//std::cout << mstMatWeight << " * " << aPrixCable << " + " << " (" << routeurs.size() << " - " << 1 << " ) * " << aPrixRouteur << " = " << cost << "  sur " << aBudgetOriginal << std::endl;
+									//std::cout << succ << std::endl;
 }
 /*
 * @param x du routeur
@@ -592,8 +578,10 @@ void Algo::random()
 {
 	// nb max de routeurs possibles
 	int maxNumRouters = aBudget / aPrixRouteur;
-	std::cout << "  Budget / prix d'un routeur = " << maxNumRouters << " routeurs\n" << std::endl;
-	std::cout << "  Routeurs\t|\t% budget utilise\t|\t% cellules couvertes" << std::endl;
+	std::cout << "  Budget / prix d'un routeur = \t" << maxNumRouters << " routeurs\n" << std::endl;
+	std::cout << "  --------------------------------------------------------------------------------------------------------------------" << std::endl;
+	std::cout << "  Routeurs\t\t|\t\t% budget utilise\t\t|\t\t% cellules couvertes" << std::endl;
+	std::cout << "  --------------------------------------------------------------------------------------------------------------------" << std::endl;
 
 
 	// matrice avec les cellules cibles a 0 et le reste a 1
@@ -642,9 +630,6 @@ void Algo::random()
 			return; // et on sort de l'algo
 		}
 
-		// ########### methode mst ###########
-		// ###################################
-
 		// on recupere une position random pour un prochain routeur
 		std::random_device rd;     // seulement utilise une fois pour initialiser le moteur (semence)
 		std::mt19937 rng(rd());    // moteur a nombre aleatoire utilise (Mersenne-Twister dans ce cas)
@@ -660,18 +645,18 @@ void Algo::random()
 
 		aMap(xyNewRouter[0], xyNewRouter[1]) = Cell::Router; // Cell::Router = 2. On positionne le routeur sur la carte
 
-		// tentative de placement de ce routeur
-		// on sauvegarde l'etat des variables au cas ou on ne pourrait pas placer ce routeur
+															 // tentative de placement de ce routeur
+															 // on sauvegarde l'etat des variables au cas ou on ne pourrait pas placer ce routeur
 		std::vector<int> idxTmp = idx;
 		std::vector<int> idyTmp = idy;
 		std::vector<int> distsTmp = dists;
 		int costTmp = cost;
 		kruskal(aMap, xyNewRouter, routeurs, idx, idy, dists, succ, cost); // modifie cost, succ, routeurs, idx, idy et dists
 
-		//std::cout << "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Nouveau routeur en [" << xyNewRouter[0] << "," << xyNewRouter[1] << "]" << std::endl;
+																		   //std::cout << "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Nouveau routeur en [" << xyNewRouter[0] << "," << xyNewRouter[1] << "]" << std::endl;
 
-		// si encore du budget
-		if (succ)
+																		   // si encore du budget
+		if (succ) // && currentRouterId<250
 		{
 			//std::cout << "entree if (succ)" << std::endl;
 			// recuperation du masque du perimetre du routeur
@@ -691,9 +676,9 @@ void Algo::random()
 			}
 
 
-			if (routeurs.size() % 1 == 0)
+			if (((routeurs.size() - 1) % 1) == 0)
 			{
-				std::cout << "  " << routeurs.size()-1 << "\t\t|\t" << (cost*100)/aBudgetOriginal << "%" << "\t\t\t|\t" << cellsCoveredPercentage(targetCells) << "%";
+				std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << cost << " / " << aBudgetOriginal << " = " << (cost * 100) / aBudgetOriginal << "%" << "\t\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
 				std::cout << '\r';
 
 			}
@@ -704,26 +689,19 @@ void Algo::random()
 			//std::cout << "succ == false" << std::endl;
 
 			// on retabli l'etat de la case dans la carte
-			aMap(xyNewRouter[0], xyNewRouter[1]) = safeguardingInfo; 
+			aMap(xyNewRouter[0], xyNewRouter[1]) = safeguardingInfo;
 
 			// on supprime le routeur de trop du vecteur
 			routeurs.erase(routeurs.begin() + routeurs.size() - 1);
-			
+
 			// on reduit la taille du vecteur au nombre d'elements dans le vecteur
-			routeurs.shrink_to_fit(); 
+			routeurs.shrink_to_fit();
 
-			std::cout << " avant placeMstPaths " << std::endl;
 			// on tire les cables
-
 			placeMstPaths(routeurs, idxTmp, idyTmp, distsTmp);
-			std::cout << " apres placeMstPaths " << std::endl;
 
-
-			if (routeurs.size() % 1 == 0)
-			{
-				std::cout << "  " << routeurs.size() - 1 << "\t\t|\t" << (costTmp * 100) / aBudgetOriginal << "%" << "\t\t\t|\t" << cellsCoveredPercentage(targetCells) << "%";
-				std::cout << '\r';
-			}
+			std::cout << "  " << routeurs.size() - 1 << "\t\t|\t" << (costTmp * 100) / aBudgetOriginal << "%" << "|\t" << cellsCoveredPercentage(targetCells) << "%";
+			std::cout << '\r';
 
 			return;
 
@@ -739,7 +717,7 @@ void Algo::run()
 {
 	if (aMethod == "random")
 	{
-		std::cout << "  Algo = " << aMethod << std::endl;
+		std::cout << "  Algo =\t\t\t" << aMethod << std::endl;
 		random();
 	}
 }

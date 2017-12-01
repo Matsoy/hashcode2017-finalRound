@@ -121,27 +121,16 @@ void IO::initializeMap(Matrix & m, std::string fichierInput)
 */
 void IO::generateOutput(Matrix & mapRouteurs, std::string pathBeginning)
 {
-	//std::cout << "dans generateOutput" << std::endl;
-
 	ioBrowser(mapRouteurs, backboneX, backboneY);
-	//std::cout << "______1" << std::endl;
-
-	std::string out = std::to_string(counterConnectedCells)+"\n";
-	//std::cout << "______2" << std::endl;
-
+	std::string out = std::to_string(counterConnectedCells) + "\n";
 	out.append(connectedcelltxt);
-	//std::cout << "______3" << std::endl;
-
 	out.append(std::to_string(counterRouter) + "\n");
-	//std::cout << "______4" << std::endl;
 
 	out.append(routeurtxt);
 
 	//##################################
 	//###  Enregistrement du fichier ###
 	//##################################
-	//std::cout << "enregistrement fichier" << std::endl;
-
 	// timestamp
 	time_t  timev;
 	time(&timev);
@@ -150,26 +139,18 @@ void IO::generateOutput(Matrix & mapRouteurs, std::string pathBeginning)
 	//chemin du fichier d'output de type ../solutions/<map>-<methode>-timestamp.out
 	std::string filePath = pathBeginning + "-" + timess.str() + ".out";
 	//Ecrase le fichier s'il existe
-	//std::cout << "ecrase fichier" << std::endl;
-
 	std::remove(filePath.c_str());
-	//std::cout << "creer fichier" << std::endl;
-
 	//Creer le fichier
 	std::ofstream write(filePath);
-	//std::cout << "inserer fichier" << std::endl;
-
 	//Insere les donnees
 	write << out;
-	//std::cout << "ferme fichier" << std::endl;
-
 	//on ferme le fichier
 	write.close();
 	//##################################
 	//##################################
 
 	std::cout << std::endl;
-	std::cout << "  " << filePath << "\n"<< std::endl;
+	std::cout << "  " << filePath << "\n" << std::endl;
 }
 
 /*
@@ -187,8 +168,8 @@ void IO::ioBrowser(Matrix & mapRouteurs, int x, int y)
 			//Si le routeur n'est pas sur le backbone
 			if (x != backboneX || y != backboneY)
 			{
-			counterConnectedCells++;
-			connectedcelltxt.append(std::to_string(x) + " " + std::to_string(y)+"\n");
+				counterConnectedCells++;
+				connectedcelltxt.append(std::to_string(x) + " " + std::to_string(y) + "\n");
 			}
 		}
 		//Si c'est un cable

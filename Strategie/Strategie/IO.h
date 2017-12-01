@@ -12,13 +12,13 @@ public:
 	void initializeMap(Matrix & m, std::string fichierInput);
 	void generateOutput(Matrix & mapRouteurs, std::string file);
 	bool isFileExist(std::string filePath);
-	
+
 private:
-	int counterRouter=0;
-	int counterConnectedCells=0;
+	int counterRouter = 0;
+	int counterConnectedCells = 0;
 	int backboneX;
 	int backboneY;
-	std::string routeurtxt="";
+	std::string routeurtxt = "";
 	std::string connectedcelltxt = "";
 
 	void ioBrowser(Matrix & mapRouteurs, int x, int y);
