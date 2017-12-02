@@ -726,6 +726,7 @@ int Algo::gainPoints(int x, int y, int radius, const Matrix & mat, Matrix & mask
 			count += 1;
 		}
 	}
+
 	return count;
 
 }
@@ -855,7 +856,7 @@ void Algo::random()
 			int indexMask = 0;
 			// dans la matrice targetCells, on met a 1 les cellules qui sont dans le perimetre du routeur, et on laisse a 0 les autres ou celles qui sont cachees pas un mur
 			int condition3 = xyNewRouter[0] + aRayonRouteurs;
-			for (int xTargetCell = xyNewRouter[0] - aRayonRouteurs; xTargetCell <= xyNewRouter[0] + aRayonRouteurs; xTargetCell++)
+			for (int xTargetCell = xyNewRouter[0] - aRayonRouteurs; xTargetCell <= condition3; xTargetCell++)
 			{
 				int condition4 = xyNewRouter[1] + aRayonRouteurs;
 				for (int yTargetCell = xyNewRouter[1] - aRayonRouteurs; yTargetCell <= condition4; yTargetCell++)
@@ -943,31 +944,41 @@ void Algo::bigCase()
 
 	for (int currentRouterId = 0; currentRouterId < maxNumRouters; currentRouterId++)
 	{
-		//std::cout << currentRouterId +1 << " routeurs" << std::endl;
 		// vecteur des coordonnees des cellules cibles n'ayant pas encore de routeur place dessus
 		std::vector<int *> targetCellsCoords;
 		int bestMove = 0, otherMove = 0;
 		int * theChosenOne = 0;
 		int condition2 = targetCells.getRows() * targetCells.getCols();
-		for (int cellxy = 0; cellxy < targetCells.getRows() * targetCells.getCols(); cellxy++)
+		for (int cellxy = 0; cellxy < condition2; cellxy++)
 		{
 			if (targetCells(cellxy) == 0) {
 				targetCellsCoords.push_back(targetCells.xy(cellxy));
-				/*Matrix mask(2 * aRayonRouteurs + 1, 2 * aRayonRouteurs + 1);
-				otherMove = gainPoints(targetCellsCoords[cellxy][0], targetCellsCoords[cellxy][1], aRayonRouteurs, aMap, mask);
-				if (otherMove >= bestMove) {
-					theChosenOne = targetCellsCoords[cellxy];
-				}*/
 			}
 		}
 		int sizeTestCells = targetCellsCoords.size();
 		for (int cellxy = 0; cellxy < sizeTestCells; cellxy++)
 		{
-			//std::cout << cellxy << "\n";
 			Matrix mask(2 * aRayonRouteurs + 1, 2 * aRayonRouteurs + 1);
 			otherMove = gainPoints(targetCellsCoords[cellxy][0], targetCellsCoords[cellxy][1], aRayonRouteurs, aMap, mask);
-			if (otherMove >= bestMove) {
+			int indexMask = 0;
+			int condition3 = targetCellsCoords[cellxy][0] + aRayonRouteurs;
+			int recount = 0;
+			for (int xTargetCell = targetCellsCoords[cellxy][0] - aRayonRouteurs; xTargetCell <= condition3; xTargetCell++)
+			{
+				int condition4 = targetCellsCoords[cellxy][1] + aRayonRouteurs;
+				for (int yTargetCell = targetCellsCoords[cellxy][1] - aRayonRouteurs; yTargetCell <= condition4; yTargetCell++)
+				{
+					if (mask(indexMask) == 1)
+					{
+						recount++;
+					}
+					indexMask++;
+				}
+			}
+
+			if ((otherMove - recount) >= bestMove) {
 				theChosenOne = targetCellsCoords[cellxy];
+				bestMove = otherMove - recount;
 			}
 		}
 
