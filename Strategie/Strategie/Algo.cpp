@@ -71,7 +71,10 @@ int Algo::quasiEuclideanDist(int*  routeur, int * newrouteur)
 	int x2 = newrouteur[0];
 	int y2 = newrouteur[1];
 
-	if (abs(x1 - x2) > abs(y1 - y2)) return abs(x1 - x2) + (sqrt(2) - 1) * abs(y1 - y2);
+	if (abs(x1 - x2) > abs(y1 - y2))
+	{
+		return abs(x1 - x2) + (sqrt(2) - 1) * abs(y1 - y2);
+	}
 	return (sqrt(2) - 1) * abs(x1 - x2) + abs(y1 - y2);
 }
 
@@ -115,9 +118,13 @@ int Algo::cellsCoveredPercentage(Matrix & targetCells)
 {
 	// nombre de cellules non couvertes
 	int nbCellsNotCovered = 0;
-	for (int k = 0; k < targetCells.getRows() * targetCells.getCols(); k++)
+	int condition = targetCells.getRows() * targetCells.getCols();
+	for (int k = 0; k < condition; k++)
 	{
-		if (targetCells(k) == 0) nbCellsNotCovered++;
+		if (targetCells(k) == 0)
+		{
+			nbCellsNotCovered++;
+		}
 	}
 
 	return ((aNbCellsOriginal - nbCellsNotCovered) * 100) / aNbCellsOriginal;
@@ -134,9 +141,13 @@ int Algo::nbCellsCovered(Matrix & targetCells)
 {
 	// nombre de cellules non couvertes
 	int nbCellsNotCovered = 0;
-	for (int k = 0; k < targetCells.getRows() * targetCells.getCols(); k++)
+	int condition = targetCells.getRows() * targetCells.getCols();
+	for (int k = 0; k < condition; k++)
 	{
-		if (targetCells(k) == 0) nbCellsNotCovered++;
+		if (targetCells(k) == 0)
+		{
+			nbCellsNotCovered++;
+		}
 	}
 
 	return aNbCellsOriginal - nbCellsNotCovered;
@@ -188,7 +199,8 @@ void Algo::findChessConnection(int * Routerfrom, int * RouterTo, std::vector<int
 	// on defini les elements droits restants
 	if (amin == 0)
 	{
-		for (int i = 0; i < abs(dx - dy); i++)
+		int condition = abs(dx - dy);
+		for (int i = 0; i < condition; i++)
 		{
 			path(path.getRows() - 1, r[amin] + i) = 1; // passe a true
 		}
@@ -196,24 +208,31 @@ void Algo::findChessConnection(int * Routerfrom, int * RouterTo, std::vector<int
 	}
 	else if (amin == 1)
 	{
-		for (int i = 0; i < abs(dx - dy); i++)
+		int condition = abs(dx - dy);
+		for (int i = 0; i < condition; i++)
 		{
 			path(r[amin] + i, path.getCols() - 1) = 1; // passe a true
 		}
 	}
 
 	// si la matrice a ete retournee, on la remet a l'endroit
-	if (reversed) path.reverse();
-
-
-	// on selectionne les cables
-	for (int r = 0; r < path.getRows(); r++)
+	if (reversed)
 	{
+		path.reverse();
+	}
 
+	int rows = path.getRows();
+	// on selectionne les cables
+	for (int r = 0; r < rows; r++)
+	{
+		int cols = path.getCols();
 		for (int c = 0; c < path.getCols(); c++)
 		{
 			// si true dans path, on place un cable a cette coordonnees
-			if (path(r, c) == 1) cables.push_back(new int[2]{ r + xmin, c + ymin });
+			if (path(r, c) == 1)
+			{
+				cables.push_back(new int[2]{ r + xmin, c + ymin });
+			}
 		}
 	}
 }
@@ -232,7 +251,8 @@ void Algo::findChessConnection(int * Routerfrom, int * RouterTo, std::vector<int
 */
 void Algo::toCsrMatrix(Matrix & mat, std::vector<int> & dists, std::vector<int> & idx, std::vector<int> & idy, int dim)
 {
-	for (int k = 0; k < dists.size(); k++)
+	int condition = dists.size();
+	for (int k = 0; k < condition; k++)
 	{
 		try
 		{
@@ -265,7 +285,10 @@ bool Algo::routerOnBackbone(std::vector<int *> & routeurs)
 			continue;
 		}
 
-		if (rout[0] == aBackbone[0] && rout[1] == aBackbone[1]) return true;
+		if (rout[0] == aBackbone[0] && rout[1] == aBackbone[1])
+		{
+			return true;
+		}
 	}
 
 	return false;
@@ -339,7 +362,8 @@ void Algo::toMinimumSpanningTree(Matrix & mat, Matrix & mst)
 	parent[0] = -1; // Le 1er noeud est toujours la racine du mst
 
 					// The mst aura "dim" sommets
-	for (int count = 0; count < dim - 1; count++)
+	int dimMinusOne = dim - 1;
+	for (int count = 0; count < dimMinusOne; count++)
 	{
 		// on choisie le sommet de cle minimum de l'ensemble des sommets par encore inclus dans le mst
 		int u = minKey(key, mstSet, dim);
@@ -391,11 +415,12 @@ void Algo::placeMstPaths(std::vector<int *> & routeurs, std::vector<int> & idx, 
 
 	//std::cout << "mstMat" << std::endl;
 	//std::cout << mstMat << std::endl;
-
+	int rows = mstMat.getRows();
+	int cols = mstMat.getCols();
 	// algo calcul distance entre les routeurs. Parcours de l'arbre couvrant minimal
-	for (int r = 0; r < mstMat.getRows(); r++)
+	for (int r = 0; r < rows; r++)
 	{
-		for (int c = 0; c < mstMat.getCols(); c++)
+		for (int c = 0; c < cols; c++)
 		{
 			if (mstMat(r, c) > 0) // si [r, c] un somment de l'arbre couvrant minimal
 			{
@@ -405,11 +430,20 @@ void Algo::placeMstPaths(std::vector<int *> & routeurs, std::vector<int> & idx, 
 				for (int *cable : cables) // pour chaque cable
 				{
 					// si le cable est sur l'emetteur
-					if (cable[0] == aBackbone[0] && cable[1] == aBackbone[1]) continue;
+					if (cable[0] == aBackbone[0] && cable[1] == aBackbone[1])
+					{
+						continue;
+					}
 
 					// si le cable est sur un routeur
-					if (aMap(cable[0], cable[1]) == Cell::Router) aMap(cable[0], cable[1]) = Cell::ConnectedRouter; // on passe la valeur de la coordonnee de 2 a 3 pour indiquer que le routeur est connecte au backbone
-					else aMap(cable[0], cable[1]) = Cell::Cable; // sinon on place tout simplement le cable
+					if (aMap(cable[0], cable[1]) == Cell::Router)
+					{
+						aMap(cable[0], cable[1]) = Cell::ConnectedRouter; // on passe la valeur de la coordonnee de 2 a 3 pour indiquer que le routeur est connecte au backbone
+					}
+					else
+					{
+						aMap(cable[0], cable[1]) = Cell::Cable; // sinon on place tout simplement le cable
+					}
 				}
 			}
 		}
@@ -444,8 +478,10 @@ void Algo::updateApproximateCost(int * newRouteurs, std::vector<int *> routeurs,
 			idy.push_back(new_id);
 			dists.push_back(dist);
 		}
-		if (dist < distMin) distMin = dist;
-
+		if (dist < distMin)
+		{
+			distMin = dist;
+		}
 		cpt++;
 	}
 
@@ -484,7 +520,6 @@ void Algo::kruskal(Matrix & m, int * newRouteurs, std::vector<int *> & routeurs,
 			idy.push_back(new_id); // ex: idy = [3, 3, 3]
 			dists.push_back(dist); // ex: dists = [1, 7, 4]
 		}
-
 		cpt++;
 	}
 
@@ -526,7 +561,8 @@ void Algo::kruskal(Matrix & m, int * newRouteurs, std::vector<int *> & routeurs,
 void Algo::wirelessAccess(int x, int y, int radius, Matrix & mat, Matrix & mask)
 {
 	// remplissage de mask
-	for (int maskIndex = 0; maskIndex < mask.getCols() * mask.getRows(); maskIndex++)
+	int condition = mask.getCols() * mask.getRows();
+	for (int maskIndex = 0; maskIndex < condition; maskIndex++)
 	{
 		mask(maskIndex) = -1; // par defaut, on place des bordures partout
 	}
@@ -548,7 +584,10 @@ void Algo::wirelessAccess(int x, int y, int radius, Matrix & mat, Matrix & mask)
 			int yt = y + dw;
 
 			// on check les bordures
-			if (xt >= mat.getRows() || xt < 0 || yt >= mat.getCols() || yt < 0) continue;
+			if (xt >= mat.getRows() || xt < 0 || yt >= mat.getCols() || yt < 0)
+			{
+				continue;
+			}
 
 			// si pas une cellule cible
 			if (mat(xt, yt) != Cell::Wireless)
@@ -583,15 +622,111 @@ void Algo::wirelessAccess(int x, int y, int radius, Matrix & mat, Matrix & mask)
 			// matrice des murs
 			Matrix walls(rect.getRows(), rect.getCols());
 			// remplissage de walls
-			for (int wallsIndex = 0; wallsIndex < walls.getRows() * walls.getCols(); wallsIndex++)
+			int condition2 = walls.getCols() * walls.getRows();
+			for (int wallsIndex = 0; wallsIndex < condition2; wallsIndex++)
 			{
 				walls(wallsIndex) = rect(wallsIndex) == Cell::Wall ? 1 : 0; // si mur ==> 1, 0 sinon
 			}
 
-			if (walls.sum()) mask(dh + radius, dw + radius) = 0; // si il a au moins 1 mur
-			else mask(dh + radius, dw + radius) = 1; // si aucun mur
+			if (walls.sum())
+			{
+				mask(dh + radius, dw + radius) = 0; // si il a au moins 1 mur
+			}
+			else
+			{
+				mask(dh + radius, dw + radius) = 1; // si aucun mur
+			}
 		}
 	}
+
+}
+
+int Algo::gainPoints(int x, int y, int radius, const Matrix & mat, Matrix & mask)
+{
+	int count = 0;
+	// remplissage de mask
+	int condition = mask.getCols() * mask.getRows();
+	for (int maskIndex = 0; maskIndex < condition; maskIndex++)
+	{
+		mask(maskIndex) = -1; // par defaut, on place des bordures partout
+	}
+
+	// on parcourt le perimetre de de gauche a droite et de haut en bas
+	for (int dh = -radius; dh <= radius; dh++) // decalage en lignes
+	{
+		for (int dw = -radius; dw <= radius; dw++) // decalage en colonnes
+		{
+			// on passe la cellule du routeur
+			if (dh == 0 && dw == 0)
+			{
+				mask(dh + radius, dw + radius) = 1;
+				continue;
+			}
+
+			// transforme les coordonnees
+			int xt = x + dh;
+			int yt = y + dw;
+
+			// on check les bordures
+			if (xt >= mat.getRows() || xt < 0 || yt >= mat.getCols() || yt < 0)
+			{
+				continue;
+			}
+
+			// si pas une cellule cible
+			if (mat(xt, yt) != Cell::Wireless)
+			{
+				// on met les autres champs a 0
+				mask(dh + radius, dw + radius) = 0;
+
+				continue;
+			}
+
+			// on construit la + petite rectangle contenant le routeur et la cellule pour pouvoir savoir si la portee du routeur est coupee par un mur
+			// coordonnees des 4 sommets du rectangle
+			int fromX = std::min(x, xt);
+			int toX = std::max(x, xt);
+			int fromY = std::min(y, yt);
+			int toY = std::max(y, yt);
+
+			Matrix rect(toX - fromX + 1, toY - fromY + 1);
+
+			// prochain index de rect a remplir
+			int nextRectIndex = 0;
+			// remplissage de rect avec les valeurs de mat correspondantes
+			for (int r = fromX; r <= toX; r++)
+			{
+				for (int c = fromY; c <= toY; c++)
+				{
+					rect(nextRectIndex) = mat(r, c);
+					nextRectIndex++;
+				}
+			}
+
+			// matrice des murs
+			Matrix walls(rect.getRows(), rect.getCols());
+			// remplissage de walls
+			int condition2 = walls.getCols()*walls.getRows();
+			for (int wallsIndex = 0; wallsIndex < condition2; wallsIndex++)
+			{
+				walls(wallsIndex) = rect(wallsIndex) == Cell::Wall ? 1 : 0; // si mur ==> 1, 0 sinon
+			}
+
+			if (walls.sum()) {
+				mask(dh + radius, dw + radius) = 0; // si il a au moins 1 mur
+			}
+			else {
+				mask(dh + radius, dw + radius) = 1; // si aucun mur
+			}
+		}
+	}
+	for (int maskIndex = 0; maskIndex < condition; maskIndex++)
+	{
+		if (mask(maskIndex) == 1) {
+			count += 1;
+		}
+	}
+	return count;
 
 }
 
@@ -610,7 +745,7 @@ void Algo::random()
 
 	// matrice avec les cellules cibles a 0 et le reste a 1
 	Matrix targetCells(aMap.getRows(), aMap.getCols());
-
+	int condition = aMap.getRows() * aMap.getCols();
 	for (int k = 0; k < aMap.getRows() * aMap.getCols(); k++)
 	{
 		if (aMap(k) == Cell::Wireless)
@@ -618,7 +753,10 @@ void Algo::random()
 			targetCells(k) = 0;
 			aNbCellsOriginal++;
 		}
-		else targetCells(k) = 1;
+		else
+		{
+			targetCells(k) = 1;
+		}
 	}
 
 	std::vector<int *> routeurs;
@@ -639,10 +777,13 @@ void Algo::random()
 		//std::cout << currentRouterId +1 << " routeurs" << std::endl;
 		// vecteur des coordonnees des cellules cibles n'ayant pas encore de routeur place dessus
 		std::vector<int *> targetCellsCoords;
-
-		for (int cellxy = 0; cellxy < targetCells.getRows() * targetCells.getCols(); cellxy++)
+		int condition2 = targetCells.getRows() * targetCells.getCols();
+		for (int cellxy = 0; cellxy < condition2; cellxy++)
 		{
-			if (targetCells(cellxy) == 0) targetCellsCoords.push_back(targetCells.xy(cellxy));
+			if (targetCells(cellxy) == 0)
+			{
+				targetCellsCoords.push_back(targetCells.xy(cellxy));
+			}
 		}
 
 		// si il n'y a pas de position dispo pour le prochain routeur
@@ -662,7 +803,7 @@ void Algo::random()
 		// on recupere une position random pour un prochain routeur
 		std::random_device rd;     // seulement utilise une fois pour initialiser le moteur (semence)
 		std::mt19937 rng(rd());    // moteur a nombre aleatoire utilise (Mersenne-Twister dans ce cas)
-		std::uniform_int_distribution<int> uni(0, aMap.getRows() * aMap.getCols()); // garantie sans biais
+		std::uniform_int_distribution<int> uni(0, condition); // garantie sans biais
 
 		auto random_integer = uni(rng) % targetCellsCoords.size();
 		int * xyNewRouter = targetCellsCoords[random_integer];
@@ -691,9 +832,14 @@ void Algo::random()
 				kruskal(aMap, xyNewRouter, routeurs, idx, idy, dists, succ, cost); // modifie cost, succ, routeurs, idx, idy et dists
 
 			}
-			else routeurs.push_back(xyNewRouter);
+			else
+			{
+				routeurs.push_back(xyNewRouter);
+			}
 		}
-		else kruskal(aMap, xyNewRouter, routeurs, idx, idy, dists, succ, cost); // modifie cost, succ, routeurs, idx, idy et dists
+		else {
+			kruskal(aMap, xyNewRouter, routeurs, idx, idy, dists, succ, cost); // modifie cost, succ, routeurs, idx, idy et dists
+		}
 
 		//std::cout << "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Nouveau routeur en [" << xyNewRouter[0] << "," << xyNewRouter[1] << "]" << std::endl;
 
@@ -708,11 +854,16 @@ void Algo::random()
 
 			int indexMask = 0;
 			// dans la matrice targetCells, on met a 1 les cellules qui sont dans le perimetre du routeur, et on laisse a 0 les autres ou celles qui sont cachees pas un mur
-			for (int xTargetCell = xyNewRouter[0] - aRayonRouteurs; xTargetCell <= (xyNewRouter[0] + aRayonRouteurs); xTargetCell++)
+			int condition3 = xyNewRouter[0] + aRayonRouteurs;
+			for (int xTargetCell = xyNewRouter[0] - aRayonRouteurs; xTargetCell <= xyNewRouter[0] + aRayonRouteurs; xTargetCell++)
 			{
-				for (int yTargetCell = xyNewRouter[1] - aRayonRouteurs; yTargetCell <= (xyNewRouter[1] + aRayonRouteurs); yTargetCell++)
+				int condition4 = xyNewRouter[1] + aRayonRouteurs;
+				for (int yTargetCell = xyNewRouter[1] - aRayonRouteurs; yTargetCell <= condition4; yTargetCell++)
 				{
-					if (mask(indexMask) == 1) targetCells(xTargetCell, yTargetCell) = 1;
+					if (mask(indexMask) == 1)
+					{
+						targetCells(xTargetCell, yTargetCell) = 1;
+					}
 					indexMask++;
 				}
 			}
@@ -754,11 +905,188 @@ void Algo::random()
 	// #################################################################################
 }
 
+void Algo::bigCase()
+{
+	// nb max de routeurs possibles
+	int maxNumRouters = aBudget / aPrixRouteur;
+	std::cout << "  Budget / prix d'un routeur = \t" << maxNumRouters << " routeurs\n" << std::endl;
+	std::cout << "  --------------------------------------------------------------------------------------------------------------------" << std::endl;
+	std::cout << "  Routeurs\t\t|\t\t% budget utilise\t\t|\t\t% cellules couvertes" << std::endl;
+	std::cout << "  --------------------------------------------------------------------------------------------------------------------" << std::endl;
+
+
+	// matrice avec les cellules cibles a 0 et le reste a 1
+	Matrix targetCells(aMap.getRows(), aMap.getCols());
+	int condition = aMap.getRows() * aMap.getCols();
+	for (int k = 0; k < condition; k++)
+	{
+		if (aMap(k) == Cell::Wireless)
+		{
+			targetCells(k) = 0;
+			aNbCellsOriginal++;
+		}
+		else targetCells(k) = 1;
+	}
+
+	std::vector<int *> routeurs;
+	std::vector<int> idx;
+	std::vector<int> idy;
+	std::vector<int> dists;
+	int cost = 0; // cout reel calcul d'apres le mst
+	int approximateCost = 0; // cout approximatif calcul dans le mst, en reliant simplement le routeur vers le routeur courant vers son plus proche
+	bool succ = true;
+	bool useKruskal = false; // vrai que le cout approximatif > budjet
+
+							 // on place le backbone dans le vecteur de routeur. 
+							 // Bien que n'etant pas un routeur avec pouvant couvrir des cellules, il represente un sommet dans la construction d'un mst avec Kruskal
+	routeurs.push_back(aBackbone);
+
+	for (int currentRouterId = 0; currentRouterId < maxNumRouters; currentRouterId++)
+	{
+		//std::cout << currentRouterId +1 << " routeurs" << std::endl;
+		// vecteur des coordonnees des cellules cibles n'ayant pas encore de routeur place dessus
+		std::vector<int *> targetCellsCoords;
+		int bestMove = 0, otherMove = 0;
+		int * theChosenOne = 0;
+		int condition2 = targetCells.getRows() * targetCells.getCols();
+		for (int cellxy = 0; cellxy < targetCells.getRows() * targetCells.getCols(); cellxy++)
+		{
+			if (targetCells(cellxy) == 0) {
+				targetCellsCoords.push_back(targetCells.xy(cellxy));
+				/*Matrix mask(2 * aRayonRouteurs + 1, 2 * aRayonRouteurs + 1);
+				otherMove = gainPoints(targetCellsCoords[cellxy][0], targetCellsCoords[cellxy][1], aRayonRouteurs, aMap, mask);
+				if (otherMove >= bestMove) {
+					theChosenOne = targetCellsCoords[cellxy];
+				}*/
+			}
+		}
+		int sizeTestCells = targetCellsCoords.size();
+		for (int cellxy = 0; cellxy < sizeTestCells; cellxy++)
+		{
+			//std::cout << cellxy << "\n";
+			Matrix mask(2 * aRayonRouteurs + 1, 2 * aRayonRouteurs + 1);
+			otherMove = gainPoints(targetCellsCoords[cellxy][0], targetCellsCoords[cellxy][1], aRayonRouteurs, aMap, mask);
+			if (otherMove >= bestMove) {
+				theChosenOne = targetCellsCoords[cellxy];
+			}
+		}
+
+		// si il n'y a pas de position dispo pour le prochain routeur
+		if (targetCellsCoords.size() == 0)
+		{
+			//std::cout << "il n'y a plus de place pour placer de routeurs" << std::endl;
+
+			// on tire les cables
+			placeMstPaths(routeurs, idx, idy, dists);
+
+			std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << (useKruskal ? cost : approximateCost) << " / " << aBudgetOriginal << " = " << ((useKruskal ? cost : approximateCost) * 100) / aBudgetOriginal << "%" << (useKruskal ? "\t" : "") << "\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
+			std::cout << '\r';
+
+			return; // et on sort de l'algo
+		}
+
+		// on garde en memoire l'etat de la case avant d'y mettre un routeur au ca ou celui-ci ne conviendrait pas
+		int safeguardingInfo = aMap(theChosenOne[0], theChosenOne[1]);
+
+		aMap(theChosenOne[0], theChosenOne[1]) = Cell::Router; // Cell::Router = 2. On positionne le routeur sur la carte
+
+															   // tentative de placement de ce routeur
+															   // on sauvegarde l'etat des variables au cas ou on ne pourrait pas placer ce routeur
+		std::vector<int> idxTmp = idx;
+		std::vector<int> idyTmp = idy;
+		std::vector<int> distsTmp = dists;
+		int costTmp = useKruskal ? cost : approximateCost;
+
+		// pour eviter de faire le mst, on calcule approximativement le cout de place de ce routeur en le cablant a son plus proche voisin
+		if (!useKruskal)
+		{
+			updateApproximateCost(theChosenOne, routeurs, idx, idy, dists, approximateCost);
+
+			// si le cout approximatif indique que le cout est depasse, on utilisera kruskal pour connaitre le cout reel
+			if (approximateCost > aBudgetOriginal)
+			{
+				useKruskal = true;
+				kruskal(aMap, theChosenOne, routeurs, idx, idy, dists, succ, cost); // modifie cost, succ, routeurs, idx, idy et dists
+
+			}
+			else
+			{
+				routeurs.push_back(theChosenOne);
+			}
+		}
+		else {
+			kruskal(aMap, theChosenOne, routeurs, idx, idy, dists, succ, cost); // modifie cost, succ, routeurs, idx, idy et dists
+		}
+
+																				 //std::cout << "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Nouveau routeur en [" << xyNewRouter[0] << "," << xyNewRouter[1] << "]" << std::endl;
+
+																				 // si encore du budget
+		if (succ)
+		{
+			//std::cout << "entree if (succ)" << std::endl;
+			// recuperation du masque du perimetre du routeur
+			Matrix mask(2 * aRayonRouteurs + 1, 2 * aRayonRouteurs + 1);
+
+			wirelessAccess(theChosenOne[0], theChosenOne[1], aRayonRouteurs, aMap, mask);
+
+			int indexMask = 0;
+			int condition3 = theChosenOne[0] + aRayonRouteurs;
+			// dans la matrice targetCells, on met a 1 les cellules qui sont dans le perimetre du routeur, et on laisse a 0 les autres ou celles qui sont cachees pas un mur
+			for (int xTargetCell = theChosenOne[0] - aRayonRouteurs; xTargetCell <= condition3; xTargetCell++)
+			{
+				int condition4 = theChosenOne[1] + aRayonRouteurs;
+				for (int yTargetCell = theChosenOne[1] - aRayonRouteurs; yTargetCell <= condition4; yTargetCell++)
+				{
+					if (mask(indexMask) == 1)
+					{
+						targetCells(xTargetCell, yTargetCell) = 1;
+					}
+					indexMask++;
+				}
+			}
+
+
+			if (((routeurs.size() - 1) % 1) == 0)
+			{
+				std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << (useKruskal ? cost : approximateCost) << " / " << aBudgetOriginal << " = " << ((useKruskal ? cost : approximateCost) * 100) / aBudgetOriginal << "%" << (useKruskal ? "\t" : "") << "\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
+				std::cout << '\r';
+
+			}
+		}
+		else // plus de budget, on enleve le routeur en trop
+		{
+			//std::cout << "\n\n\nPlus de budget !" << std::endl;
+			//std::cout << "succ == false" << std::endl;
+
+			// on retabli l'etat de la case dans la carte
+			aMap(theChosenOne[0], theChosenOne[1]) = safeguardingInfo;
+
+			// on supprime le routeur de trop du vecteur
+			routeurs.erase(routeurs.begin() + routeurs.size() - 1);
+
+			// on reduit la taille du vecteur au nombre d'elements dans le vecteur
+			routeurs.shrink_to_fit();
+
+			// on tire les cables
+			placeMstPaths(routeurs, idxTmp, idyTmp, distsTmp);
+			std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << costTmp << " / " << aBudgetOriginal << " = " << (costTmp * 100) / aBudgetOriginal << "%" << "\t\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
+			std::cout << '\r';
+
+			return;
+
+		}
+	}
+	// #################################################################################
+	// peut etre a enlever pr les grosses map
+	placeMstPaths(routeurs, idx, idy, dists);
+	// #################################################################################
+}
+
 void Algo::run()
 {
 	if (aMethod == "random")
 	{
 		std::cout << "  Algo =\t\t\t" << aMethod << std::endl;
-		random();
+		bigCase();
 	}
 }

@@ -28,10 +28,18 @@ int* IO::initializeData(std::string fichierInput)
 		{
 			while (iss >> word) //pour chaque mot
 			{
-				if (wordIndex == 1)	retDatas[0] = std::stoi(word); // nombre de lignes
-				else if (wordIndex == 2) retDatas[1] = std::stoi(word); // nombre de colonnes
-				else retDatas[2] = std::stoi(word); // rayon des routeurs
-
+				if (wordIndex == 1)
+				{
+					retDatas[0] = std::stoi(word); // nombre de lignes
+				}
+				else if (wordIndex == 2)
+				{
+					retDatas[1] = std::stoi(word);// nombre de colonnes
+				}
+				else
+				{
+					retDatas[2] = std::stoi(word); // rayon des routeurs
+				}
 				wordIndex++;
 			}
 		}
@@ -39,9 +47,18 @@ int* IO::initializeData(std::string fichierInput)
 		{
 			while (iss >> word) //pour chaque mot
 			{
-				if (wordIndex == 1)	retDatas[3] = std::stoi(word); // prix d'un cable
-				else if (wordIndex == 2) retDatas[4] = std::stoi(word); // prix d'un routeur
-				else retDatas[5] = std::stoi(word); // budget maximum
+				if (wordIndex == 1)
+				{
+					retDatas[3] = std::stoi(word); // prix d'un cable
+				}
+				else if (wordIndex == 2)
+				{
+					retDatas[4] = std::stoi(word); // prix d'un routeur
+				}
+				else
+				{
+					retDatas[5] = std::stoi(word); // budget maximum
+				}
 
 				wordIndex++;
 			}
@@ -50,19 +67,22 @@ int* IO::initializeData(std::string fichierInput)
 		{
 			while (iss >> word) //pour chaque mot
 			{
-				if (wordIndex == 1) {
+				if (wordIndex == 1) 
+				{
 					retDatas[6] = std::stoi(word); // coordonnee X de l'antenne --> = index ligne
 					backboneX = retDatas[6];
 				}
-				else {
+				else 
+				{
 					retDatas[7] = std::stoi(word); // coordonnee Y de l'antenne --> = index colonne
 					backboneY = retDatas[7];
 				}
-
 				wordIndex++;
 			}
 		}
-		else break; //sinon, c'est la carte
+		else {
+			break; //sinon, c'est la carte
+		}
 
 		wordIndex = 1;
 		lineIndex++;
@@ -85,7 +105,6 @@ int* IO::initializeData(std::string fichierInput)
 void IO::initializeMap(Matrix & m, std::string fichierInput)
 {
 	int cpt = 0;
-
 	std::ifstream input(fichierInput);
 	std::string line; //ligne courante
 	unsigned int lineIndex = 1; //numero de la ligne
@@ -159,9 +178,11 @@ void IO::generateOutput(Matrix & mapRouteurs, std::string pathBeginning)
 void IO::ioBrowser(Matrix & mapRouteurs, int x, int y)
 {
 	//Si c'est une case valide. i.e. un routeur, un cable ou le backbone
-	if (mapRouteurs(x, y) == 3 || mapRouteurs(x, y) == 4 || (x == backboneX && y == backboneY)) {
+	if (mapRouteurs(x, y) == 3 || mapRouteurs(x, y) == 4 || (x == backboneX && y == backboneY)) 
+	{
 		//Si c'est un routeur cable
-		if (mapRouteurs(x, y) == 3) {
+		if (mapRouteurs(x, y) == 3) 
+		{
 			counterRouter++;
 			routeurtxt.append(std::to_string(x) + " " + std::to_string(y) + "\n");
 
@@ -173,7 +194,8 @@ void IO::ioBrowser(Matrix & mapRouteurs, int x, int y)
 			}
 		}
 		//Si c'est un cable
-		else if (mapRouteurs(x, y) == 4) {
+		else if (mapRouteurs(x, y) == 4) 
+		{
 			counterConnectedCells++;
 			connectedcelltxt.append(std::to_string(x) + " " + std::to_string(y) + "\n");
 		}

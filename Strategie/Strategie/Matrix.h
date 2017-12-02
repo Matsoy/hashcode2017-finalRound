@@ -16,8 +16,8 @@ public:
 	int operator()(int k) const;
 
 	// accesseurs
-	int getRows();
-	int getCols();
+	int getRows() const;
+	int getCols() const;
 
 	bool isEmpty();
 	int sum();

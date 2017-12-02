@@ -39,7 +39,9 @@ public:
 	void toMinimumSpanningTree(Matrix & csrMat, Matrix & mstMat);
 	int minKey(std::vector<int> key, std::vector<bool> mstSet, int dim);
 	void random();
+	void bigCase();
 	void wirelessAccess(int x, int y, int radius, Matrix & mat, Matrix & mask);
+	int gainPoints(int x, int y, int radius, const Matrix & mat, Matrix & mask);
 	void placeMstPaths(std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists);
 	int argMin(int * tab, int size);
 	void findChessConnection(int * Routerfrom, int * RouterTo, std::vector<int *> & cables);
