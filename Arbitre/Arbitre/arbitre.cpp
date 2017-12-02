@@ -1,20 +1,22 @@
 #include "arbitre.h"
-#include <time.h>
-#include <map>
 #include "copyofdirent.h"
-using namespace std;
+//using namespace std;
+
 int main()
 {
-	checkSolution("../../inputs/charleston_road.in", "../../solutions/random-charleston_road-1512092257-21953913.out");
+	std::string method = "random";
+	std::string map = "lets_go_higher";
+	std::string extension = "1512179763";
+	checkSolution("../../inputs/" + map + ".in", "../../solutions/" + map + "/" + method + "-" + map + "-" + extension + ".out");
 	return(EXIT_SUCCESS);
 }
 //commented as it won't compile yet
 /*
-int tempmain(const string& dir, const string& outfile) {
-	vector<string> inputlist = ...;
-	vector<string> outputlist = ...;
+int tempmain(const std::string& dir, const std::string& outfile) {
+	std::vector<std::string> inputlist = ...;
+	std::vector<std::string> outputlist = ...;
 	int iterate = 0;
-	std::map<int, std::pair<float,string>> results;
+	std::map<int, std::pair<float, std::string>> results;
 	float sumtimes;
 	for (auto &s : filevec) {
 		int testcount = 0;
@@ -29,12 +31,12 @@ int tempmain(const string& dir, const string& outfile) {
 			sumtimes += secondsdiff;
 		}
 		int score = checkSolution(intputlist[iterate], outputlist[iterate]);
-		results[score] = make_pair(sumtimes/5,s);
+		results[score] = std::make_pair(sumtimes/5,s);
 	}
-	ofstream outputS;
+	std::ofstream outputS;
 	outputS.open(outfile);
 	for (const auto& result : results) {
-		cout << "executable :" << result.second.second << " temps moyen: " << result.second.first << " score: " << result.first << "\n";
+		std::cout << "executable :" << result.second.second << " temps moyen: " << result.second.first << " score: " << result.first << "\n";
 	}
 }
 */
@@ -304,9 +306,11 @@ int checkSolution(const std::string & mapFile, const std::string & solutionFile)
 		return 0;
 	}
 }
+
+
 /* plagiat mdr */
 
-void GetFilesInDirectory(std::vector<string> &out, const string &directory)
+void GetFilesInDirectory(std::vector<std::string> &out, const std::string &directory)
 {
 #ifdef WINDOWS
 	HANDLE dir;
@@ -337,8 +341,8 @@ void GetFilesInDirectory(std::vector<string> &out, const string &directory)
 
 	dir = opendir(directory.c_str());
 	while ((ent = readdir(dir)) != NULL) {
-		const string file_name = ent->d_name;
-		const string full_file_name = directory + "/" + file_name;
+		const std::string file_name = ent->d_name;
+		const std::string full_file_name = directory + "/" + file_name;
 
 		if (file_name[0] == '.')
 			continue;
