@@ -1,12 +1,42 @@
 #include "arbitre.h"
-
+#include <time.h>
+#include <map>
+using namespace std;
 int main()
 {
 	checkSolution("../../inputs/charleston_road.in", "../../solutions/random-charleston_road-1512092257-21953913.out");
 	return(EXIT_SUCCESS);
 }
+//commented as it won't compile yet
+/*
+int tempmain(const string& dir, const string& outfile) {
+	vector<string> inputlist = ...;
+	vector<string> outputlist = ...;
+	int iterate = 0;
+	std::map<int, std::pair<float,string>> results;
+	float sumtimes;
+	for (auto &s : filevec) {
+		int testcount = 0;
+		sumtimes = 0;
+		while (testcount <= 5) {
 
-
+			clock_t t1, t2;
+			t1 = clock();
+			system("curfile inputlist[iterate] outputlist[iterate]");
+			t2 = clock();
+			float secondsdiff = (float)t2 - (float)t1;
+			sumtimes += secondsdiff;
+		}
+		int score = checkSolution(intputlist[iterate], outputlist[iterate]);
+		results[score] = make_pair(sumtimes/5,s);
+	}
+	ofstream outputS;
+	outputS.open(outfile);
+	for (const auto& result : results) {
+		cout << "executable :" << result.second.second << " temps moyen: " << result.second.first << " score: " << result.first << "\n";
+	}
+}
+*/
 std::vector<int> infoMap(const std::string & mapName)
 {
 	std::vector<int> data;
