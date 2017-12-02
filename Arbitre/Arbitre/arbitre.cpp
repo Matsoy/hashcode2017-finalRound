@@ -4,10 +4,12 @@
 
 int main()
 {
+	//Changer les 3 paramètres en fonction de la méthode, de la map et du timestamp
 	std::string method = "random";
-	std::string map = "lets_go_higher";
-	std::string extension = "1512179763";
-	checkSolution("../../inputs/" + map + ".in", "../../solutions/" + map + "/" + method + "-" + map + "-" + extension + ".out");
+	std::string map = "opera";
+	std::string extension = "1512154692";
+
+	checkSolution("../../solutions/" + map + "/" + method + "-" + map + "-" + extension + ".out");
 	return(EXIT_SUCCESS);
 }
 //commented as it won't compile yet
@@ -166,8 +168,10 @@ bool wallPresence(const std::vector<std::vector<int>>& map, const int & xRouter,
 }
 
 
-int checkSolution(const std::string & mapFile, const std::string & solutionFile)
+int checkSolution(const std::string & solutionFile)
 {
+	std::string soltmp = solutionFile.substr(16);
+	std::string mapFile = "../../inputs/" + soltmp.substr(0, soltmp.find("/")) + ".in";
 	std::cout << "Test de la solution : " << solutionFile.substr(16) << std::endl;
 	std::cout << "Sur la map : " << mapFile.substr(13) << std::endl << std::endl;
 
