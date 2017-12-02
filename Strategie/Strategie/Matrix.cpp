@@ -121,13 +121,13 @@ std::ostream & operator<<(std::ostream & os, const Matrix &mat)
 		m = cpt / mat.mCols;
 		n = cpt % mat.mCols;
 
-		if (n == 0) os << "[ "; // si 1er elem
+		// si 1er elem
+		if (n == 0) os << "[ ";
 
-		if ((n == mat.mCols - 1)) // si dernier elem
-		{
-			os << mat(m, n) << " ]" << std::endl;
-		}
+		// si dernier elem
+		if ((n == mat.mCols - 1)) os << mat(m, n) << " ]" << std::endl;
 		else os << mat(m, n) << ", ";
+
 		cpt++;
 	}
 

@@ -7,7 +7,9 @@ int main()
 {
 	try {
 		//Nom de la carte
-		std::string mapName = "charleston_road";
+		std::string mapName = "lets_go_higher";
+		std::string method = "random";
+
 
 		std::cout << "  Carte =\t\t\t" << mapName << std::endl;
 
@@ -28,7 +30,7 @@ int main()
 
 			int * xyBackbone = new int[2]{ datas[6], datas[7] };
 
-			Algo algo("random", map, datas[2], datas[3], datas[4], datas[5], datas[5], xyBackbone); // type, rayonRouteurs, prixCable, prixRouteur, budgetMax, budgetOriginal, [xBackbone, yBackbone]
+			Algo algo(method, mapName, map, datas[2], datas[3], datas[4], datas[5], datas[5], xyBackbone); // type, rayonRouteurs, prixCable, prixRouteur, budgetMax, budgetOriginal, [xBackbone, yBackbone]
 
 																									// remplissage de la matrice
 			io.initializeMap(map, inputFile);

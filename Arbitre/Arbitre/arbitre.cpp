@@ -1,9 +1,13 @@
 #include "arbitre.h"
 
+
 int main()
 {
-	checkSolution("../../inputs/charleston_road.in", "../../solutions/random-charleston_road-1512092257-21953913.out");
-	return(EXIT_SUCCESS);
+std::string method = "random";
+std::string map = "lets_go_higher";
+std::string extension = "1512179763";
+checkSolution("../../inputs/" + map + ".in", "../../solutions/" + map + "/" + method + "-" + map + "-" +extension + ".out");
+return(EXIT_SUCCESS);
 }
 
 
