@@ -25,3 +25,5 @@ std::vector<std::vector<int>> parseMap(const std::string & mapName, const int & 
 int checkSolution(const std::string & solutionFile);
 int scoreRouter(std::vector<std::vector<int>> & walls, const std::vector<std::pair<int, int>> & routerCoord, const int & routerRadius, const int & row, const int & column);
 bool wallPresence(const std::vector<std::vector<int>> & walls, const int & xRouter, const int & yRouter, const int & xCell, const int & yCell);
+std::string remove_extension(const std::string& filename);
+void GetFilesInDirectory(std::vector<std::string> &out, const std::string &directory);

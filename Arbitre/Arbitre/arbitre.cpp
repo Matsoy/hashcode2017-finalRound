@@ -1,6 +1,12 @@
 #include "arbitre.h"
-#include "copyofdirent.h"
-//using namespace std;
+#include <sys/stat.h>
+#ifdef _WIN32
+#include <windows.h>
+#include <atlstr.h>
+#else
+#include <dirent.h>
+#endif
+
 
 int main()
 {
@@ -13,35 +19,49 @@ int main()
 	return(EXIT_SUCCESS);
 }
 //commented as it won't compile yet
-/*
-int tempmain(const std::string& dir, const std::string& outfile) {
-	std::vector<std::string> inputlist = ...;
-	std::vector<std::string> outputlist = ...;
+
+int tempmain(const char* &dir, const char* & outfile) {
+	
+	std::vector<std::string> inputlist;
+	GetFilesInDirectory(inputlist,"../../inputs/");
+	std::vector<std::string> solutionslist;
+	GetFilesInDirectory(solutionslist,dir);
 	int iterate = 0;
 	std::map<int, std::pair<float, std::string>> results;
 	float sumtimes;
-	for (auto &s : filevec) {
+	for (auto &s : solutionslist) {
+		int maxscore = 0;
 		int testcount = 0;
 		sumtimes = 0;
+		std::string fileout = remove_extension(inputlist[iterate]);
 		while (testcount <= 5) {
-
+			time_t  timev;
+			time(&timev);
+			std::stringstream timess;
+			timess << timev;
 			clock_t t1, t2;
 			t1 = clock();
-			system("curfile inputlist[iterate] outputlist[iterate]");
+			std::string fullfileout = "../../solutions/" + fileout + timess.str() + ".out";
+			std::string temp_concat = solutionslist[iterate] + " " + s + " " + fileout;
+			const char* fullcommand = temp_concat.c_str();
+			system(fullcommand);
 			t2 = clock();
 			float secondsdiff = (float)t2 - (float)t1;
 			sumtimes += secondsdiff;
+			int score = checkSolution(fullfileout);
+			if (score > maxscore) maxscore = score;
 		}
-		int score = checkSolution(intputlist[iterate], outputlist[iterate]);
-		results[score] = std::make_pair(sumtimes/5,s);
+		
+		results[maxscore] = std::make_pair(sumtimes/5,s);
 	}
 	std::ofstream outputS;
 	outputS.open(outfile);
 	for (const auto& result : results) {
 		std::cout << "executable :" << result.second.second << " temps moyen: " << result.second.first << " score: " << result.first << "\n";
 	}
+	return 0;
 }
-*/
+
 std::vector<int> infoMap(const std::string & mapName)
 {
 	std::vector<int> data;
@@ -243,7 +263,8 @@ int checkSolution(const std::string & solutionFile)
 
 			if ((nbCable * cableCost + nbRouters * routerCost) > budget)	//Test du budget
 			{
-				throw std::exception("Le budget a ete depasse");
+				std::cout << "Le budget a ete depasse";
+				return 0;
 			}
 
 			if (0 <= nbRouters && nbRouters < row*column)
@@ -310,34 +331,35 @@ int checkSolution(const std::string & solutionFile)
 		return 0;
 	}
 }
+std::string remove_extension(const std::string& filename) {
+	size_t lastdot = filename.find_last_of(".");
+	if (lastdot == std::string::npos) return filename;
+	return filename.substr(0, lastdot);
+}
 
-
-/* plagiat mdr */
+/* Returns a list of files in a directory (except the ones that begin with a dot) */
 
 void GetFilesInDirectory(std::vector<std::string> &out, const std::string &directory)
 {
-#ifdef WINDOWS
-	HANDLE dir;
-	WIN32_FIND_DATA file_data;
+#ifdef WIN32
+		HANDLE dir;
+		WIN32_FIND_DATAA file_data;
+		std::string  file_name, full_file_name;
+		if ((dir = FindFirstFileA((directory + "/*").c_str(), &file_data)) == INVALID_HANDLE_VALUE)
+		{
+			// Invalid directory
+		}
 
-	if ((dir = FindFirstFile((directory + "/*").c_str(), &file_data)) == INVALID_HANDLE_VALUE)
-		return; /* No files found */
-
-	do {
-		const string file_name = file_data.cFileName;
-		const string full_file_name = directory + "/" + file_name;
-		const bool is_directory = (file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
-
-		if (file_name[0] == '.')
-			continue;
-
-		if (is_directory)
-			continue;
-
-		out.push_back(full_file_name);
-	} while (FindNextFile(dir, &file_data));
-
-	FindClose(dir);
+		while (FindNextFileA(dir, &file_data)) {
+			file_name = file_data.cFileName;
+			full_file_name = directory + file_name;
+			if (strcmp(file_data.cFileName, ".") != 0 && strcmp(file_data.cFileName, "..") != 0)
+			{
+				
+				out.push_back(full_file_name);
+			}
+		}
+		FindClose(dir);
 #else
 	DIR *dir;
 	class dirent *ent;
