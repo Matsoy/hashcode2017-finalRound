@@ -1066,7 +1066,7 @@ void Algo::bigCase()
 				int condition4 = targetCellsCoords[cellxy][1] + aRayonRouteurs;
 				for (int yTargetCell = targetCellsCoords[cellxy][1] - aRayonRouteurs; yTargetCell <= condition4; yTargetCell++)
 				{
-					if (mask(indexMask) == 1)
+					if (aMap(indexMask) == 1)
 					{
 						recount++;
 					}
@@ -1074,7 +1074,7 @@ void Algo::bigCase()
 				}
 			}
 
-			if ((otherMove - recount) >= bestMove) {
+			if ((otherMove - recount) > bestMove) {
 				theChosenOne = targetCellsCoords[cellxy];
 				bestMove = otherMove - recount;
 			}
@@ -1127,9 +1127,9 @@ void Algo::bigCase()
 			kruskal(aMap, theChosenOne, routeurs, idx, idy, dists, succ, cost); // modifie cost, succ, routeurs, idx, idy et dists
 		}
 
-																				 //std::cout << "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Nouveau routeur en [" << xyNewRouter[0] << "," << xyNewRouter[1] << "]" << std::endl;
+		//std::cout << "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Nouveau routeur en [" << xyNewRouter[0] << "," << xyNewRouter[1] << "]" << std::endl;
 
-																				 // si encore du budget
+		// si encore du budget
 		if (succ)
 		{
 			//std::cout << "entree if (succ)" << std::endl;
@@ -1185,12 +1185,7 @@ void Algo::bigCase()
 
 		}
 	}
-	// #################################################################################
-	// peut etre a enlever pr les grosses map
-	placeMstPaths(routeurs, idx, idy, dists);
-	// #################################################################################
 }
-
 
 /*
 * defini aleatoirement la position des routeurs
@@ -1474,7 +1469,13 @@ void Algo::run(int bestScore)
 {
 	std::cout << "  Algo\t\t\t" << aMethod << "\n" << std::endl;
 	aBestScore = bestScore;
-
-	if (aMethod == "random") bigCase();
+	if (aMethod == "random")
+	{
+		random();
+	}
+	if (aMethod == "bigcase")
+	{
+		bigCase();
+	}
 	else if (aMethod == "gaussian_blur") gaussianBlur();
 }
