@@ -26,3 +26,48 @@ public:
 
 	friend std::ostream & operator<<(std::ostream &os, const Matrix &mat);
 };
+
+
+// Accesseurs inline
+
+inline
+int Matrix::getRows()
+{
+	return mRows;
+}
+
+inline
+int Matrix::getCols()
+{
+	return mCols;
+}
+
+// #####
+
+inline
+int& Matrix::operator()(int i, int j)
+{
+	if ((i * mCols + j) >= (mRows * mCols)) throw std::out_of_range("Depassement des bornes");
+	return mData[i * mCols + j];
+}
+
+inline
+int Matrix::operator()(int i, int j) const
+{
+	if ((i * mCols + j) >= (mRows * mCols)) throw std::out_of_range("Depassement des bornes");
+	return mData[i * mCols + j];
+}
+
+inline
+int& Matrix::operator()(int k)
+{
+	if (k >= (mRows * mCols)) throw std::out_of_range("Depassement des bornes");
+	return mData[k];
+}
+
+inline
+int Matrix::operator()(int k) const
+{
+	if (k >= (mRows * mCols)) throw std::out_of_range("Depassement des bornes");
+	return mData[k];
+}

@@ -5,41 +5,6 @@ Matrix::Matrix(int rows, int cols) : mRows(rows), mCols(cols), mData(rows * cols
 {
 }
 
-int& Matrix::operator()(int i, int j)
-{
-	if ((i * mCols + j) >= (mRows * mCols)) throw std::out_of_range("Depassement des bornes");
-	return mData[i * mCols + j];
-}
-
-int Matrix::operator()(int i, int j) const
-{
-	if ((i * mCols + j) >= (mRows * mCols)) throw std::out_of_range("Depassement des bornes");
-	return mData[i * mCols + j];
-}
-
-int& Matrix::operator()(int k)
-{
-	if (k >= (mRows * mCols)) throw std::out_of_range("Depassement des bornes");
-	return mData[k];
-}
-
-int Matrix::operator()(int k) const
-{
-	if (k >= (mRows * mCols)) throw std::out_of_range("Depassement des bornes");
-	return mData[k];
-}
-
-// Accesseurs
-int Matrix::getRows()
-{
-	return mRows;
-}
-
-int Matrix::getCols()
-{
-	return mCols;
-}
-
 /*
 * test si la matrice est vide
 *
