@@ -52,12 +52,13 @@ public:
 	bool isCyclical(Matrix & mat);
 	int nbCellsCovered(Matrix & targetCells);
 	void updateApproximateCost(int * newRouteurs, std::vector<int *> routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, int & approximateCost);
-	void gaussianKernel(std::vector<double> & kernel, int W);
-	void convolve(std::vector<double> & convolvedMat, Matrix & mat, std::vector<double> kernel, int w);
+	void gaussianKernel(std::vector<float> & kernel, int W);
+	void convolve(std::vector<float> & convolvedMat, Matrix & mat, std::vector<float> kernel, int w);
 	void displayVector(const std::vector<int> &vect, int h, int w);
-	void displayVector(const std::vector<double> &vect, int h, int w);
+	void displayVector(const std::vector<float> &vect, int h, int w);
 	int nbNewCoveredCells(int xRouter, int yRouter, Matrix & targetCells);
 	void displayScore(Matrix & targetCells, int nbRouters);
+	int nbNotTargetCellsAround(int xRouter, int yRouter, Matrix & targetCells);
 };
 
 

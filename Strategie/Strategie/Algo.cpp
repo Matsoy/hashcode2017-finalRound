@@ -34,8 +34,8 @@ void Algo::displayVector(const std::vector<int> &vect, int h, int w)
 	}
 }
 
-//Pour afficher une vecteur de double sous forme de matrice
-void Algo::displayVector(const std::vector<double> &vect, int h, int w)
+//Pour afficher une vecteur de float sous forme de matrice
+void Algo::displayVector(const std::vector<float> &vect, int h, int w)
 {
 	std::string out;
 
@@ -115,14 +115,36 @@ int Algo::nbNewCoveredCells(int xRouter, int yRouter, Matrix & targetCells)
 	return nbNewCoveredCells;
 }
 
-void Algo::convolve(std::vector<double> & convolvedMat, Matrix & mat, std::vector<double> kernel, int w)
+
+int Algo::nbNotTargetCellsAround(int xRouter, int yRouter, Matrix & targetCells)
+{
+	int nbNotTargetCellsAround = 0;
+
+	// parcour gauche et doite du perimetre
+	for (int xTargetCell = xRouter - aRayonRouteurs - 1; xTargetCell <= (xRouter + aRayonRouteurs + 1); xTargetCell++)
+	{
+		if (targetCells(xTargetCell, yRouter - aRayonRouteurs - 1)) nbNotTargetCellsAround++;
+		if (targetCells(xTargetCell, yRouter + aRayonRouteurs + 1)) nbNotTargetCellsAround++;
+	}
+
+	// parcour haut et bas du perimetre
+	for (int yTargetCell = yRouter - aRayonRouteurs - 1; yTargetCell <= (yRouter + aRayonRouteurs + 1); yTargetCell++)
+	{
+		if (targetCells(xRouter - aRayonRouteurs - 1, yRouter)) nbNotTargetCellsAround++;
+		if (targetCells(xRouter + aRayonRouteurs + 1, yRouter)) nbNotTargetCellsAround++;
+	}
+
+	return nbNotTargetCellsAround;
+}
+
+void Algo::convolve(std::vector<float> & convolvedMat, Matrix & mat, std::vector<float> kernel, int w)
 {
 	// pour chaque case de la matrice mat
 	for (int rowM = 0; rowM < mat.getRows(); rowM++)
 	{
 		for (int colM = 0; colM < mat.getCols(); colM++)
 		{
-			double sumOfProducts = 0;
+			float sumOfProducts = 0;
 			// pour chaque case du kernel gaussien
 			for (int rowK = (-w / 2); rowK <= (w / 2); rowK++)
 			{
@@ -192,27 +214,27 @@ int Algo::cellsCoveredPercentage(Matrix & targetCells)
 }
 
 
-void Algo::gaussianKernel(std::vector<double> & kernel, int W)
+void Algo::gaussianKernel(std::vector<float> & kernel, int W)
 {
 
 	// on prend un sigma aleatoire
 	std::random_device rd;     // seulement utilise une fois pour initialiser le moteur (semence)
 	std::mt19937 rng(rd());    // moteur a nombre aleatoire utilise (Mersenne-Twister dans ce cas)
-	std::uniform_real_distribution<double> uni(1, 10); // garantie sans biais
+	std::uniform_real_distribution<float> uni(0, 4); // garantie sans biais
 
-	double sigma = uni(rng);
-	//double sigma = 0.1;
+	float sigma = uni(rng);
+	//float sigma = 0.01;
 	std::cout << "sigma = " << sigma << std::endl;
 
 
-	//double sigma = 10; // + sigma est grand, + le flou gaussien est fort, + les valeur du kernel gaussien seront proches 
-	double mean = W / 2;
-	double sum = 0.0; // pour accumuler les valeurs du noyau
+	//float sigma = 10; // + sigma est grand, + le flou gaussien est fort, + les valeur du kernel gaussien seront proches 
+	float mean = W / 2;
+	float sum = 0.0; // pour accumuler les valeurs du noyau
 	for (int x = 0; x < W; ++x)
 	{
 		for (int y = 0; y < W; ++y)
 		{
-			kernel[x * W + y] = exp(-0.5 * (pow((x - mean) / sigma, 2.0) + pow((y - mean) / sigma, 2.0))) / (2 * 3.14159265359 * sigma * sigma);
+			kernel[x * W + y] = exp(-0.5 * (pow((x - mean) / sigma, 2.0) + pow((y - mean) / sigma, 2.0))) / (2 * 3.14159265 * sigma * sigma);
 
 			// on accumule les valeurs du noyau
 			sum += kernel[x * W + y];
@@ -414,7 +436,7 @@ int Algo::minKey(std::vector<int> key, std::vector<bool> mstSet, int dim)
 			min_index = v;
 		}
 	}
-		
+
 
 	//std::cout << "min_index -> " << min_index << std::endl;
 	return min_index;
@@ -867,8 +889,8 @@ void Algo::random()
 	bool succ = true;
 	bool useKruskal = false; // vrai que le cout approximatif > budjet
 
-	// on place le backbone dans le vecteur de routeur. 
-	// Bien que n'etant pas un routeur avec pouvant couvrir des cellules, il represente un sommet dans la construction d'un mst avec Kruskal
+							 // on place le backbone dans le vecteur de routeur. 
+							 // Bien que n'etant pas un routeur avec pouvant couvrir des cellules, il represente un sommet dans la construction d'un mst avec Kruskal
 	routeurs.push_back(aBackbone);
 
 	for (int currentRouterId = 0; currentRouterId < maxNumRouters; currentRouterId++)
@@ -906,14 +928,14 @@ void Algo::random()
 
 		auto random_integer = uni(rng) % targetCellsCoords.size();
 		int * xyNewRouter = targetCellsCoords[random_integer];
-			
+
 		// on garde en memoire l'etat de la case avant d'y mettre un routeur au ca ou celui-ci ne conviendrait pas
 		int safeguardingInfo = aMap(xyNewRouter[0], xyNewRouter[1]);
 
 		aMap(xyNewRouter[0], xyNewRouter[1]) = Cell::Router; // Cell::Router = 2. On positionne le routeur sur la carte
 
-		// tentative de placement de ce routeur
-		// on sauvegarde l'etat des variables au cas ou on ne pourrait pas placer ce routeur
+															 // tentative de placement de ce routeur
+															 // on sauvegarde l'etat des variables au cas ou on ne pourrait pas placer ce routeur
 		std::vector<int> idxTmp = idx;
 		std::vector<int> idyTmp = idy;
 		std::vector<int> distsTmp = dists;
@@ -925,7 +947,7 @@ void Algo::random()
 			updateApproximateCost(xyNewRouter, routeurs, idx, idy, dists, approximateCost);
 
 			// si le cout approximatif indique que le cout est depasse, on utilisera kruskal pour connaitre le cout reel
-			if (approximateCost > aBudgetOriginal)
+			if (approximateCost >= aBudgetOriginal)
 			{
 				useKruskal = true;
 				kruskal(aMap, xyNewRouter, routeurs, idx, idy, dists, succ, cost); // modifie cost, succ, routeurs, idx, idy et dists
@@ -970,7 +992,7 @@ void Algo::random()
 
 			if (((routeurs.size() - 1) % 1) == 0)
 			{
-				std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal?"":"env. ") << (useKruskal ? cost : approximateCost ) << " / " << aBudgetOriginal << " = " << ((useKruskal ? cost : approximateCost) * 100) / aBudgetOriginal << "%" << (useKruskal ? "\t" : "") << "\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
+				std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << (useKruskal ? cost : approximateCost) << " / " << aBudgetOriginal << " = " << ((useKruskal ? cost : approximateCost) * 100) / aBudgetOriginal << "%" << (useKruskal ? "\t" : "") << "\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
 				std::cout << '\r';
 
 			}
@@ -1203,29 +1225,35 @@ void Algo::gaussianBlur()
 	Matrix targetCellsForConvolution(aMap.getRows(), aMap.getCols());
 	// matrice avec les cellules cibles a 0 et le reste a 1
 	Matrix targetCells(aMap.getRows(), aMap.getCols());
+	// nombre de cellules cibles pas encore couvertes
+	int nbTargetCells = 0;
 
-	for (int k = 0; k < aMap.getRows() * aMap.getCols(); k++)
+	for (int x = 0; x < aMap.getRows(); x++)
 	{
-		// remplissage de targetCellsForConvolution et de targetCells
-		if (aMap(k) == Cell::Wireless)
+		for (int y = 0; y < aMap.getCols(); y++)
 		{
-			targetCellsForConvolution(k) = 1;
-			targetCells(k) = 0;
-			aNbCellsOriginal++;
-		}
-		else
-		{
-			targetCellsForConvolution(k) = -1;
-			targetCells(k) = 1;
+			// remplissage de targetCellsForConvolution, de targetCells
+			if (aMap(x, y) == Cell::Wireless)
+			{
+				targetCellsForConvolution(x, y) = 1;
+				targetCells(x, y) = 0;
+				nbTargetCells++;
+				aNbCellsOriginal++;
+			}
+			else
+			{
+				targetCellsForConvolution(x, y) = -1;
+				targetCells(x, y) = 1;
+			}
 		}
 	}
 
 	//std::cout << "targetCellsForConvolution" << std::endl;
 	//std::cout << targetCellsForConvolution << std::endl;
 
-	// vecteur de double representant un vrai noyau de filtre gaussien. On le manipule comme une matrice
+	// vecteur de float representant un vrai noyau de filtre gaussien. On le manipule comme une matrice
 	int kernelW = 2 * aRayonRouteurs + 1;
-	std::vector<double> kernel(kernelW * kernelW);
+	std::vector<float> kernel(kernelW * kernelW);
 	gaussianKernel(kernel, kernelW);
 
 	//std::cout << "kernel" << std::endl;
@@ -1244,18 +1272,11 @@ void Algo::gaussianBlur()
 							 // Bien que n'etant pas un routeur avec pouvant couvrir des cellules, il represente un sommet dans la construction d'un mst avec Kruskal
 	routeurs.push_back(aBackbone);
 
+
 	for (int currentRouterId = 0; currentRouterId < maxNumRouters; currentRouterId++)
 	{
-		// vecteur des coordonnees des cellules cibles n'ayant pas encore de routeur place dessus
-		std::vector<int *> targetCellsCoords;
-
-		for (int cellxy = 0; cellxy < targetCells.getRows() * targetCells.getCols(); cellxy++)
-		{
-			if (targetCells(cellxy) == 0) targetCellsCoords.push_back(targetCells.xy(cellxy));
-		}
-
 		// si il n'y a pas de position dispo pour le prochain routeur
-		if (targetCellsCoords.size() == 0)
+		if (nbTargetCells == 0)
 		{
 			//std::cout << "il n'y a plus de place pour placer de routeurs" << std::endl;
 
@@ -1268,12 +1289,12 @@ void Algo::gaussianBlur()
 		}
 
 		//std::cout << "convolution" << std::endl;
-		std::vector<double> convolvedMat(aMap.getRows() * aMap.getCols());
+		std::vector<float> convolvedMat(aMap.getRows() * aMap.getCols());
 
 		// on convolue la matrice de cellules cibles avec le flou gaussien
 		convolve(convolvedMat, targetCellsForConvolution, kernel, kernelW);
 
-		// on met la valeur minimum au cellules qui ne sont pas des cellules cibles pa encore couvertes
+		// on met la valeur minimum aux cellules qui ne sont pas des cellules cibles pas encore couvertes
 		for (int iConv = 0; iConv < convolvedMat.size(); iConv++)
 		{
 			// si la case n'est une cellule cible ou n'apporte pas de nouvelles cellule couvertes /!\ VOIR SI ON A LE DROIT DE METTRE UN ROUTEUR SUR UNE CELLULE VIDE
@@ -1297,7 +1318,7 @@ void Algo::gaussianBlur()
 		{
 			// on recupere les coordonnees avec la plus grande valeur dans le vecteur convolue
 			std::vector<int> maxIndexs; // vecteur des positions dans convolvedMat avec la valeur maximale
-			double valMax = -1 * kernelW * kernelW; // valeur max de la matrice de convolution. Dans le pire des cas. i.e. avec sigma = 0
+			float valMax = -1 * kernelW * kernelW; // valeur max de la matrice de convolution. Dans le pire des cas. i.e. avec sigma = 0
 			for (int x = 0; x < aMap.getRows(); x++)
 			{
 				for (int y = 0; y < aMap.getCols(); y++)
@@ -1318,7 +1339,7 @@ void Algo::gaussianBlur()
 				}
 			}
 
-			// on recupere les positions qui couvrent un maximum de nouvelles cellules
+			// on recupere les positions qui couvrent un maximum de nouvelles cellules et qui sont si possible collees a un mur
 			std::vector<int> bestMaxIndexs; // vecteur des positions dans convolvedMat avec la valeur maximale en fonction du nombre de cellules nouvellement couvertes
 			int nbCells = 0;
 			for (int index : maxIndexs)
@@ -1341,20 +1362,38 @@ void Algo::gaussianBlur()
 				}
 			}
 
-			//std::cout << maxIndexs.size() << " positions dispos" << std::endl;
-			//std::cout << maxIndexs.size() << " positions dispos" << std::endl;
-			//std::cout << maxIndexs.size() << " positions dispos" << std::endl;
+			std::vector<int> bestPositions; // vecteur contenant les meilleurs positions pour un nouveau routeur compte tenu du nombre de cellules couvertes et de sa position dans un coin
+			int nbCorners = -1;
+			// on ne garde que les positions le plus dans un coin
 
-			//std::cout << "valMax = " << valMax << std::endl;
+			for (int index : bestMaxIndexs)
+			{
+				int xIndex = (index / aMap.getCols());
+				int yIndex = (index - xIndex * aMap.getCols());
+				int currentNbCorners = nbNotTargetCellsAround(xIndex, yIndex, targetCells);
+
+				// si on trouve une nb de coins + grand, on vide le vecteur et on rajoute les coord
+				if (nbCorners < currentNbCorners)
+				{
+					bestPositions.clear();
+					bestPositions.push_back(index);
+					nbCorners = currentNbCorners;
+				}
+				// si on trouve un nb egal, on rajoute les coord au vecteur
+				else if (nbCorners == currentNbCorners)
+				{
+					bestPositions.push_back(index);
+				}
+			}
 
 			// on recupere une position random pour un prochain routeur parmi ces positions optimales
 			std::random_device rd;     // seulement utilise une fois pour initialiser le moteur (semence)
 			std::mt19937 rng(rd());    // moteur a nombre aleatoire utilise (Mersenne-Twister dans ce cas)
 			std::uniform_int_distribution<int> uni(0, aMap.getRows() * aMap.getCols()); // garantie sans biais
 
-			auto random_integer = uni(rng) % bestMaxIndexs.size();
-			int xRouter = (bestMaxIndexs[random_integer] / aMap.getCols());
-			int yRouter = (bestMaxIndexs[random_integer] - xRouter * aMap.getCols());
+			int random_integer = uni(rng) % bestPositions.size();
+			int xRouter = (bestPositions[random_integer] / aMap.getCols());
+			int yRouter = (bestPositions[random_integer] - xRouter * aMap.getCols());
 			//std::cout << "random_integer. On prend maxIndexs[" << random_integer << "] --> [" << xRouteur << ", " << yRouteur << "] --> " <<  convolvedMat[maxIndexs[random_integer]] << std::endl;
 			xyNewRouter[0] = xRouter;
 			xyNewRouter[1] = yRouter;
@@ -1365,6 +1404,7 @@ void Algo::gaussianBlur()
 				convolvedMat[maxIndexs[random_integer]] = -1 * kernelW * kernelW; // pour ne pas reprendre cette position dans la matrice convoluee
 			}
 			else findPosition = true;
+
 		}
 
 		// on garde en memoire l'etat de la case avant d'y mettre un routeur au ca ou celui-ci ne conviendrait pas
@@ -1412,11 +1452,12 @@ void Algo::gaussianBlur()
 			{
 				for (int yTargetCell = xyNewRouter[1] - aRayonRouteurs; yTargetCell <= (xyNewRouter[1] + aRayonRouteurs); yTargetCell++)
 				{
-					// maj de targetCellsForConvolution et de targetCells
-					if (mask(indexMask) == 1)
+					// maj de targetCellsForConvolution et de targetCells si nouvelle cellule pas encore couverte
+					if (mask(indexMask) == 1 && targetCells(xTargetCell, yTargetCell) == 0)
 					{
 						targetCellsForConvolution(xTargetCell, yTargetCell) = -1;
 						targetCells(xTargetCell, yTargetCell) = 1;
+						nbTargetCells--;
 					}
 					indexMask++;
 				}
@@ -1464,7 +1505,6 @@ void Algo::gaussianBlur()
 	displayScore(targetCells, routeurs.size() - 1);
 }
 
-
 void Algo::run(int bestScore)
 {
 	std::cout << "  Algo\t\t\t" << aMethod << "\n" << std::endl;
@@ -1473,9 +1513,12 @@ void Algo::run(int bestScore)
 	{
 		random();
 	}
-	if (aMethod == "bigcase")
+	else if (aMethod == "bigcase")
 	{
 		bigCase();
 	}
-	else if (aMethod == "gaussian_blur") gaussianBlur();
+	else if (aMethod == "gaussian_blur")
+	{
+		gaussianBlur();
+	}
 }
