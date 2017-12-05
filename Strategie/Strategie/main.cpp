@@ -8,8 +8,8 @@ int main()
 	int nbSimulations = 100;
 
 	// affichage des meilleurs scores
-	int bestScore1 = 21961401;
-	int bestScore2 = 56773105;
+	int bestScore1 = 21962689;
+	int bestScore2 = 57978030;
 	int bestScore3 = 162569115;
 	int bestScore4 = 289862792;
 	int scoreTotal = bestScore1 + bestScore2 + bestScore3 + bestScore4;
@@ -23,7 +23,7 @@ int main()
 
 	//Nom de la carte
 	std::string mapName = "charleston_road";
-	std::string method = "gaussian_blur";
+	std::string method = "lets_go_higher";
 
 
 	for (int i = 1; i <= nbSimulations; i++)

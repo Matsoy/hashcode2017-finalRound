@@ -12,7 +12,7 @@ Matrix::Matrix(int rows, int cols) : mRows(rows), mCols(cols), mData(rows * cols
 * @return true si la matrice remplie de 0
 *			false sinon
 */
-bool Matrix::isEmpty()
+bool Matrix::isEmpty() const
 {
 	int size = mData.size();
 	for (int i = 0; i < size; i++)
@@ -29,7 +29,7 @@ bool Matrix::isEmpty()
 *
 * @return la somme des valeurs de la matrice
 */
-int Matrix::sum()
+int Matrix::sum() const
 {
 	int sum = 0;
 	int size = mData.size();

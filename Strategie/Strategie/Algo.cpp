@@ -6,50 +6,52 @@ Algo::Algo(std::string method, std::string mapName, Matrix & map, int rayonRoute
 }
 
 // Accesseurs
-std::string Algo::getMethod()
+std::string Algo::getMethod() const
 {
 	return aMethod;
 }
 
-Matrix & Algo::getMap()
+Matrix & Algo::getMap() const
 {
 	return aMap;
 }
 
-int Algo::getRayonRouteurs()
+int Algo::getRayonRouteurs() const
 {
 	return aRayonRouteurs;
 }
 
-int Algo::getPrixCable()
+int Algo::getPrixCable() const
 {
 	return aPrixCable;
 }
 
-int Algo::getPrixRouteur()
+int Algo::getPrixRouteur() const
 {
 	return aPrixRouteur;
 }
-int Algo::getBudget()
+
+int Algo::getBudget() const
 {
 	return aBudget;
 }
 
-int Algo::getBudgetOriginal()
+int Algo::getBudgetOriginal() const
 {
 	return aBudgetOriginal;
 }
-int * Algo::getBackbone()
+
+int * Algo::getBackbone() const
 {
 	return aBackbone;
 }
 
-int Algo::getNbCellsOriginal()
+int Algo::getNbCellsOriginal() const
 {
 	return aNbCellsOriginal;
 }
 
-int Algo::chessboardDist(int*  routeur, int * newrouteur)
+int Algo::chessboardDist(int*  routeur, int * newrouteur) const
 {
 	int x1 = routeur[0];
 	int y1 = routeur[1];
@@ -61,7 +63,7 @@ int Algo::chessboardDist(int*  routeur, int * newrouteur)
 
 
 //Pour afficher une vecteur de int sous forme de matrice
-void Algo::displayVector(const std::vector<int> &vect, int h, int w)
+void Algo::displayVector(const std::vector<int> &vect, int h, int w) const
 {
 	std::string out;
 
@@ -89,7 +91,7 @@ void Algo::displayVector(const std::vector<int> &vect, int h, int w)
 }
 
 //Pour afficher une vecteur de float sous forme de matrice
-void Algo::displayVector(const std::vector<float> &vect, int h, int w)
+void Algo::displayVector(const std::vector<float> &vect, int h, int w) const
 {
 	std::string out;
 
@@ -118,7 +120,7 @@ void Algo::displayVector(const std::vector<float> &vect, int h, int w)
 
 
 // affiche le score realise
-void Algo::displayScore(Matrix & targetCells, int nbRouters)
+void Algo::displayScore(Matrix & targetCells, int nbRouters) const
 {
 	// nombre de cellules non couvertes
 	int nbCellsNotCovered = 0;
@@ -170,7 +172,7 @@ int Algo::nbNewCoveredCells(int xRouter, int yRouter, Matrix & targetCells)
 }
 
 
-int Algo::nbNotTargetCellsAround(int xRouter, int yRouter, Matrix & targetCells)
+int Algo::nbNotTargetCellsAround(int xRouter, int yRouter, Matrix & targetCells) const
 {
 	int nbNotTargetCellsAround = 0;
 
@@ -274,7 +276,7 @@ void Algo::gaussianKernel(std::vector<float> & kernel, int W)
 	// on prend un sigma aleatoire
 	std::random_device rd;     // seulement utilise une fois pour initialiser le moteur (semence)
 	std::mt19937 rng(rd());    // moteur a nombre aleatoire utilise (Mersenne-Twister dans ce cas)
-	std::uniform_real_distribution<float> uni(0, 4); // garantie sans biais
+	std::uniform_real_distribution<float> uni(0.01, 0.05); // garantie sans biais
 
 	float sigma = uni(rng);
 	//float sigma = 0.01;

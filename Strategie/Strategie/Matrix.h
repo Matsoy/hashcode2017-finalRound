@@ -19,8 +19,8 @@ public:
 	int getRows() const;
 	int getCols() const;
 
-	bool isEmpty();
-	int sum();
+	bool isEmpty() const;
+	int sum() const;
 	int * xy(int z);
 	void reverse();
 

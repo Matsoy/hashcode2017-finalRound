@@ -21,21 +21,19 @@ public:
 	Algo(std::string method, std::string mapName, Matrix & map, int rayonRouteurs, int prixCable, int prixRouteur, int budget, int budgetOriginal, int * backbone);
 
 	// accesseurs
-	std::string getMethod(); // type d'algo
-	std::string getMapName(); // nom de la carte
-	Matrix & getMap();
-	int getRayonRouteurs();
-	int getPrixCable();
-	int getPrixRouteur();
-	int getBudget(); // budget courant
-	int getBudgetOriginal(); // budget max
-	int * getBackbone(); // coordonnes [x, y] de l'emetteur
-	int getNbCellsOriginal(); // nombre de cellules cibles au depart
+	std::string getMethod() const; // type d'algo
+	Matrix & getMap() const;
+	int getRayonRouteurs() const;
+	int getPrixCable() const;
+	int getPrixRouteur() const;
+	int getBudget() const; // budget courant
+	int getBudgetOriginal() const; // budget max
+	int * getBackbone() const; // coordonnes [x, y] de l'emetteur
+	int getNbCellsOriginal() const; // nombre de cellules cibles au depart
 
 	void run(int bestScore);
 	void kruskal(Matrix & m, int * newRouteurs, std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, bool & succ, int & cost);
-	int chessboardDist(int * routeur, int * newrouteur);
-	int quasiEuclideanDist(int * routeur, int * newrouteur);
+	int chessboardDist(int * routeur, int * newrouteur) const;
 	void toCsrMatrix(Matrix & mat, std::vector<int> & dists, std::vector<int> & idx, std::vector<int> & idy, int dim);
 	void toMinimumSpanningTree(Matrix & csrMat, Matrix & mstMat);
 	int minKey(std::vector<int> key, std::vector<bool> mstSet, int dim);
@@ -54,9 +52,9 @@ public:
 	void updateApproximateCost(int * newRouteurs, std::vector<int *> routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, int & approximateCost);
 	void gaussianKernel(std::vector<float> & kernel, int W);
 	void convolve(std::vector<float> & convolvedMat, Matrix & mat, std::vector<float> kernel, int w);
-	void displayVector(const std::vector<int> &vect, int h, int w);
-	void displayVector(const std::vector<float> &vect, int h, int w);
+	void displayVector(const std::vector<int> &vect, int h, int w) const;
+	void displayVector(const std::vector<float> &vect, int h, int w) const;
 	int nbNewCoveredCells(int xRouter, int yRouter, Matrix & targetCells);
-	void displayScore(Matrix & targetCells, int nbRouters);
-	int nbNotTargetCellsAround(int xRouter, int yRouter, Matrix & targetCells);
+	void displayScore(Matrix & targetCells, int nbRouters) const;
+	int nbNotTargetCellsAround(int xRouter, int yRouter, Matrix & targetCells) const;
 };
