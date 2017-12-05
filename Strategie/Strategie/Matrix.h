@@ -16,8 +16,8 @@ public:
 	int operator()(int k) const;
 
 	// accesseurs
-	int getRows();
-	int getCols();
+	int getRows() const;
+	int getCols() const;
 
 	bool isEmpty();
 	int sum();
@@ -27,17 +27,16 @@ public:
 	friend std::ostream & operator<<(std::ostream &os, const Matrix &mat);
 };
 
-
 // Accesseurs inline
 
 inline
-int Matrix::getRows()
+int Matrix::getRows() const
 {
 	return mRows;
 }
 
 inline
-int Matrix::getCols()
+int Matrix::getCols() const
 {
 	return mCols;
 }

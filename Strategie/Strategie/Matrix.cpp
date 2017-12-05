@@ -5,6 +5,7 @@ Matrix::Matrix(int rows, int cols) : mRows(rows), mCols(cols), mData(rows * cols
 {
 }
 
+
 /*
 * test si la matrice est vide
 *
@@ -13,11 +14,13 @@ Matrix::Matrix(int rows, int cols) : mRows(rows), mCols(cols), mData(rows * cols
 */
 bool Matrix::isEmpty()
 {
-	for (int i = 0; i < mData.size(); i++)
+	int size = mData.size();
+	for (int i = 0; i < size; i++)
 	{
-		if (mData[i] != 0) return false;
+		if (mData[i] != 0) {
+			return false;
+		}
 	}
-
 	return true;
 }
 
@@ -29,8 +32,8 @@ bool Matrix::isEmpty()
 int Matrix::sum()
 {
 	int sum = 0;
-
-	for (int i = 0; i < mData.size(); i++)
+	int size = mData.size();
+	for (int i = 0; i < size; i++)
 	{
 		sum += mData[i];
 	}
@@ -65,7 +68,8 @@ void Matrix::reverse()
 {
 	for (int c = 0; c < mCols; c++) // pour chaque colonne
 	{
-		for (int r = 0; r < (mRows / 2); r++) // on parcourt seulement la moitie des lignes
+		int condition = (mRows / 2);
+		for (int r = 0; r < condition; r++) // on parcourt seulement la moitie des lignes
 		{
 			// on inverse les lignes
 			int tmp = mData[r * mCols + c];
@@ -80,18 +84,24 @@ void Matrix::reverse()
 std::ostream & operator<<(std::ostream & os, const Matrix &mat)
 {
 	int m = 0, n = 0, cpt = 0;
-
-	for (int j = 0; j <(mat.mRows * mat.mCols); j++)
+	int condition = mat.mRows * mat.mCols;
+	for (int j = 0; j < condition; j++)
 	{
 		m = cpt / mat.mCols;
 		n = cpt % mat.mCols;
 
 		// si 1er elem
-		if (n == 0) os << "[ ";
+		if (n == 0) {
+			os << "[ ";
+		}
 
 		// si dernier elem
-		if ((n == mat.mCols - 1)) os << mat(m, n) << " ]" << std::endl;
-		else os << mat(m, n) << ", ";
+		if ((n == mat.mCols - 1)) {
+			os << mat(m, n) << " ]" << std::endl;
+		}
+		else {
+			os << mat(m, n) << ", ";
+		}
 
 		cpt++;
 	}

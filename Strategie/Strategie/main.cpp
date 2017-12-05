@@ -5,10 +5,10 @@
 
 int main()
 {
-	int nbSimulations = 3;
+	int nbSimulations = 100;
 
 	// affichage des meilleurs scores
-	int bestScore1 = 21961157;
+	int bestScore1 = 21961401;
 	int bestScore2 = 56773105;
 	int bestScore3 = 162569115;
 	int bestScore4 = 289862792;
@@ -22,7 +22,7 @@ int main()
 	std::cout << "\t\t\ttotal\t\t\t" << scoreTotal << "\n" << std::endl;
 
 	//Nom de la carte
-	std::string mapName = "rue_de_londres";
+	std::string mapName = "charleston_road";
 	std::string method = "gaussian_blur";
 
 
@@ -62,7 +62,7 @@ int main()
 				else if (mapName == "rue_de_londres") algo.run(bestScore2);
 				else if (mapName == "opera") algo.run(bestScore3);
 				else if (mapName == "lets_go_higher") algo.run(bestScore4);
-
+				else if (mapName == "simple_example") algo.run(10000000);
 
 				// impression du temps ecoule
 				printf("  Temps d'execution:\t %.2fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
