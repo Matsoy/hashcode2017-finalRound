@@ -1,8 +1,62 @@
-#include "Algo.h"
+ï»¿#include "Algo.h"
 #include "Cell.h"
 
 Algo::Algo(std::string method, std::string mapName, Matrix & map, int rayonRouteurs, int prixCable, int prixRouteur, int budget, int budgetOriginal, int * xyBackbone) : aMethod(method), aMapName(mapName), aMap(map), aRayonRouteurs(rayonRouteurs), aPrixCable(prixCable), aPrixRouteur(prixRouteur), aBudget(budget), aBudgetOriginal(budgetOriginal), aBackbone(xyBackbone)
 {
+}
+
+// Accesseurs
+std::string Algo::getMethod()
+{
+	return aMethod;
+}
+
+Matrix & Algo::getMap()
+{
+	return aMap;
+}
+
+int Algo::getRayonRouteurs()
+{
+	return aRayonRouteurs;
+}
+
+int Algo::getPrixCable()
+{
+	return aPrixCable;
+}
+
+int Algo::getPrixRouteur()
+{
+	return aPrixRouteur;
+}
+int Algo::getBudget()
+{
+	return aBudget;
+}
+
+int Algo::getBudgetOriginal()
+{
+	return aBudgetOriginal;
+}
+int * Algo::getBackbone()
+{
+	return aBackbone;
+}
+
+int Algo::getNbCellsOriginal()
+{
+	return aNbCellsOriginal;
+}
+
+int Algo::chessboardDist(int*  routeur, int * newrouteur)
+{
+	int x1 = routeur[0];
+	int y1 = routeur[1];
+	int x2 = newrouteur[0];
+	int y2 = newrouteur[1];
+
+	return std::max(abs(x1 - x2), abs(y1 - y2));
 }
 
 
@@ -588,7 +642,7 @@ void Algo::updateApproximateCost(int * newRouteurs, std::vector<int *> routeurs,
 	int new_id = routeurs.size();
 	int cpt = 0;
 
-	// on récupère la distance avec le routeur le plus proche
+	// on rï¿½cupï¿½re la distance avec le routeur le plus proche
 	for (int * rout : routeurs)
 	{
 		int dist = chessboardDist(rout, newRouteurs);
