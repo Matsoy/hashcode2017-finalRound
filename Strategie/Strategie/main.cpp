@@ -8,8 +8,9 @@ int main()
 	int nbSimulations = 50;
 
 	// affichage des meilleurs scores
+
 	int bestScore1 = 21962720;
-	int bestScore2 = 58060019;
+	int bestScore2 = 58037049;
 	int bestScore3 = 172792103;
 	int bestScore4 = 290174532;
 	int scoreTotal = bestScore1 + bestScore2 + bestScore3 + bestScore4;
