@@ -253,7 +253,7 @@ void Algo::gaussianKernel(std::vector<float> & kernel, const int w) const
 	// on prend un sigma aleatoire
 	std::random_device rd;     // seulement utilise une fois pour initialiser le moteur (semence)
 	std::mt19937 rng(rd());    // moteur a nombre aleatoire utilise (Mersenne-Twister dans ce cas)
-	std::uniform_real_distribution<float> uni(0.01, 0.01); // garantie sans biais
+	std::uniform_real_distribution<float> uni(0, 0.1); // garantie sans biais
 
 	const float sigma = uni(rng);
 	//float sigma = 0.01;
@@ -890,6 +890,18 @@ int Algo::gainPoints(int x, int y, int radius, const Matrix & mat, Matrix & mask
 	return count;
 
 }
+
+
+/*void Algo::centroid(const std::vector<int *> & routeurs, const std::vector<int> & idx, const std::vector<int> & idy, const std::vector<int> & dists, std::vector<int *> & cables) const
+{
+
+	// barycentre triangle quelconque : base/2
+		const int dim = routeurs.size();
+		// calcul du mst
+		Matrix csrMat(dim, dim);
+		toCsrMatrix(csrMat, dists, idx, idy, dim);
+
+}*/
 
 /*
 * defini aleatoirement la position des routeurs
