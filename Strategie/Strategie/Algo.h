@@ -32,29 +32,91 @@ public:
 	int getNbCellsOriginal() const; // nombre de cellules cibles au depart
 
 	void run(int bestScore);
-	void kruskal(Matrix & m, int * newRouteurs, std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, bool & succ, int & cost);
-	int chessboardDist(int * routeur, int * newrouteur) const;
-	void toCsrMatrix(Matrix & mat, std::vector<int> & dists, std::vector<int> & idx, std::vector<int> & idy, int dim);
-	void toMinimumSpanningTree(Matrix & csrMat, Matrix & mstMat);
-	int minKey(std::vector<int> key, std::vector<bool> mstSet, int dim);
+	void kruskal(int * newRouteurs, std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, bool & succ, int & cost) const;
+	int chessboardDist(const int * routeur, const int * newrouteur) const;
+	void toCsrMatrix(Matrix & mat, const std::vector<int> & dists, const std::vector<int> & idx, const std::vector<int> & idy, const int dim) const;
+	void toMinimumSpanningTree(const Matrix & csrMat, Matrix & mstMat) const;
+	int minKey(const std::vector<int> key, const std::vector<bool> mstSet, const int dim) const;
 	void random();
 	void bigCase();
 	void gaussianBlur();
-	void wirelessAccess(int x, int y, int radius, Matrix & mat, Matrix & mask);
+	void wirelessAccess(const int x, const int y, const Matrix & mat, Matrix & mask) const;
 	int gainPoints(int x, int y, int radius, const Matrix & mat, Matrix & mask);
-	void placeMstPaths(std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists);
-	int argMin(int * tab, int size);
-	void findChessConnection(int * Routerfrom, int * RouterTo, std::vector<int *> & cables);
-	bool routerOnBackbone(std::vector<int *> & routeurs);
-	int cellsCoveredPercentage(Matrix & targetCells);
+	void placeMstPaths(const std::vector<int *> & routeurs, const std::vector<int> & idx, const std::vector<int> & idy, const std::vector<int> & dists);
+	int argMin(const int * tab, const int size) const;
+	void findChessConnection(const int * Routerfrom, const int * RouterTo, std::vector<int *> & cables) const;
+	bool routerOnBackbone(const std::vector<int *> & routeurs) const;
+	int cellsCoveredPercentage(const Matrix & targetCells) const;
 	bool isCyclical(Matrix & mat);
-	int nbCellsCovered(Matrix & targetCells);
-	void updateApproximateCost(int * newRouteurs, std::vector<int *> routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, int & approximateCost);
-	void gaussianKernel(std::vector<float> & kernel, int W);
-	void convolve(std::vector<float> & convolvedMat, Matrix & mat, std::vector<float> kernel, int w);
+	int nbCellsCovered(const Matrix & targetCells) const;
+	void updateApproximateCost(const int * newRouteurs, const std::vector<int *> routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, int & approximateCost) const;
+	void gaussianKernel(std::vector<float> & kernel, const int w) const;
+	void convolve(std::vector<float> & convolvedMat, const Matrix & mat, Matrix & deadMat, const std::vector<float> kernel, const int w) const;
 	void displayVector(const std::vector<int> &vect, int h, int w) const;
 	void displayVector(const std::vector<float> &vect, int h, int w) const;
-	int nbNewCoveredCells(int xRouter, int yRouter, Matrix & targetCells);
-	void displayScore(Matrix & targetCells, int nbRouters) const;
-	int nbNotTargetCellsAround(int xRouter, int yRouter, Matrix & targetCells) const;
+	int nbNewCoveredCells(const int xRouter, const int yRouter, const Matrix & targetCells) const;
+	void displayScore(const Matrix & targetCells, const int nbRouters) const;
+	int nbNotTargetCellsAround(const int xRouter, const int yRouter, const Matrix & targetCells) const;
 };
+
+
+// Accesseurs
+inline
+Matrix & Algo::getMap() const
+{
+	return aMap;
+}
+
+inline
+int * Algo::getBackbone() const
+{
+	return aBackbone;
+}
+
+inline
+int Algo::getNbCellsOriginal() const
+{
+	return aNbCellsOriginal;
+}
+
+inline
+int Algo::getRayonRouteurs() const
+{
+	return aRayonRouteurs;
+}
+
+inline
+int Algo::getPrixCable() const
+{
+	return aPrixCable;
+}
+
+inline
+int Algo::getPrixRouteur() const
+{
+	return aPrixRouteur;
+}
+
+inline
+int Algo::getBudget() const
+{
+	return aBudget;
+}
+
+inline
+int Algo::getBudgetOriginal() const
+{
+	return aBudgetOriginal;
+}
+
+inline
+std::string Algo::getMethod() const
+{
+	return aMethod;
+}
+
+inline
+int Algo::chessboardDist(const int * routeur, const int * newrouteur) const
+{
+	return std::max(abs(routeur[0] - newrouteur[0]), abs(routeur[1] - newrouteur[1]));
+}

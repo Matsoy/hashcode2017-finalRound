@@ -5,13 +5,13 @@
 
 int main()
 {
-	int nbSimulations = 100;
+	int nbSimulations = 50;
 
 	// affichage des meilleurs scores
-	int bestScore1 = 21962689;
-	int bestScore2 = 57978030;
-	int bestScore3 = 162569115;
-	int bestScore4 = 289862792;
+	int bestScore1 = 21962718;
+	int bestScore2 = 58037049;
+	int bestScore3 = 171878201;
+	int bestScore4 = 290160122;
 	int scoreTotal = bestScore1 + bestScore2 + bestScore3 + bestScore4;
 	std::cout << "  Meilleurs scores";
 	std::cout << "\tcharleston_road\t\t" << bestScore1 << std::endl;
@@ -22,8 +22,8 @@ int main()
 	std::cout << "\t\t\ttotal\t\t\t" << scoreTotal << "\n" << std::endl;
 
 	//Nom de la carte
-	std::string mapName = "charleston_road";
-	std::string method = "lets_go_higher";
+	std::string mapName = "opera";
+	std::string method = "gaussian_blur";
 
 
 	for (int i = 1; i <= nbSimulations; i++)

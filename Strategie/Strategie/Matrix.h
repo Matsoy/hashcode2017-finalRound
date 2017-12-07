@@ -46,27 +46,27 @@ int Matrix::getCols() const
 inline
 int& Matrix::operator()(int i, int j)
 {
-	if ((i * mCols + j) >= (mRows * mCols)) throw std::out_of_range("Depassement des bornes");
+	if ((i * mCols + j) >= (mRows * mCols)) throw std::out_of_range("Depassement des bornes pour [i,j] = [" + std::to_string(i) + "," + std::to_string(j) + "]");
 	return mData[i * mCols + j];
 }
 
 inline
 int Matrix::operator()(int i, int j) const
 {
-	if ((i * mCols + j) >= (mRows * mCols)) throw std::out_of_range("Depassement des bornes");
+	if ((i * mCols + j) >= (mRows * mCols)) throw std::out_of_range("Depassement des bornes pour [i,j] = [" + std::to_string(i) + "," + std::to_string(j) + "]");
 	return mData[i * mCols + j];
 }
 
 inline
 int& Matrix::operator()(int k)
 {
-	if (k >= (mRows * mCols)) throw std::out_of_range("Depassement des bornes");
+	if (k >= (mRows * mCols)) throw std::out_of_range("Depassement des bornes pour [k] = [" + std::to_string(k) + "]");
 	return mData[k];
 }
 
 inline
 int Matrix::operator()(int k) const
 {
-	if (k >= (mRows * mCols)) throw std::out_of_range("Depassement des bornes");
+	if (k >= (mRows * mCols)) throw std::out_of_range("Depassement des bornes pour [k] = [" + std::to_string(k) + "]");
 	return mData[k];
 }
