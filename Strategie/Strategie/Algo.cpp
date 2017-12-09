@@ -551,6 +551,7 @@ void Algo::toMinimumSpanningTree(const Matrix & mat, Matrix & mst) const
 }
 
 
+
 void Algo::placeMstPaths(const std::vector<int *> & routeurs, const std::vector<int> & idx, const std::vector<int> & idy, const std::vector<int> & dists)
 {
 	//std::cout << "________________dans placeMstPaths________________" << std::endl;
@@ -616,6 +617,77 @@ void Algo::placeMstPaths(const std::vector<int *> & routeurs, const std::vector<
 	}
 
 }
+
+void Algo::placeMstPaths_2(const std::vector<int *> & routeurs, const std::vector<int> & idx, const std::vector<int> & idy, const std::vector<int> & dists)
+{
+	//std::cout << "________________dans placeMstPaths________________" << std::endl;
+	const int dim = routeurs.size();
+	// calcul du mst
+	Matrix csrMat(dim, dim);
+	toCsrMatrix(csrMat, dists, idx, idy, dim);
+
+	//std::cout << "csrMat" << std::endl;
+	//std::cout << csrMat << std::endl;
+
+	// arbre couvrant minimal
+	// i.e.  un graphe constitue du sous-ensemble d'aretes qui relient ensemble tous les noeuds connectes, tout en minimisant la somme totale des poids sur les aretes.
+	Matrix mstMat(dim, dim);
+	toMinimumSpanningTree(csrMat, mstMat);
+
+	//std::cout << "mstMat" << std::endl;
+	//std::cout << mstMat << std::endl;
+	const int rows = mstMat.getRows();
+	const int cols = mstMat.getCols();
+	// algo calcul distance entre les routeurs. Parcours de l'arbre couvrant minimal
+	for (int r = 0; r < rows; r++)
+	{
+		for (int c = 0; c < cols; c++)
+		{
+			if (mstMat(r, c) > 0) // si [r, c] un somment de l'arbre couvrant minimal
+			{
+				std::vector<int *> cables;
+				findChessConnection(routeurs[r], routeurs[c], cables);
+
+				for (int *cable : cables) // pour chaque cable
+				{
+					// si le cable est sur l'emetteur
+					if (cable[0] == aBackbone[0] && cable[1] == aBackbone[1])
+					{
+						continue;
+					}
+
+					// si le cable n'est pas sur un routeur
+					if (aMap(cable[0], cable[1]) != Cell::ConnectedRouter)
+					{
+						aMap(cable[0], cable[1]) = Cell::Cable; // on place le cable
+					}
+				}
+			}
+		}
+	}
+
+	/*bool backbonePassed = false;
+	for (int * rout : routeurs)
+	{
+		if (!backbonePassed) // on passe le 1er routeur pcq il correspond au backbone
+		{
+			backbonePassed = true;
+			continue;
+		}
+
+		if (aMap(rout[0], rout[1]) == Cell::ConnectedRouter || aMap(rout[0], rout[1]) == Cell::Router)
+		{
+			aMap(rout[0], rout[1]) = Cell::ConnectedRouter; // on passe la valeur de la coordonnee de 2 a 3 pour indiquer que le routeur est connecte au backbone
+		}
+		else
+		{
+			aMap(rout[0], rout[1]) = Cell::Cable; // si le sommet est un cable
+		}
+	}*/
+
+}
+
+
 void Algo::updateApproximateCost(const int * newRouteurs, const std::vector<int *> routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, int & approximateCost) const
 {
 	int distMin = INT_MAX;
@@ -892,16 +964,224 @@ int Algo::gainPoints(int x, int y, int radius, const Matrix & mat, Matrix & mask
 }
 
 
-/*void Algo::centroid(const std::vector<int *> & routeurs, const std::vector<int> & idx, const std::vector<int> & idy, const std::vector<int> & dists, std::vector<int *> & cables) const
+
+int Algo::centerIsBetter(int * center, std::vector<int *> & vertices, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, const int nbCablesBefore, Matrix & intermediateCsrMat)
 {
+	std::vector<int> idxTmp = idx;
+	std::vector<int> idyTmp = idy;
+	std::vector<int> distsTmp = dists;
 
-	// barycentre triangle quelconque : base/2
-		const int dim = routeurs.size();
-		// calcul du mst
-		Matrix csrMat(dim, dim);
-		toCsrMatrix(csrMat, dists, idx, idy, dim);
+	const int new_id = vertices.size();
 
-}*/
+	int cpt = 0;
+
+	// algo calcul distance entre les routeurs
+	for (int * ver : vertices)
+	{
+		int dist = chessboardDist(ver, center);
+		if (dist > 0)
+		{
+			idxTmp.push_back(cpt); // ex: idx = [0, 1, 2]
+			idyTmp.push_back(new_id); // ex: idy = [3, 3, 3]
+			distsTmp.push_back(dist); // ex: dists = [1, 7, 4]
+		}
+		cpt++;
+	}
+
+	std::vector<int *> verticesTmp = vertices;
+	verticesTmp.push_back(center);
+
+	const int dim = verticesTmp.size();
+
+	Matrix csrMat(dim, dim);
+	toCsrMatrix(csrMat, distsTmp, idxTmp, idyTmp, dim); // d'apres l'ex avec les donnees ci-dessus, donnerait la matrice: 
+											   // [0 0 0 1]
+											   // [0 0 0 7]
+											   // [0 0 0 4]
+											   // [1 7 4 0]
+
+	// arbre couvrant minimal
+	Matrix mstMat(dim, dim);
+	toMinimumSpanningTree(csrMat, mstMat);
+
+	// poids de l'arbre couvrant minimum. i.e le nombre d'aretes
+	const int mstMatWeight = mstMat.sum();
+
+	const int diff = nbCablesBefore - mstMatWeight;
+
+	// si ce cablage est demande moins de cables, on valide les variables temporaires
+	if (diff > 0)
+	{
+		idx = idxTmp;
+		idy = idyTmp;
+		dists = distsTmp;
+		vertices = verticesTmp;
+		intermediateCsrMat = csrMat;
+	}
+
+	//std::cout << "center[" << center[0] << "," << center[1] << "]" << std::endl;
+	//std::cout << "nbCablesBefore = " << nbCablesBefore << std::endl;
+	//std::cout << "mstMatWeight = " << mstMatWeight << std::endl;
+	//std::cout << "diff = " << diff << std::endl;
+	return diff;
+}
+
+
+/*
+* renvoie la barycentre d'un triangle
+*
+* @param pt1 le 1er point du triangle
+* @param pt2 le 2eme point du triangle
+* @param pt3 le 3eme point du triangle
+* @return le point representant le centre de gravite
+*/
+int * Algo::getCentroid(const int * pt1, const int * pt2, const int * pt3) const
+{
+	int centerX = (pt1[0] + pt2[0] + pt3[0]) / 3;
+	int centerY = (pt1[1] + pt2[1] + pt3[1]) / 3;
+
+	return new int[2]{centerX, centerY};
+}
+
+
+
+void Algo::centroid(std::vector<int *> & routeurs)
+{
+	//std::cout << "#######################################################################################" << std::endl;
+	//std::cout << "remplissage de idx, idy et dists pour les prochains Kruskal" << std::endl;
+	//std::cout << "#######################################################################################" << std::endl;
+
+	// vecteur des sommets du graphe. Au debut, il n'y a que le backbone + les routeurs
+	std::vector<int *> vertices;
+
+	// #######################################################################################
+	// remplissage de idx, idy et dists pour les prochains Kruskal 
+	// #######################################################################################
+
+	std::vector<int> idx;
+	std::vector<int> idy;
+	std::vector<int> dists;
+
+	const int routeursSize = routeurs.size();
+
+	int new_id = 0;
+
+	for (int * rout1 : routeurs)
+	{
+		int cpt = 0;
+		// calcul distance entre les routeurs
+		for (int * rout2 : routeurs)
+		{
+			int dist = chessboardDist(rout1, rout2);
+			if (dist > 0)
+			{
+				idx.push_back(cpt); // ex: idx = [0, 1, 2]
+				idy.push_back(new_id); // ex: idy = [3, 3, 3]
+				dists.push_back(dist); // ex: dists = [1, 7, 4]
+			}
+			cpt++;
+		}
+
+		vertices.push_back(rout1);
+		new_id++;
+	}
+
+
+	// #######################################################################################
+	// matrice d'adjacence
+	// #######################################################################################
+
+	Matrix csrMat(routeursSize, routeursSize);
+	toCsrMatrix(csrMat, dists, idx, idy, routeursSize);
+
+	// #######################################################################################
+	// matrice d'adjacence de l'arbre couvrant minimal
+	// #######################################################################################
+
+	// arbre couvrant minimal
+	Matrix mstMat(routeursSize, routeursSize);
+	toMinimumSpanningTree(csrMat, mstMat);
+
+	// poids de l'arbre couvrant minimum. i.e le nombre d'aretes
+	const int originalWeight = mstMat.sum();
+
+	// #######################################################################################
+	// calcul des barycentres pour chercher a optimiser le cablage
+	// #######################################################################################
+
+	int indexVertice = 0;
+	int newDistSum = originalWeight;
+
+	//std::cout << "--------------------------originalWeight = " << originalWeight << std::endl;
+	
+	while (indexVertice < csrMat.getRows()) // ps: la matrice est carree
+	{
+		//std::cout << std::endl;
+		//std::cout << "-----------indexVertice = " << indexVertice << std::endl;
+		int distToA = INT_MAX;
+		int distToB = INT_MAX;
+		int indexVerticeA;
+		int indexVerticeB;
+
+		// parcours de la matrice d'adjacence du sommet indexVertice pour trouver les 2 sommets les + proches 
+		// afin de calculer le barycentre du traingle forme par le sommet indexVertice et des 2 autres sommets les + proches de lui
+		for (int verticeCol = 0; verticeCol < csrMat.getCols(); verticeCol++)
+		{
+			if (indexVertice != verticeCol) // on ne regarde pas les diagonales
+			{
+				int currentDist = csrMat(indexVertice, verticeCol);
+
+				// si la distance avec ce point est < a la distance avec le point indexA
+				if (currentDist < distToA)
+				{
+					distToA = currentDist;
+					indexVerticeA = verticeCol;
+				}
+				// sinon si la distance avec ce point est < a la distance avec le point indexB
+				else if (currentDist < distToB)
+				{
+					distToB = currentDist;
+					indexVerticeB = verticeCol;
+				}
+			}
+		}
+
+		//std::cout << "----indexVerticeA = " << indexVerticeA << std::endl;
+		//std::cout << "----indexVerticeB = " << indexVerticeB << std::endl;
+
+
+		// on recupere la position du barycentre du triangle forme par ces 3 points
+		int * center = getCentroid(vertices[indexVertice], vertices[indexVerticeA], vertices[indexVerticeB]);
+
+		// on regarde si ajouter ce sommet permet d'utiliser moins de cable
+		int diffNbCables = centerIsBetter(center, vertices, idx, idy, dists, newDistSum, csrMat); // modifie vertices, idx, idyTmp, dists et csrMat si, apres Kruskal, diff > 0
+
+		if (diffNbCables > 0)
+		{
+			// on maj le nombre de cables courant
+			newDistSum -= diffNbCables;
+			//std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! newNbCables = " << newDistSum << std::endl;
+		}
+
+		indexVertice++;
+	}
+
+	std::cout << newDistSum;
+	std::cout << '\r';
+
+	// si la nouvelle distance inter-routeurs est inferieure la distance inter-routeurs precedente
+	if (originalWeight > newDistSum)
+	{
+		// on re essaie de placer des points barycentre
+		centroid(vertices);
+	}
+	else
+	{
+		//std::cout << "FIN" << std::endl;
+		//std::cout << "newDistSum FINAL = " << newDistSum << std::endl;
+		placeMstPaths_2(vertices, idx, idy, dists);
+	}
+}
 
 /*
 * defini aleatoirement la position des routeurs
