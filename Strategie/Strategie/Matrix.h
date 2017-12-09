@@ -19,6 +19,10 @@ public:
 	int getRows() const;
 	int getCols() const;
 
+	// mutateurs
+	int setRows(int r);
+	int setCols(int c);
+
 	bool isEmpty() const;
 	int sum() const;
 	int * xy(int z);

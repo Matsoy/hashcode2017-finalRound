@@ -10,6 +10,7 @@ public:
 	IO();
 	int* initializeData(std::string fichierInput);
 	void initializeMap(Matrix & m, std::string fichierInput);
+	int initializeMapFromSolution(Matrix & m, std::string solutionFile, std::vector<int *> & routeurs);
 	void generateOutput(Matrix & mapRouteurs, std::string file);
 	bool isFileExist(std::string filePath);
 

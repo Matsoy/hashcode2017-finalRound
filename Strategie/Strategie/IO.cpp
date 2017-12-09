@@ -7,14 +7,14 @@ IO::IO()
 /*
 * renvoie un tableau avec les donnees des 3 1eres lignes du fichier d'input
 *
-*@param fichierInput le nom du fichier d'input a lire
+*@param inputFile le nom du fichier d'input a lire
 *@return [nbLignes, nbColonnes, rayonRouteurs, prixCable, prixRouteur, budgetMax, xBackbone, yBackbone]
 */
-int* IO::initializeData(std::string fichierInput)
+int* IO::initializeData(std::string inputFile)
 {
 	int * retDatas = new int[8];
 
-	std::ifstream input(fichierInput);
+	std::ifstream input(inputFile);
 	std::string line; //ligne courante
 	unsigned int lineIndex = 1; //numero de la ligne
 
@@ -100,12 +100,11 @@ int* IO::initializeData(std::string fichierInput)
 * . -> 1
 *
 *@param la reference de la matrice
-*@param fichierInput le nom du fichier d'input a lire
+*@param inputFile le nom du fichier d'input a lire
 */
-void IO::initializeMap(Matrix & m, std::string fichierInput)
+void IO::initializeMap(Matrix & m, std::string inputFile)
 {
-	int cpt = 0;
-	std::ifstream input(fichierInput);
+	std::ifstream input(inputFile);
 	std::string line; //ligne courante
 	unsigned int lineIndex = 1; //numero de la ligne
 	while (getline(input, line)) //pour chaque ligne
@@ -132,6 +131,70 @@ void IO::initializeMap(Matrix & m, std::string fichierInput)
 		}
 		lineIndex++;
 	}
+}
+
+
+/*
+* Rempli la matrice d'entiers en fonction des routeurs d'un fichier solution
+* routeurs -> 3
+*
+*@param la reference de la matrice
+*@param solutionFile le nom du fichier solution a lire
+*/
+int IO::initializeMapFromSolution(Matrix & m, std::string solutionFile, std::vector<int *> & routeurs)
+{
+	routeurs.push_back(new int[2]{ backboneX, backboneY });
+	int nbRouteurs = 0;
+
+	std::ifstream input(solutionFile);
+	std::string line; //ligne courante
+	int lineIndex = 1; //numero de la ligne
+
+	int nbCables = 0;
+
+	while (getline(input, line)) //pour chaque ligne
+	{
+		std::istringstream iss(line);
+		std::string word; //mot courant
+
+		
+
+		if (lineIndex == 1)
+		{
+			nbCables = atoi(line.c_str());
+		}
+		else if (lineIndex == nbCables + 2) // nb de routeurs
+		{
+			nbRouteurs = atoi(line.c_str());
+
+		}
+		else if (lineIndex > (nbCables + 2)) // les coords des routeurs
+		{
+			int xRout, yRout;
+			int wordIndex = 1;
+
+			while (iss >> word) //pour chaque mot
+			{
+				if (wordIndex == 1)
+				{
+					xRout = std::stoi(word); // nombre de lignes
+				}
+				else if (wordIndex == 2)
+				{
+					yRout = std::stoi(word);// nombre de colonnes
+				}
+				wordIndex++;
+			}
+
+			m(xRout, yRout) = Cell::ConnectedRouter;
+			routeurs.push_back(new int[2]{ xRout, yRout });
+		}
+		
+		lineIndex++;
+	}
+
+	return nbCables;
+
 }
 
 /*

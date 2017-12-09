@@ -5,12 +5,12 @@
 
 int main()
 {
-	int nbSimulations = 50;
+	int nbSimulations = 1;
 
 	// affichage des meilleurs scores
 
-	int bestScore1 = 21962720;
-	int bestScore2 = 58037049;
+	int bestScore1 = 21962790;
+	int bestScore2 = 58118255;
 	int bestScore3 = 172792103;
 	int bestScore4 = 290174532;
 	int scoreTotal = bestScore1 + bestScore2 + bestScore3 + bestScore4;
@@ -23,7 +23,7 @@ int main()
 	std::cout << "\t\t\ttotal\t\t\t" << scoreTotal << "\n" << std::endl;
 
 	//Nom de la carte
-	std::string mapName = "lets_go_higher";
+	std::string mapName = "opera";
 	std::string method = "gaussian_blur";
 
 
@@ -55,9 +55,22 @@ int main()
 
 				Algo algo(method, mapName, map, datas[2], datas[3], datas[4], datas[5], datas[5], xyBackbone); // type, rayonRouteurs, prixCable, prixRouteur, budgetMax, budgetOriginal, [xBackbone, yBackbone]
 
-																											   // remplissage de la matrice
+				// remplissage de la matrice
 				io.initializeMap(map, inputFile);
 
+
+
+				/*
+				// ###################### CABLAGE SUR SOLUTION ######################
+				std::vector<int *> routeurs;
+				std::string solutionFile = "../../solutions/lets_go_higher/gaussian_blur-1512722223-290177232.out";
+				int exNbCables = io.initializeMapFromSolution(map, solutionFile, routeurs);
+				algo.centroid(routeurs);
+				// ##################################################################
+				*/
+
+				
+				
 				// lancement de l'algo en lui fournissant le meilleur score de la carte correspondante
 				if (mapName == "charleston_road") algo.run(bestScore1);
 				else if (mapName == "rue_de_londres") algo.run(bestScore2);
@@ -67,11 +80,15 @@ int main()
 
 				// impression du temps ecoule
 				printf("  Temps d'execution:\t %.2fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
+				
 
 				// ###################### CREATION OUTPUT ######################
 				std::cout << std::endl;
 				std::string pathBeginning = pathOutput + algo.getMethod();
 				io.generateOutput(map, pathBeginning);
+
+				
+				
 			}
 			else std::cout << "ERREUR: Le fichier " << inputFile << " n'existe pas !" << std::endl;
 

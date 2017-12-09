@@ -43,6 +43,7 @@ public:
 	void wirelessAccess(const int x, const int y, const Matrix & mat, Matrix & mask) const;
 	int gainPoints(int x, int y, int radius, const Matrix & mat, Matrix & mask);
 	void placeMstPaths(const std::vector<int *> & routeurs, const std::vector<int> & idx, const std::vector<int> & idy, const std::vector<int> & dists);
+	void placeMstPaths_2(const std::vector<int *> & routeurs, const std::vector<int> & idx, const std::vector<int> & idy, const std::vector<int> & dists);
 	int argMin(const int * tab, const int size) const;
 	void findChessConnection(const int * Routerfrom, const int * RouterTo, std::vector<int *> & cables) const;
 	bool routerOnBackbone(const std::vector<int *> & routeurs) const;
@@ -57,6 +58,9 @@ public:
 	int nbNewCoveredCells(const int xRouter, const int yRouter, const Matrix & targetCells) const;
 	void displayScore(const Matrix & targetCells, const int nbRouters) const;
 	int nbNotTargetCellsAround(const int xRouter, const int yRouter, const Matrix & targetCells) const;
+	void centroid(std::vector<int *> & routeurs);
+	int centerIsBetter(int * center, std::vector<int *> & vertices, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, const int nbCablesBefore, Matrix & intermediateCsrMat);
+	int * getCentroid(const int * pt1, const int * pt2, const int * pt3) const;
 };
 
 
