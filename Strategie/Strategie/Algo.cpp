@@ -1700,7 +1700,8 @@ void Algo::gaussianBlur()
 				}
 			}
 
-			std::vector<int> maxCornersVect; // vecteur contenant les meilleurs positions pour un nouveau routeur compte tenu du nombre de cellules couvertes et de sa position dans un coin
+			std::vector<int> maxCornersVect; // vecteur contenant les meilleurs positions pour un nouveau routeur compte tenu du nombre de cellules couvertes
+											// et de sa position dans un coin
 			int nbCorners = -1;
 			// on ne garde que les positions le plus dans un coin
 
@@ -1725,39 +1726,33 @@ void Algo::gaussianBlur()
 			}
 
 
-			std::vector<int> closestRouterVect; // vecteur contenant les meilleurs positions pour un nouveau routeur compte tenu du nombre de cellules couvertes, de sa position dans un coin et de son eloignement par rapport aux bordures
-			
-			if (nbCells > aRayonRouteurs)
-			{
-				closestRouterVect = maxCornersVect;
-			}
-			else
-			{
-				const int xMin = 0;
-				const int yMin = 0;
-				const int xMax = aMap.getRows() - 1;
-				const int yMax = aMap.getCols() - 1;
-				int distToXY = INT_MAX;
-				// on ne garde que les positions les plus proches d'un routeur
+			std::vector<int> closestRouterVect; // vecteur contenant les meilleurs positions pour un nouveau routeur compte tenu du nombre de cellules couvertes,
+												// de sa position dans un coin
+												// et de son eloignement par rapport aux bordures de la carte
 
-				for (int index : maxCornersVect)
+			const int xMin = 0;
+			const int yMin = 0;
+			const int xMax = aMap.getRows() - 1;
+			const int yMax = aMap.getCols() - 1;
+			int distToBorders = INT_MIN;
+
+			for (int index : maxCornersVect)
+			{
+				int xIndex = (index / aMapCols);
+				int yIndex = (index - xIndex * aMapCols);
+				int currentDistToBorders = std::min(std::min(xMax - xIndex, abs(xMin - xIndex)), std::min(yMax - yIndex, abs(yMin - yIndex)));
+
+				// si le point est + loin des bordures de la carte, on vide le vecteur et on rajoute les coord
+				if (currentDistToBorders > distToBorders)
 				{
-					int xIndex = (index / aMapCols);
-					int yIndex = (index - xIndex * aMapCols);
-					int currentDistToXY = std::min(std::min(xMax - xIndex, abs(xMin - xIndex)), std::min(yMax - yIndex, abs(yMin - yIndex)));
-
-					// si on trouve une nb de coins + grand, on vide le vecteur et on rajoute les coord
-					if (currentDistToXY < distToXY)
-					{
-						closestRouterVect.clear();
-						closestRouterVect.push_back(index);
-						distToXY = currentDistToXY;
-					}
-					// si on trouve un nb egal, on rajoute les coord au vecteur
-					else if (currentDistToXY == distToXY)
-					{
-						closestRouterVect.push_back(index);
-					}
+					closestRouterVect.clear();
+					closestRouterVect.push_back(index);
+					distToBorders = currentDistToBorders;
+				}
+				// si on trouve un nb egal, on rajoute les coord au vecteur
+				else if (currentDistToBorders == distToBorders)
+				{
+					closestRouterVect.push_back(index);
 				}
 			}
 
