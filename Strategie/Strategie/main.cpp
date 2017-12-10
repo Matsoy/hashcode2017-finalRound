@@ -5,13 +5,13 @@
 
 int main()
 {
-	int nbSimulations = 1;
+	int nbSimulations = 100;
 
 	// affichage des meilleurs scores
 
 	int bestScore1 = 21962790;
 	int bestScore2 = 58118255;
-	int bestScore3 = 172792103;
+	int bestScore3 = 172830633;
 	int bestScore4 = 290174532;
 	int scoreTotal = bestScore1 + bestScore2 + bestScore3 + bestScore4;
 	std::cout << "  Meilleurs scores";
@@ -23,7 +23,7 @@ int main()
 	std::cout << "\t\t\ttotal\t\t\t" << scoreTotal << "\n" << std::endl;
 
 	//Nom de la carte
-	std::string mapName = "opera";
+	std::string mapName = "rue_de_londres";
 	std::string method = "gaussian_blur";
 
 
@@ -63,7 +63,7 @@ int main()
 				/*
 				// ###################### CABLAGE SUR SOLUTION ######################
 				std::vector<int *> routeurs;
-				std::string solutionFile = "../../solutions/lets_go_higher/gaussian_blur-1512722223-290177232.out";
+				std::string solutionFile = "../../solutions/opera/gaussian_blur-1512923265-172829091.out";
 				int exNbCables = io.initializeMapFromSolution(map, solutionFile, routeurs);
 				algo.centroid(routeurs);
 				// ##################################################################
@@ -77,9 +77,11 @@ int main()
 				else if (mapName == "opera") algo.run(bestScore3);
 				else if (mapName == "lets_go_higher") algo.run(bestScore4);
 				else if (mapName == "simple_example") algo.run(10000000);
+				
 
 				// impression du temps ecoule
 				printf("  Temps d'execution:\t %.2fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
+
 				
 
 				// ###################### CREATION OUTPUT ######################

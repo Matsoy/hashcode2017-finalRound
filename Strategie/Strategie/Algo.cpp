@@ -1167,7 +1167,6 @@ void Algo::centroid(std::vector<int *> & routeurs)
 	}
 
 	std::cout << newDistSum;
-	std::cout << '\r';
 
 	// si la nouvelle distance inter-routeurs est inferieure la distance inter-routeurs precedente
 	if (originalWeight > newDistSum)
@@ -1656,7 +1655,7 @@ void Algo::gaussianBlur()
 		while (!findPosition)
 		{
 			// on recupere les coordonnees avec la plus grande valeur dans le vecteur convolue
-			std::vector<int> maxIndexs; // vecteur des positions dans convolvedMat avec la valeur maximale
+			std::vector<int> maxValuesVect; // vecteur des positions dans convolvedMat avec la valeur maximale
 			float valMax = -kernelSize; // valeur max de la matrice de convolution. Dans le pire des cas. i.e. avec sigma = 0
 			for (int x = 0; x < aMapRows; x++)
 			{
@@ -1666,22 +1665,22 @@ void Algo::gaussianBlur()
 					// si on trouve une valeur + grande, on vide le vecteur et on rajoute les coord
 					if (valMax < convolvedMat[currentIndex])
 					{
-						maxIndexs.clear();
-						maxIndexs.push_back(currentIndex);
+						maxValuesVect.clear();
+						maxValuesVect.push_back(currentIndex);
 						valMax = convolvedMat[currentIndex];
 					}
 					// si on trouve une valeur egale, on rajoute les coord au vecteur
 					else if (valMax == convolvedMat[currentIndex])
 					{
-						maxIndexs.push_back(currentIndex);
+						maxValuesVect.push_back(currentIndex);
 					}
 				}
 			}
 
 			// on recupere les positions qui couvrent un maximum de nouvelles cellules et qui sont si possible collees a un mur
-			std::vector<int> bestMaxIndexs; // vecteur des positions dans convolvedMat avec la valeur maximale en fonction du nombre de cellules nouvellement couvertes
+			std::vector<int> maxCoveredCellsVect; // vecteur des positions dans convolvedMat avec la valeur maximale en fonction du nombre de cellules nouvellement couvertes
 			int nbCells = 0;
-			for (int index : maxIndexs)
+			for (int index : maxValuesVect)
 			{
 				int xIndex = (index / aMapCols);
 				int yIndex = (index - xIndex * aMapCols);
@@ -1690,22 +1689,22 @@ void Algo::gaussianBlur()
 				// si on trouve une nb de nouveles cellules couvertes + grand, on vide le vecteur et on rajoute les coord
 				if (nbCells < currentNbCells)
 				{
-					bestMaxIndexs.clear();
-					bestMaxIndexs.push_back(index);
+					maxCoveredCellsVect.clear();
+					maxCoveredCellsVect.push_back(index);
 					nbCells = currentNbCells;
 				}
 				// si on trouve un nb egal, on rajoute les coord au vecteur
 				else if (nbCells == currentNbCells)
 				{
-					bestMaxIndexs.push_back(index);
+					maxCoveredCellsVect.push_back(index);
 				}
 			}
 
-			std::vector<int> bestPositions; // vecteur contenant les meilleurs positions pour un nouveau routeur compte tenu du nombre de cellules couvertes et de sa position dans un coin
+			std::vector<int> maxCornersVect; // vecteur contenant les meilleurs positions pour un nouveau routeur compte tenu du nombre de cellules couvertes et de sa position dans un coin
 			int nbCorners = -1;
 			// on ne garde que les positions le plus dans un coin
 
-			for (int index : bestMaxIndexs)
+			for (int index : maxCoveredCellsVect)
 			{
 				int xIndex = (index / aMapCols);
 				int yIndex = (index - xIndex * aMapCols);
@@ -1714,14 +1713,51 @@ void Algo::gaussianBlur()
 				// si on trouve une nb de coins + grand, on vide le vecteur et on rajoute les coord
 				if (nbCorners < currentNbCorners)
 				{
-					bestPositions.clear();
-					bestPositions.push_back(index);
+					maxCornersVect.clear();
+					maxCornersVect.push_back(index);
 					nbCorners = currentNbCorners;
 				}
 				// si on trouve un nb egal, on rajoute les coord au vecteur
 				else if (nbCorners == currentNbCorners)
 				{
-					bestPositions.push_back(index);
+					maxCornersVect.push_back(index);
+				}
+			}
+
+
+			std::vector<int> closestRouterVect; // vecteur contenant les meilleurs positions pour un nouveau routeur compte tenu du nombre de cellules couvertes, de sa position dans un coin et de son eloignement par rapport aux bordures
+			
+			if (nbCells > aRayonRouteurs)
+			{
+				closestRouterVect = maxCornersVect;
+			}
+			else
+			{
+				const int xMin = 0;
+				const int yMin = 0;
+				const int xMax = aMap.getRows() - 1;
+				const int yMax = aMap.getCols() - 1;
+				int distToXY = INT_MAX;
+				// on ne garde que les positions les plus proches d'un routeur
+
+				for (int index : maxCornersVect)
+				{
+					int xIndex = (index / aMapCols);
+					int yIndex = (index - xIndex * aMapCols);
+					int currentDistToXY = std::min(std::min(xMax - xIndex, abs(xMin - xIndex)), std::min(yMax - yIndex, abs(yMin - yIndex)));
+
+					// si on trouve une nb de coins + grand, on vide le vecteur et on rajoute les coord
+					if (currentDistToXY < distToXY)
+					{
+						closestRouterVect.clear();
+						closestRouterVect.push_back(index);
+						distToXY = currentDistToXY;
+					}
+					// si on trouve un nb egal, on rajoute les coord au vecteur
+					else if (currentDistToXY == distToXY)
+					{
+						closestRouterVect.push_back(index);
+					}
 				}
 			}
 
@@ -1730,9 +1766,9 @@ void Algo::gaussianBlur()
 			std::mt19937 rng(rd());    // moteur a nombre aleatoire utilise (Mersenne-Twister dans ce cas)
 			std::uniform_int_distribution<int> uni(0, aMap.getRows() * aMap.getCols()); // garantie sans biais
 
-			const int random_integer = uni(rng) % bestPositions.size();
-			int xRouter = (bestPositions[random_integer] / aMapCols);
-			int yRouter = (bestPositions[random_integer] - xRouter * aMapCols);
+			const int random_integer = uni(rng) % closestRouterVect.size();
+			int xRouter = (closestRouterVect[random_integer] / aMapCols);
+			int yRouter = (closestRouterVect[random_integer] - xRouter * aMapCols);
 			//std::cout << "random_integer. On prend maxIndexs[" << random_integer << "] --> [" << xRouteur << ", " << yRouteur << "] --> " <<  convolvedMat[maxIndexs[random_integer]] << std::endl;
 			xyNewRouter[0] = xRouter;
 			xyNewRouter[1] = yRouter;
@@ -1740,7 +1776,7 @@ void Algo::gaussianBlur()
 			// si la case n'est une cellule cible ou n'apporte pas de nouvelles cellule couvertes /!\ VOIR SI ON A LE DROIT DE METTRE UN ROUTEUR SUR UNE CELLULE VIDE
 			if (aMap(xRouter, yRouter) != Cell::Wireless || nbCells == 0)
 			{
-				convolvedMat[maxIndexs[random_integer]] = -kernelSize; // pour ne pas reprendre cette position dans la matrice convoluee
+				convolvedMat[maxValuesVect[random_integer]] = -kernelSize; // pour ne pas reprendre cette position dans la matrice convoluee
 			}
 			else findPosition = true;
 
