@@ -1,6 +1,7 @@
 #pragma once
 #include "Header.h"
 #include "Matrix.h"
+#include "IO.h"
 
 class Algo
 {
@@ -8,6 +9,7 @@ private:
 	std::string aMethod;
 	std::string aMapName;
 	Matrix & aMap;
+	Matrix & aMapSolution;
 	int aRayonRouteurs;
 	int aPrixCable;
 	int aPrixRouteur;
@@ -18,7 +20,7 @@ private:
 	int aBestScore; // meilleur score de la carte correspondante
 
 public:
-	Algo(std::string method, std::string mapName, Matrix & map, int rayonRouteurs, int prixCable, int prixRouteur, int budget, int budgetOriginal, int * backbone);
+	Algo(std::string method, std::string mapName, Matrix & map, Matrix & mapSolution,int rayonRouteurs, int prixCable, int prixRouteur, int budget, int budgetOriginal, int * backbone);
 
 	// accesseurs
 	std::string getMethod() const; // type d'algo
@@ -30,6 +32,9 @@ public:
 	int getBudgetOriginal() const; // budget max
 	int * getBackbone() const; // coordonnes [x, y] de l'emetteur
 	int getNbCellsOriginal() const; // nombre de cellules cibles au depart
+
+	// mutateurs
+	void setMapSolution(Matrix & mapSolution);
 
 	void run(int bestScore);
 	void kruskal(int * newRouteurs, std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, bool & succ, int & cost) const;
@@ -58,9 +63,10 @@ public:
 	int nbNewCoveredCells(const int xRouter, const int yRouter, const Matrix & targetCells) const;
 	void displayScore(const Matrix & targetCells, const int nbRouters) const;
 	int nbNotTargetCellsAround(const int xRouter, const int yRouter, const Matrix & targetCells) const;
-	void centroid(std::vector<int *> & routeurs);
+	void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBeginning);
 	int centerIsBetter(int * center, std::vector<int *> & vertices, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, const int nbCablesBefore, Matrix & intermediateCsrMat);
 	int * getCentroid(const int * pt1, const int * pt2, const int * pt3) const;
+	void addLastRouters(std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists);
 };
 
 

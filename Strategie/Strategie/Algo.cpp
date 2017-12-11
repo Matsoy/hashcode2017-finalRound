@@ -1,8 +1,13 @@
 ﻿#include "Algo.h"
-#include "Cell.h"
 
-Algo::Algo(std::string method, std::string mapName, Matrix & map, int rayonRouteurs, int prixCable, int prixRouteur, int budget, int budgetOriginal, int * xyBackbone) : aMethod(method), aMapName(mapName), aMap(map), aRayonRouteurs(rayonRouteurs), aPrixCable(prixCable), aPrixRouteur(prixRouteur), aBudget(budget), aBudgetOriginal(budgetOriginal), aBackbone(xyBackbone)
+Algo::Algo(std::string method, std::string mapName, Matrix & map, Matrix & mapSolution, int rayonRouteurs, int prixCable, int prixRouteur, int budget, int budgetOriginal, int * xyBackbone) : aMethod(method), aMapName(mapName), aMap(map), aMapSolution(mapSolution), aRayonRouteurs(rayonRouteurs), aPrixCable(prixCable), aPrixRouteur(prixRouteur), aBudget(budget), aBudgetOriginal(budgetOriginal), aBackbone(xyBackbone)
 {
+}
+
+// mutateurs
+void Algo::setMapSolution(Matrix & mapSolution)
+{
+	aMapSolution = mapSolution;
 }
 
 //Pour afficher une vecteur de int sous forme de matrice
@@ -619,7 +624,9 @@ void Algo::placeMstPaths(const std::vector<int *> & routeurs, const std::vector<
 }
 
 void Algo::placeMstPaths_2(const std::vector<int *> & routeurs, const std::vector<int> & idx, const std::vector<int> & idy, const std::vector<int> & dists)
+
 {
+
 	//std::cout << "________________dans placeMstPaths________________" << std::endl;
 	const int dim = routeurs.size();
 	// calcul du mst
@@ -666,7 +673,7 @@ void Algo::placeMstPaths_2(const std::vector<int *> & routeurs, const std::vecto
 		}
 	}
 
-	/*bool backbonePassed = false;
+	bool backbonePassed = false;
 	for (int * rout : routeurs)
 	{
 		if (!backbonePassed) // on passe le 1er routeur pcq il correspond au backbone
@@ -683,7 +690,7 @@ void Algo::placeMstPaths_2(const std::vector<int *> & routeurs, const std::vecto
 		{
 			aMap(rout[0], rout[1]) = Cell::Cable; // si le sommet est un cable
 		}
-	}*/
+	}
 
 }
 
@@ -963,7 +970,481 @@ int Algo::gainPoints(int x, int y, int radius, const Matrix & mat, Matrix & mask
 
 }
 
+// routeurs seuls
+// nb de cellules couvertes
+void Algo::addLastRouters(std::vector<int *> & vertices, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists)
+{
+	int nbRouters = 0;
+	int nbCables = 0;
 
+	const int dim = vertices.size();
+
+	std::vector<int *> routers;
+
+	// calcul du mst
+	Matrix csrMat(dim, dim);
+	toCsrMatrix(csrMat, dists, idx, idy, dim);
+
+	//std::cout << "csrMat" << std::endl;
+	//std::cout << csrMat << std::endl;
+
+	// arbre couvrant minimal
+	// i.e.  un graphe constitue du sous-ensemble d'aretes qui relient ensemble tous les noeuds connectes, tout en minimisant la somme totale des poids sur les aretes.
+	Matrix mstMat(dim, dim);
+	toMinimumSpanningTree(csrMat, mstMat);
+
+	//std::cout << "mstMat" << std::endl;
+	//std::cout << mstMat << std::endl;
+	const int rows = mstMat.getRows();
+	const int cols = mstMat.getCols();
+
+	const int aMapRows = aMap.getRows();
+	const int aMapCols = aMap.getCols();
+	const int aMapSize = aMapRows*aMapCols;
+
+	Matrix cablesMap(aMapRows, aMapCols);
+
+	// algo calcul distance entre les routeurs. Parcours de l'arbre couvrant minimal
+	for (int r = 0; r < rows; r++)
+	{
+		for (int c = 0; c < cols; c++)
+		{
+			if (mstMat(r, c) > 0) // si [r, c] un somment de l'arbre couvrant minimal
+			{
+				std::vector<int *> cables;
+				findChessConnection(vertices[r], vertices[c], cables);
+
+				for (int *cable : cables) // pour chaque cable
+				{
+					// si le cable est sur l'emetteur
+					if (cable[0] == aBackbone[0] && cable[1] == aBackbone[1])
+					{
+						continue;
+					}
+
+					cablesMap(cable[0], cable[1]) = Cell::Cable;
+				}
+			}
+		}
+	}
+
+
+
+	for (int r = 0; r < aMapRows; r++)
+	{
+		for (int c = 0; c < aMapCols; c++)
+		{
+			if (aMapSolution(r, c) == Cell::ConnectedRouter)
+			{
+				nbRouters++;
+				routers.push_back(new int[2]{ r, c });
+			}
+		}
+	}
+
+	for (int r = 0; r < aMapRows; r++)
+	{
+		for (int c = 0; c < aMapCols; c++)
+		{
+			if (cablesMap(r, c) == Cell::Cable)
+			{
+				nbCables++;
+			}
+		}
+	}
+
+	// budget restant
+	int remainingBudget = aBudgetOriginal - nbRouters * aPrixRouteur - nbCables * aPrixCable;
+
+	// ###########################################################################################################
+	// on refait l'algo du flou gaussien pour tenter de placer les derniers routeurs
+	// ###########################################################################################################
+	
+	// nb max de routeurs possibles
+	const int maxNumRouters = remainingBudget / aPrixRouteur;
+
+	// matrice avec les cellules cibles a 1 et le reste a -1
+	Matrix targetCellsForConvolution(aMapRows, aMapCols);
+	// matrice avec a 1 les cellules qui de toute facon n'auront aucun impact sur le flou. On les stocks pour gagner du temps lors des prochaines convolution avec le kernel gaussien
+	Matrix deadCellsForConvolution(aMapRows, aMapCols);
+	// matrice avec les cellules cibles a 0 et le reste a 1
+	Matrix targetCells(aMapRows, aMapCols);
+	// nombre de cellules cibles pas encore couvertes
+	int nbTargetCells = 0;
+
+	for (int x = 0; x < aMapRows; x++)
+	{
+		for (int y = 0; y < aMapCols; y++)
+		{
+			// remplissage de targetCellsForConvolution, de targetCells
+			if (aMap(x, y) == Cell::Wireless)
+			{
+				targetCellsForConvolution(x, y) = 1;
+				targetCells(x, y) = 0;
+				nbTargetCells++;
+				aNbCellsOriginal++;
+			}
+			else
+			{
+				targetCellsForConvolution(x, y) = -1;
+				targetCells(x, y) = 1;
+			}
+		}
+	}
+
+
+	// vecteur de float representant un vrai noyau de filtre gaussien. On le manipule comme une matrice
+	const int kernelDim = 2 * aRayonRouteurs + 1;
+	const int kernelSize = kernelDim * kernelDim;
+
+	std::vector<float> kernel(kernelSize);
+	gaussianKernel(kernel, kernelDim);
+
+	int cost = 0; // cout reel calcul d'apres le mst
+	bool succ = true;
+
+	for (int * rout : routers)
+	{
+		// recuperation du masque du perimetre du routeur
+		Matrix mask(2 * aRayonRouteurs + 1, 2 * aRayonRouteurs + 1);
+
+		wirelessAccess(rout[0], rout[1], aMap, mask);
+
+		int indexMask = 0;
+		const int xFrom = rout[0] - aRayonRouteurs;
+		const int xTo = rout[0] + aRayonRouteurs;
+		const int yFrom = rout[1] - aRayonRouteurs;
+		const int yTo = rout[1] + aRayonRouteurs;
+		// dans la matrice targetCells, on met a 1 les cellules qui sont dans le perimetre du routeur, et on laisse a 0 les autres ou celles qui sont cachees pas un mur
+		for (int xTargetCell = xFrom; xTargetCell <= xTo; xTargetCell++)
+		{
+			for (int yTargetCell = yFrom; yTargetCell <= yTo; yTargetCell++)
+			{
+				// maj de targetCellsForConvolution et de targetCells si nouvelle cellule pas encore couverte
+				if (mask(indexMask) == 1 && targetCells(xTargetCell, yTargetCell) == 0)
+				{
+					targetCellsForConvolution(xTargetCell, yTargetCell) = -1;
+					targetCells(xTargetCell, yTargetCell) = 1;
+					nbTargetCells--;
+				}
+				indexMask++;
+			}
+		}
+	}
+
+	for (int currentRouterId = 0; currentRouterId < maxNumRouters; currentRouterId++)
+	{
+		// si il n'y a pas de position dispo pour le prochain routeur
+		if (nbTargetCells == 0)
+		{
+			for (int * rout : routers)
+			{
+				aMap(rout[0], rout[1]) = Cell::ConnectedRouter;
+			}
+			// on tire les cables
+			placeMstPaths_2(vertices, idx, idy, dists);
+			return; // et on sort de l'algo
+		}
+
+		//std::cout << "convolution" << std::endl;
+		std::vector<float> convolvedMat(aMapSize);
+
+		// on convolue la matrice de cellules cibles avec le flou gaussien
+		convolve(convolvedMat, targetCellsForConvolution, deadCellsForConvolution, kernel, kernelDim);
+
+		// on met la valeur minimum aux cellules qui ne sont pas des cellules cibles pas encore couvertes
+		for (int iConv = 0; iConv < aMapSize; iConv++)
+		{
+			// si la case n'est une cellule cible ou n'apporte pas de nouvelles cellule couvertes /!\ VOIR SI ON A LE DROIT DE METTRE UN ROUTEUR SUR UNE CELLULE VIDE
+			if (aMap(iConv) != Cell::Wireless || targetCellsForConvolution(iConv) == -1)
+			{
+				convolvedMat[iConv] = -kernelSize; // pour ne pas reprendre cette position dans la matrice convoluee
+			}
+		}
+
+
+		//displayVector(convolvedMat, aMap.getRows(), aMap.getCols());
+		//std::cout << "apres convolution" << std::endl;
+
+		//std::cout << "____________________________________________" << std::endl;
+
+		int * xyNewRouter = new int[2];
+
+		// tant qu'on n'a pas trouve une position pour placer un routeur
+		bool findPosition = false;
+		while (!findPosition)
+		{
+			// on recupere les coordonnees avec la plus grande valeur dans le vecteur convolue
+			std::vector<int> maxValuesVect; // vecteur des positions dans convolvedMat avec la valeur maximale
+			float valMax = -kernelSize; // valeur max de la matrice de convolution. Dans le pire des cas. i.e. avec sigma = 0
+			for (int x = 0; x < aMapRows; x++)
+			{
+				for (int y = 0; y < aMapCols; y++)
+				{
+					int currentIndex = x * aMapCols + y;
+					// si on trouve une valeur + grande, on vide le vecteur et on rajoute les coord
+					if (valMax < convolvedMat[currentIndex])
+					{
+						maxValuesVect.clear();
+						maxValuesVect.push_back(currentIndex);
+						valMax = convolvedMat[currentIndex];
+					}
+					// si on trouve une valeur egale, on rajoute les coord au vecteur
+					else if (valMax == convolvedMat[currentIndex])
+					{
+						maxValuesVect.push_back(currentIndex);
+					}
+				}
+			}
+
+			// on recupere les positions qui couvrent un maximum de nouvelles cellules et qui sont si possible collees a un mur
+			std::vector<int> maxCoveredCellsVect; // vecteur des positions dans convolvedMat avec la valeur maximale en fonction du nombre de cellules nouvellement couvertes
+			int nbCells = 0;
+			for (int index : maxValuesVect)
+			{
+				int xIndex = (index / aMapCols);
+				int yIndex = (index - xIndex * aMapCols);
+				int currentNbCells = nbNewCoveredCells(xIndex, yIndex, targetCells);
+
+				// si on trouve une nb de nouveles cellules couvertes + grand, on vide le vecteur et on rajoute les coord
+				if (nbCells < currentNbCells)
+				{
+					maxCoveredCellsVect.clear();
+					maxCoveredCellsVect.push_back(index);
+					nbCells = currentNbCells;
+				}
+				// si on trouve un nb egal, on rajoute les coord au vecteur
+				else if (nbCells == currentNbCells)
+				{
+					maxCoveredCellsVect.push_back(index);
+				}
+			}
+
+			std::vector<int> maxCornersVect; // vecteur contenant les meilleurs positions pour un nouveau routeur compte tenu du nombre de cellules couvertes
+												// et de sa position dans un coin
+			int nbCorners = -1;
+			// on ne garde que les positions le plus dans un coin
+
+			for (int index : maxCoveredCellsVect)
+			{
+				int xIndex = (index / aMapCols);
+				int yIndex = (index - xIndex * aMapCols);
+				int currentNbCorners = nbNotTargetCellsAround(xIndex, yIndex, targetCells);
+
+				// si on trouve une nb de coins + grand, on vide le vecteur et on rajoute les coord
+				if (nbCorners < currentNbCorners)
+				{
+					maxCornersVect.clear();
+					maxCornersVect.push_back(index);
+					nbCorners = currentNbCorners;
+				}
+				// si on trouve un nb egal, on rajoute les coord au vecteur
+				else if (nbCorners == currentNbCorners)
+				{
+					maxCornersVect.push_back(index);
+				}
+			}
+
+
+			std::vector<int> closestRouterVect; // vecteur contenant les meilleurs positions pour un nouveau routeur compte tenu du nombre de cellules couvertes,
+												// de sa position dans un coin
+												// et de son eloignement par rapport aux bordures de la carte
+
+			const int xMin = 0;
+			const int yMin = 0;
+			const int xMax = aMap.getRows() - 1;
+			const int yMax = aMap.getCols() - 1;
+			int distToBorders = INT_MIN;
+
+			for (int index : maxCornersVect)
+			{
+				int xIndex = (index / aMapCols);
+				int yIndex = (index - xIndex * aMapCols);
+				int currentDistToBorders = std::min(std::min(xMax - xIndex, abs(xMin - xIndex)), std::min(yMax - yIndex, abs(yMin - yIndex)));
+
+				// si le point est + loin des bordures de la carte, on vide le vecteur et on rajoute les coord
+				if (currentDistToBorders > distToBorders)
+				{
+					closestRouterVect.clear();
+					closestRouterVect.push_back(index);
+					distToBorders = currentDistToBorders;
+				}
+				// si on trouve un nb egal, on rajoute les coord au vecteur
+				else if (currentDistToBorders == distToBorders)
+				{
+					closestRouterVect.push_back(index);
+				}
+			}
+
+			// on recupere une position random pour un prochain routeur parmi ces positions optimales
+			std::random_device rd;     // seulement utilise une fois pour initialiser le moteur (semence)
+			std::mt19937 rng(rd());    // moteur a nombre aleatoire utilise (Mersenne-Twister dans ce cas)
+			std::uniform_int_distribution<int> uni(0, aMap.getRows() * aMap.getCols()); // garantie sans biais
+
+			const int random_integer = uni(rng) % closestRouterVect.size();
+			int xRouter = (closestRouterVect[random_integer] / aMapCols);
+			int yRouter = (closestRouterVect[random_integer] - xRouter * aMapCols);
+			//std::cout << "random_integer. On prend maxIndexs[" << random_integer << "] --> [" << xRouteur << ", " << yRouteur << "] --> " <<  convolvedMat[maxIndexs[random_integer]] << std::endl;
+			xyNewRouter[0] = xRouter;
+			xyNewRouter[1] = yRouter;
+
+			// si la case n'est une cellule cible ou n'apporte pas de nouvelles cellule couvertes /!\ VOIR SI ON A LE DROIT DE METTRE UN ROUTEUR SUR UNE CELLULE VIDE
+			if (aMap(xRouter, yRouter) != Cell::Wireless || nbCells == 0)
+			{
+				convolvedMat[maxValuesVect[random_integer]] = -kernelSize; // pour ne pas reprendre cette position dans la matrice convoluee
+			}
+			else findPosition = true;
+
+		}
+
+		// on garde en memoire l'etat de la case avant d'y mettre un routeur au ca ou celui-ci ne conviendrait pas
+		int safeguardingInfo = aMap(xyNewRouter[0], xyNewRouter[1]);
+
+		aMap(xyNewRouter[0], xyNewRouter[1]) = Cell::ConnectedRouter; // Cell::Router = 2. On positionne le routeur sur la carte
+
+																// tentative de placement de ce routeur
+																// on sauvegarde l'etat des variables au cas ou on ne pourrait pas placer ce routeur
+		std::vector<int> idxTmp = idx;
+		std::vector<int> idyTmp = idy;
+		std::vector<int> distsTmp = dists;
+		int costTmp = cost;
+
+		// ##########################
+		// Kruskal
+		// ##########################
+
+		const int new_id = vertices.size();
+
+		int cpt = 0;
+
+		// algo calcul distance entre les routeurs
+		for (int * rout : vertices)
+		{
+			int dist = chessboardDist(rout, xyNewRouter);
+			if (dist > 0)
+			{
+				idx.push_back(cpt);
+				idy.push_back(new_id);
+				dists.push_back(dist);
+			}
+			cpt++;
+		}
+
+		routers.push_back(xyNewRouter);
+		vertices.push_back(xyNewRouter);
+
+		const int dim = vertices.size();
+
+		Matrix csrMat(dim, dim);
+		toCsrMatrix(csrMat, dists, idx, idy, dim); // d'apres l'ex avec les donnees ci-dessus, donnerait la matrice: 
+												   // [0 x x 1]
+												   // [0 0 x 7]
+												   // [0 0 0 2]
+
+												   //std::cout << "csrMat" << std::endl;
+												   //std::cout << csrMat << std::endl;
+
+												   // arbre couvrant minimal
+		Matrix mstMat(dim, dim);
+		toMinimumSpanningTree(csrMat, mstMat);
+
+		Matrix cablesM(aMapRows, aMapCols);
+
+		for (int r = 0; r < dim; r++)
+		{
+			for (int c = 0; c < dim; c++)
+			{
+				if (mstMat(r, c) > 0) // si [r, c] un somment de l'arbre couvrant minimal
+				{
+					std::vector<int *> cables;
+					findChessConnection(vertices[r], vertices[c], cables);
+
+					for (int *cable : cables) // pour chaque cable
+					{
+						// si le cable est sur l'emetteur
+						if (cable[0] == aBackbone[0] && cable[1] == aBackbone[1])
+						{
+							continue;
+						}
+
+						// si le cable n'est pas sur un routeur
+						if (aMap(cable[0], cable[1]) != Cell::ConnectedRouter)
+						{
+							cablesM(cable[0], cable[1]) = 1; // on place le cable
+						}
+					}
+				}
+			}
+		}
+
+		cost = cablesM.sum() * aPrixCable + routers.size() * aPrixRouteur; // routeur - 1 car on interprete le backbone comme un routeur dans l'algorithme
+		succ = cost <= aBudgetOriginal; // si on ne depasse par le budget
+
+
+		// si encore du budget
+		if (succ)
+		{
+			// recuperation du masque du perimetre du routeur
+			Matrix mask(2 * aRayonRouteurs + 1, 2 * aRayonRouteurs + 1);
+
+			wirelessAccess(xyNewRouter[0], xyNewRouter[1], aMap, mask);
+
+			int indexMask = 0;
+			const int xFrom = xyNewRouter[0] - aRayonRouteurs;
+			const int xTo = xyNewRouter[0] + aRayonRouteurs;
+			const int yFrom = xyNewRouter[1] - aRayonRouteurs;
+			const int yTo = xyNewRouter[1] + aRayonRouteurs;
+			// dans la matrice targetCells, on met a 1 les cellules qui sont dans le perimetre du routeur, et on laisse a 0 les autres ou celles qui sont cachees pas un mur
+			for (int xTargetCell = xFrom; xTargetCell <= xTo; xTargetCell++)
+			{
+				for (int yTargetCell = yFrom; yTargetCell <= yTo; yTargetCell++)
+				{
+					// maj de targetCellsForConvolution et de targetCells si nouvelle cellule pas encore couverte
+					if (mask(indexMask) == 1 && targetCells(xTargetCell, yTargetCell) == 0)
+					{
+						targetCellsForConvolution(xTargetCell, yTargetCell) = -1;
+						targetCells(xTargetCell, yTargetCell) = 1;
+						nbTargetCells--;
+					}
+					indexMask++;
+				}
+			}
+		}
+		else // plus de budget, on enleve le routeur en trop
+		{
+
+			// on retabli l'etat de la case dans la carte
+			aMap(xyNewRouter[0], xyNewRouter[1]) = safeguardingInfo;
+
+			// on supprime le routeur de trop du vecteur
+			routers.erase(routers.begin() + routers.size() - 1);
+			vertices.erase(vertices.begin() + vertices.size() - 1);
+
+			// on reduit la taille du vecteur au nombre d'elements dans le vecteur
+			routers.shrink_to_fit();
+			vertices.shrink_to_fit();
+
+			for (int * rout : routers)
+			{
+				aMap(rout[0], rout[1]) = Cell::ConnectedRouter;
+			}
+			// on tire les cables
+			placeMstPaths_2(vertices, idxTmp, idyTmp, distsTmp);
+			return;
+
+		}
+
+		//targetCellsCoords.clear(); // on vide le vecteur, ce qui aura effet de delete les new int[2] (eviter les fuites memoires)
+		//delete xyNewRouter;
+	}
+
+	for (int * rout : routers)
+	{
+		aMap(rout[0], rout[1]) = Cell::ConnectedRouter;
+	}
+	placeMstPaths_2(vertices, idx, idy, dists);
+
+}
 
 int Algo::centerIsBetter(int * center, std::vector<int *> & vertices, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, const int nbCablesBefore, Matrix & intermediateCsrMat)
 {
@@ -1044,8 +1525,7 @@ int * Algo::getCentroid(const int * pt1, const int * pt2, const int * pt3) const
 }
 
 
-
-void Algo::centroid(std::vector<int *> & routeurs)
+void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBeginning)
 {
 	//std::cout << "#######################################################################################" << std::endl;
 	//std::cout << "remplissage de idx, idy et dists pour les prochains Kruskal" << std::endl;
@@ -1166,19 +1646,43 @@ void Algo::centroid(std::vector<int *> & routeurs)
 		indexVertice++;
 	}
 
-	std::cout << newDistSum;
+	std::cout << newDistSum << std::endl;
 
 	// si la nouvelle distance inter-routeurs est inferieure la distance inter-routeurs precedente
 	if (originalWeight > newDistSum)
 	{
+		for (int * rout : routeurs)
+		{
+			aMap = aMapSolution;
+			aMap(rout[0], rout[1]) = Cell::ConnectedRouter;
+		}
+		placeMstPaths_2(routeurs, idx, idy, dists);
+
+		// on sauvegarde l'avancement en generant l'output
+		io.generateOutput(aMap, pathBeginning);
+
 		// on re essaie de placer des points barycentre
-		centroid(vertices);
+		centroid(vertices, io,pathBeginning);
 	}
 	else
 	{
-		//std::cout << "FIN" << std::endl;
-		//std::cout << "newDistSum FINAL = " << newDistSum << std::endl;
-		placeMstPaths_2(vertices, idx, idy, dists);
+		// si c'est une map ou il est impossible de couvrir 100% des cellules cibles
+		// l'optimisation du cablage a pu liberer du budget
+		// on essaie donc d'ajouter d'autres routeurs pour couvrir davantage de cellules
+		if (aMapName == "rue_de_londres" || aMapName == "opera")
+		{
+			addLastRouters(vertices, idx, idy, dists);
+		}
+		else
+		{
+			for (int * rout : routeurs)
+			{
+				aMap = aMapSolution;
+				aMap(rout[0], rout[1]) = Cell::ConnectedRouter;
+			}
+			placeMstPaths_2(routeurs, idx, idy, dists);
+		}
+		
 	}
 }
 

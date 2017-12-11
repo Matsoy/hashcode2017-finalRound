@@ -20,8 +20,8 @@ public:
 	int getCols() const;
 
 	// mutateurs
-	int setRows(int r);
-	int setCols(int c);
+	void setRows(int r);
+	void setCols(int c);
 
 	bool isEmpty() const;
 	int sum() const;
