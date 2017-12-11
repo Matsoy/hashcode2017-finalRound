@@ -1589,13 +1589,29 @@ void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBegi
 	// calcul des barycentres pour chercher a optimiser le cablage
 	// #######################################################################################
 
-	int indexVertice = 0;
 	int newDistSum = originalWeight;
+	const int dim = csrMat.getRows();
+
+	std::vector<int> availableVerticesIndexs(dim);
+	int cpt = 0;
+	for (int index = 0; index < dim; index++ )
+	{
+		availableVerticesIndexs[index] = cpt;
+		cpt++;
+	}
 
 	//std::cout << "--------------------------originalWeight = " << originalWeight << std::endl;
 	
-	while (indexVertice < csrMat.getRows()) // ps: la matrice est carree
+	while (availableVerticesIndexs.size())
 	{
+		// on recupere une position random pour un pour construire le + petit carré
+		std::random_device rd;     // seulement utilise une fois pour initialiser le moteur (semence)
+		std::mt19937 rng(rd());    // moteur a nombre aleatoire utilise (Mersenne-Twister dans ce cas)
+		std::uniform_int_distribution<int> uni(0, dim); // garantie sans biais
+
+		auto random_integer = uni(rng) % availableVerticesIndexs.size();
+		int indexVertice = random_integer;
+
 		//std::cout << std::endl;
 		//std::cout << "-----------indexVertice = " << indexVertice << std::endl;
 		int distToA = INT_MAX;
@@ -1642,8 +1658,13 @@ void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBegi
 			newDistSum -= diffNbCables;
 			//std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! newNbCables = " << newDistSum << std::endl;
 		}
+		
+		// on supprime le sommet du vecteur
+		availableVerticesIndexs.erase(availableVerticesIndexs.begin() + indexVertice);
 
-		indexVertice++;
+		// on reduit la taille du vecteur au nombre d'elements dans le vecteur
+		availableVerticesIndexs.shrink_to_fit();
+
 	}
 
 	std::cout << newDistSum << std::endl;
@@ -1651,7 +1672,7 @@ void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBegi
 	// si la nouvelle distance inter-routeurs est inferieure la distance inter-routeurs precedente
 	if (originalWeight > newDistSum)
 	{
-		for (int * rout : routeurs)
+		/*for (int * rout : routeurs)
 		{
 			aMap = aMapSolution;
 			aMap(rout[0], rout[1]) = Cell::ConnectedRouter;
@@ -1659,7 +1680,7 @@ void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBegi
 		placeMstPaths_2(routeurs, idx, idy, dists);
 
 		// on sauvegarde l'avancement en generant l'output
-		io.generateOutput(aMap, pathBeginning);
+		io.generateOutput(aMap, pathBeginning);*/
 
 		// on re essaie de placer des points barycentre
 		centroid(vertices, io,pathBeginning);
@@ -1682,7 +1703,6 @@ void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBegi
 			}
 			placeMstPaths_2(routeurs, idx, idy, dists);
 		}
-		
 	}
 }
 

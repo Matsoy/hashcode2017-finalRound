@@ -5,25 +5,40 @@
 
 int main()
 {
-	int nbSimulations = 1;
+	int nbSimulations = 100;
 
 	// affichage des meilleurs scores
 
 	int bestScore1 = 21962790;
 	int bestScore2 = 58307050;
 	int bestScore3 = 174527047;
-	int bestScore4 = 290174532;
+	int bestScore4 = 290177232;
 	int scoreTotal = bestScore1 + bestScore2 + bestScore3 + bestScore4;
-	std::cout << "  Meilleurs scores";
-	std::cout << "\tcharleston_road\t\t" << bestScore1 << std::endl;
-	std::cout << "\t\t\true_de_londres\t\t" << bestScore2 << std::endl;
-	std::cout << "\t\t\topera\t\t\t" << bestScore3 << std::endl;
-	std::cout << "\t\t\tlets_go_higher\t\t" << bestScore4 << std::endl;
-	std::cout << "\t\t\t---------------------------------" << std::endl;
-	std::cout << "\t\t\ttotal\t\t\t" << scoreTotal << "\n" << std::endl;
+
+	int bestScore1WithoutCentroids = 21962725;
+	int bestScore2WithoutCentroids = 58095015;
+	int bestScore3WithoutCentroids = 172792103;
+	int bestScore4WithoutCentroids = 290177232;
+	int scoreTotalWithoutCentroids = bestScore1WithoutCentroids + bestScore2WithoutCentroids + bestScore3WithoutCentroids + bestScore4WithoutCentroids;
+
+	std::cout << "  Meilleurs scores SANS barycentres";
+	std::cout << "\t\tcharleston_road\t\t" << bestScore1WithoutCentroids << std::endl;
+	std::cout << "\t\t\t\t\t\true_de_londres\t\t" << bestScore2WithoutCentroids << std::endl;
+	std::cout << "\t\t\t\t\t\topera\t\t\t" << bestScore3WithoutCentroids << std::endl;
+	std::cout << "\t\t\t\t\t\tlets_go_higher\t\t" << bestScore4WithoutCentroids << std::endl;
+	std::cout << "\t\t\t\t\t\t---------------------------------" << std::endl;
+	std::cout << "\t\t\t\t\t\ttotal\t\t\t" << scoreTotalWithoutCentroids << "\n" << std::endl;
+
+	std::cout << "  Meilleurs scores AVEC barycentres";
+	std::cout << "\t\tcharleston_road\t\t" << bestScore1 << std::endl;
+	std::cout << "\t\t\t\t\t\true_de_londres\t\t" << bestScore2 << std::endl;
+	std::cout << "\t\t\t\t\t\topera\t\t\t" << bestScore3 << std::endl;
+	std::cout << "\t\t\t\t\t\tlets_go_higher\t\t" << bestScore4 << std::endl;
+	std::cout << "\t\t\t\t\t\t---------------------------------" << std::endl;
+	std::cout << "\t\t\t\t\t\ttotal\t\t\t" << scoreTotal << "\n" << std::endl;
 
 	//Nom de la carte
-	std::string mapName = "lets_go_higher";
+	std::string mapName = "charleston_road";
 	std::string method = "gaussian_blur";
 
 
@@ -62,26 +77,26 @@ int main()
 
 
 				
-				// ###################### CABLAGE SUR SOLUTION ######################
+				/*// ###################### CABLAGE SUR SOLUTION ######################
 				std::vector<int *> routeurs;
 				io.initializeMap(mapSolution, inputFile);
-				std::string solutionFile = "../../solutions/lets_go_higher/gaussian_blur-1512722223-290177232.out";
+				std::string solutionFile = "../../solutions/charleston_road/gaussian_blur-1512991281-21962725.out";
 				int exNbCables = io.initializeMapFromSolution(mapSolution, solutionFile, routeurs);
 				algo.setMapSolution(mapSolution);
 				algo.centroid(routeurs, io, pathOutput + algo.getMethod());
 
-				// ##################################################################
+				// ##################################################################*/
 				
 
 				
-				/*
+				
 				// lancement de l'algo en lui fournissant le meilleur score de la carte correspondante
-				if (mapName == "charleston_road") algo.run(bestScore1);
-				else if (mapName == "rue_de_londres") algo.run(bestScore2);
-				else if (mapName == "opera") algo.run(bestScore3);
-				else if (mapName == "lets_go_higher") algo.run(bestScore4);
+				if (mapName == "charleston_road") algo.run(bestScore1WithoutCentroids);
+				else if (mapName == "rue_de_londres") algo.run(bestScore2WithoutCentroids);
+				else if (mapName == "opera") algo.run(bestScore3WithoutCentroids);
+				else if (mapName == "lets_go_higher") algo.run(bestScore4WithoutCentroids);
 				else if (mapName == "simple_example") algo.run(10000000);
-				*/
+				
 
 				// impression du temps ecoule
 				printf("  Temps d'execution:\t %.2fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
