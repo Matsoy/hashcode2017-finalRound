@@ -56,6 +56,7 @@ public:
 	bool isCyclical(Matrix & mat);
 	int nbCellsCovered(const Matrix & targetCells) const;
 	void updateApproximateCost(const int * newRouteurs, const std::vector<int *> routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, int & approximateCost) const;
+	int getApproximateCost(const int * newRouteurs, const std::vector<int *> routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists) const;
 	void gaussianKernel(std::vector<float> & kernel, const int w) const;
 	void convolve(std::vector<float> & convolvedMat, const Matrix & mat, Matrix & deadMat, const std::vector<float> kernel, const int w) const;
 	void displayVector(const std::vector<int> &vect, int h, int w) const;
@@ -63,10 +64,12 @@ public:
 	int nbNewCoveredCells(const int xRouter, const int yRouter, const Matrix & targetCells) const;
 	void displayScore(const Matrix & targetCells, const int nbRouters) const;
 	int nbNotTargetCellsAround(const int xRouter, const int yRouter, const Matrix & targetCells) const;
-	void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBeginning);
+	void centroid(std::vector<int *> & routeurs, IO & io, std::string pathBeginning);
 	int centerIsBetter(int * center, std::vector<int *> & vertices, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, const int nbCablesBefore, Matrix & intermediateCsrMat);
 	int * getCentroid(const int * pt1, const int * pt2, const int * pt3) const;
 	void addLastRouters(std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists);
+	void displayScoreAfterCentroids(const Matrix & targetCells, const int nbRouters) const;
+	float * get3rdPointEquilateral(const int * A, const int * B, const int * C) const;
 };
 
 

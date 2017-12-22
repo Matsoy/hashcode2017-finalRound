@@ -9,13 +9,13 @@ int main()
 
 	// affichage des meilleurs scores
 
-	int bestScore1 = 21962790;
-	int bestScore2 = 58307050;
-	int bestScore3 = 174527047;
+	int bestScore1 = 21962821;
+	int bestScore2 = 58356020;
+	int bestScore3 = 174527096;
 	int bestScore4 = 290177232;
 	int scoreTotal = bestScore1 + bestScore2 + bestScore3 + bestScore4;
 
-	int bestScore1WithoutCentroids = 21962725;
+	int bestScore1WithoutCentroids = 21962733;
 	int bestScore2WithoutCentroids = 58095015;
 	int bestScore3WithoutCentroids = 172792103;
 	int bestScore4WithoutCentroids = 290177232;
@@ -77,25 +77,25 @@ int main()
 
 
 				
-				/*// ###################### CABLAGE SUR SOLUTION ######################
+				// ###################### CABLAGE SUR SOLUTION ######################
 				std::vector<int *> routeurs;
 				io.initializeMap(mapSolution, inputFile);
-				std::string solutionFile = "../../solutions/charleston_road/gaussian_blur-1512991281-21962725.out";
+				std::string solutionFile = "../../solutions/charleston_road/gaussian_blur-1512995455-21962821.out";
 				int exNbCables = io.initializeMapFromSolution(mapSolution, solutionFile, routeurs);
 				algo.setMapSolution(mapSolution);
 				algo.centroid(routeurs, io, pathOutput + algo.getMethod());
 
-				// ##################################################################*/
+				// ##################################################################
 				
 
 				
 				
 				// lancement de l'algo en lui fournissant le meilleur score de la carte correspondante
-				if (mapName == "charleston_road") algo.run(bestScore1WithoutCentroids);
+				/*if (mapName == "charleston_road") algo.run(bestScore1WithoutCentroids);
 				else if (mapName == "rue_de_londres") algo.run(bestScore2WithoutCentroids);
 				else if (mapName == "opera") algo.run(bestScore3WithoutCentroids);
 				else if (mapName == "lets_go_higher") algo.run(bestScore4WithoutCentroids);
-				else if (mapName == "simple_example") algo.run(10000000);
+				else if (mapName == "simple_example") algo.run(10000000);*/
 				
 
 				// impression du temps ecoule
