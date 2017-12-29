@@ -5,14 +5,14 @@
 
 int main()
 {
-	int nbSimulations = 100;
+	int nbSimulations = 1;
 
 	// affichage des meilleurs scores
 
-	int bestScore1 = 21962821;
-	int bestScore2 = 58356020;
-	int bestScore3 = 174527096;
-	int bestScore4 = 290177232;
+	int bestScore1 = 21962856;
+	int bestScore2 = 58356153;
+	int bestScore3 = 174527508;
+	int bestScore4 = 290192787;
 	int scoreTotal = bestScore1 + bestScore2 + bestScore3 + bestScore4;
 
 	int bestScore1WithoutCentroids = 21962733;
@@ -80,11 +80,10 @@ int main()
 				// ###################### CABLAGE SUR SOLUTION ######################
 				std::vector<int *> routeurs;
 				io.initializeMap(mapSolution, inputFile);
-				std::string solutionFile = "../../solutions/charleston_road/gaussian_blur-1512995455-21962821.out";
+				std::string solutionFile = "../../solutions/charleston_road/gaussian_blur-1514552240-21962856.out";
 				int exNbCables = io.initializeMapFromSolution(mapSolution, solutionFile, routeurs);
 				algo.setMapSolution(mapSolution);
 				algo.centroid(routeurs, io, pathOutput + algo.getMethod());
-
 				// ##################################################################
 				
 
@@ -96,6 +95,14 @@ int main()
 				else if (mapName == "opera") algo.run(bestScore3WithoutCentroids);
 				else if (mapName == "lets_go_higher") algo.run(bestScore4WithoutCentroids);
 				else if (mapName == "simple_example") algo.run(10000000);*/
+
+				/*int * Routerfrom;
+				int * RouterTo;
+				Routerfrom = new int[2]{ 0,70 };
+				RouterTo = new int[2]{ 4,12 };
+				std::vector<int *> cables;
+				std::vector<int *> allCables;
+				algo.findDiagonalConnection(Routerfrom, RouterTo, cables, allCables);*/
 				
 
 				// impression du temps ecoule

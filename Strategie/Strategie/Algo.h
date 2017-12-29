@@ -51,6 +51,8 @@ public:
 	void placeMstPaths_2(const std::vector<int *> & routeurs, const std::vector<int> & idx, const std::vector<int> & idy, const std::vector<int> & dists);
 	int argMin(const int * tab, const int size) const;
 	void findChessConnection(const int * Routerfrom, const int * RouterTo, std::vector<int *> & cables) const;
+	void addIntersectInVertices(const int * Routerfrom, const int * RouterTo, std::vector<int *> & vertices) const;
+	void findDiagonalConnection(const int * Routerfrom, const int * RouterTo, std::vector<int *> & cables) const;
 	bool routerOnBackbone(const std::vector<int *> & routeurs) const;
 	int cellsCoveredPercentage(const Matrix & targetCells) const;
 	bool isCyclical(Matrix & mat);
@@ -70,6 +72,7 @@ public:
 	void addLastRouters(std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists);
 	void displayScoreAfterCentroids(const Matrix & targetCells, const int nbRouters) const;
 	float * get3rdPointEquilateral(const int * A, const int * B, const int * C) const;
+	void placeMstPaths_3(const std::vector<int *> & cables, const std::vector<int *> & vertices);
 };
 
 
