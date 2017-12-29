@@ -6,12 +6,12 @@ Matrix::Matrix(int rows, int cols) : mRows(rows), mCols(cols), mData(rows * cols
 }
 
 // mutateurs
-int Matrix::setRows(int r)
+void Matrix::setRows(int r)
 {
 	mRows = r;
 }
 
-int Matrix::setCols(int c)
+void Matrix::setCols(int c)
 {
 	mCols = c;
 }
