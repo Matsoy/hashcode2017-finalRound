@@ -10,7 +10,7 @@
 
 int main()
 {
-	//Changer les 3 paramètres en fonction de la méthode, de la map et du timestamp
+	//Changer les 3 parametres en fonction de la methode, de la map et du timestamp
 	std::string method = "random";
 	std::string map = "opera";
 	std::string extension = "1512154692";
@@ -35,24 +35,23 @@ int tempmain(const char* &dir, const char* & outfile) {
 		sumtimes = 0;
 		std::string fileout = remove_extension(inputlist[iterate]);
 		while (testcount <= 5) {
-			time_t  timev;
-			time(&timev);
-			std::stringstream timess;
-			timess << timev;
 			clock_t t1, t2;
-			t1 = clock();
-			std::string fullfileout = "../../solutions/" + fileout + timess.str() + ".out";
-			std::string temp_concat = solutionslist[iterate] + " " + s + " " + fileout;
+			std::string temp_concat = solutionslist[iterate] +" "+ fileout;
 			const char* fullcommand = temp_concat.c_str();
+			t1 = clock();
 			system(fullcommand);
 			t2 = clock();
 			float secondsdiff = (float)t2 - (float)t1;
 			sumtimes += secondsdiff;
-			int score = checkSolution(fullfileout);
-			if (score > maxscore) maxscore = score;
 		}
-		
-		results[maxscore] = std::make_pair(sumtimes/5,s);
+		std::string search = "../../solutions/" + fileout + "/" + s + "-" + fileout+"*";
+		WIN32_FIND_DATAA fd;
+		HANDLE hfdind = FindFirstFileA(search.c_str(), &fd);
+		do {
+			int score = checkSolution(fd.cFileName);
+			if (score > maxscore) maxscore = score;
+		} while (FindNextFileA(hfdind, &fd) != 0);
+		results[maxscore] = std::make_pair(sumtimes / 5, s);
 	}
 	std::ofstream outputS;
 	outputS.open(outfile);
@@ -116,7 +115,7 @@ std::vector<std::vector<int>> parseMap(const std::string & mapName, const int & 
 	std::ifstream file(mapName);
 	std::string line = "";	//ligne courante
 
-	//Il faut passer les 3 premières lignes pour ensuite lire la map
+	//Il faut passer les 3 premieres lignes pour ensuite lire la map
 	for (int i = 1; i < 4; i++)
 	{
 		getline(file, line);
@@ -172,8 +171,8 @@ int scoreRouter(std::vector<std::vector<int>>& map, const std::vector<std::pair<
 
 bool wallPresence(const std::vector<std::vector<int>>& map, const int & xRouter, const int & yRouter, const int & xCell, const int & yCell)
 {
-	//Selon si le routeur est plus haut ou bas, plus à gauche ou à droite, alors il faudra aller dans un sens ou un autre.
-	//C'est pour cela qu'il y a la condition d'arrêt et l'incrémentation/décrémentation avec les conditions ternaires.
+	//Selon si le routeur est plus haut ou bas, plus Egauche ou Edroite, alors il faudra aller dans un sens ou un autre.
+	//C'est pour cela qu'il y a la condition d'arret et l'incrementation/decrementation avec les conditions ternaires.
 	for (int i = xRouter; ((xRouter - xCell) < 0) ? i <= xCell : i >= xCell; ((xRouter - xCell) < 0) ? i++ : i--)
 	{
 		for (int j = yRouter; ((yRouter - yCell) < 0) ? j <= yCell : j >= yCell; ((yRouter - yCell) < 0) ? j++ : j--)
@@ -195,7 +194,7 @@ int checkSolution(const std::string & solutionFile)
 	std::cout << "Test de la solution : " << solutionFile.substr(16) << std::endl;
 	std::cout << "Sur la map : " << mapFile.substr(13) << std::endl << std::endl;
 
-	std::vector<int> data = infoMap(mapFile);	//Contient les informations liées à la map
+	std::vector<int> data = infoMap(mapFile);	//Contient les informations liees Ela map
 	const int row = data[0];
 	const int column = data[1];
 	const int radius = data[2];
@@ -280,7 +279,7 @@ int checkSolution(const std::string & solutionFile)
 						{
 							if (cablesMatrix[a][b] == true && map[a][b] != Cell::Wall)
 							{
-								routerCoord.push_back(std::pair<int, int>(a, b));	//Ajouté car pas sur un mur et cablé
+								routerCoord.push_back(std::pair<int, int>(a, b));	//AjoutEcar pas sur un mur et cablE
 							}
 							else
 							{
