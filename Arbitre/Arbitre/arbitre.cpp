@@ -33,20 +33,27 @@ int main(int argc, char* argv[]) {
 	std::cout << "un arg:" << dir << "\n";
 	std::string outf = argv[2];
 	std::cout << "deux arg: "<<outf<<"\n";
-	std::cout << "test";
-
+	std::string inputdir = "..\\..\\inputs\\";
+	std::string outputdir = "..\\..\\solutions\\";
 	std::vector<std::string> execlist;
 	GetFilesInDirectory(execlist,dir,"");
+	for (auto &s : execlist) {
+		std::cout << s;
+	}
 	std::map<int, std::pair<float, std::string>> results;
 	float sumtimes;
 	for (auto &s : execlist) { //pour chaque strat
-		std::cout << s << "\n";
 		int maxscore = 0;
 		int testcount = 0;
 		sumtimes = 0;
+		size_t lastindex = s.find_last_of(".");
+		std::string stratname = s.substr(0, lastindex);
+		std::string outputdirmap = outputdir + outf;
 		while (testcount <= 5) {
 			clock_t t1, t2;
-			std::string temp_concat = s +" "+ outf+" "+s+"-"+outf;
+			
+			std::string temp_concat = "..\\..\\executables\\"+stratname +" "+inputdir+outf+".in"+" "+outputdirmap+"\\"+outf+"-"+stratname+std::to_string(testcount)+".out";
+
 			const char* fullcommand = temp_concat.c_str();  //commande a lancer
 			std::cout << fullcommand << "\n";
 			t1 = clock();
@@ -54,15 +61,18 @@ int main(int argc, char* argv[]) {
 			t2 = clock();
 			float secondsdiff = (float)t2 - (float)t1;
 			sumtimes += secondsdiff;
+			testcount += 1;
 		}
-		std::string soldir = "../../solutions/" + outf;
+		std::string soldir = "..\\..\\solutions\\" + outf;
 		std::vector<std::string>solutions;
 		GetFilesInDirectory(solutions, soldir,s);  //scan fichiers sortis
 		for(auto &s2:solutions){
+
 			int score = checkSolution(s2);  //verif solution valide
 			if (score > maxscore) maxscore = score;
 		}
 		results[maxscore] = std::make_pair(sumtimes / 5, s);  //stockage resultats de chaque strat apres 5 tests.
+		CleanupDirectory(outputdirmap);
 	}
 	std::string outffull = outf+".txt";
 	std::ofstream outputS;
@@ -71,7 +81,6 @@ int main(int argc, char* argv[]) {
 		std::cout << "executable :" << result.second.second << " temps moyen: " << result.second.first << " score: " << result.first << "\n";
 	}
 	return 0;
->>>>>>> origin/arbitre
 }
 
 std::vector<int> infoMap(const std::string & mapName)
@@ -128,11 +137,11 @@ std::vector<std::vector<int>> parseMap(const std::string & mapName, const int & 
 	std::ifstream file(mapName);
 	std::string line = "";	//ligne courante
 
-<<<<<<< HEAD
+
 							//Il faut passer les 3 premières lignes pour ensuite lire la map
-=======
+
 	//Il faut passer les 3 premieres lignes pour ensuite lire la map
->>>>>>> origin/arbitre
+
 	for (int i = 1; i < 4; i++)
 	{
 		getline(file, line);
@@ -205,9 +214,11 @@ bool wallPresence(const std::vector<std::vector<int>>& map, const int & xRouter,
 
 
 int checkSolution(const std::string & solutionFile)
-{
-	std::string soltmp = solutionFile.substr(16);
-	std::string mapFile = "../../inputs/" + soltmp.substr(0, soltmp.find("/")) + ".in";
+{	
+	
+	std::string sdir = "..\\..\\solutions\\"+solutionFile.substr(0,solutionFile.find("-"))+"\\";
+	std::cout << sdir+solutionFile + "\n";
+	std::string mapFile = "../../inputs/" + solutionFile.substr(0,solutionFile.find("-")) + ".in";
 	std::cout << "Test de la solution : " << solutionFile.substr(16) << std::endl;
 	std::cout << "Sur la map : " << mapFile.substr(13) << std::endl << std::endl;
 
@@ -221,7 +232,7 @@ int checkSolution(const std::string & solutionFile)
 	const int xBackbone = data[6];
 	const int yBackbone = data[7];
 
-	std::ifstream solution(solutionFile, std::ios::in);
+	std::ifstream solution(sdir+solutionFile, std::ios::in);
 	if (solution)	//On test si le fichier est bien ouvert
 	{
 		//Parser le fichier de solution
@@ -361,11 +372,11 @@ void GetFilesInDirectory(std::vector<std::string> &out, const std::string &direc
 	HANDLE dir;
 	WIN32_FIND_DATAA file_data;
 	std::string  file_name;
-	if ((dir = FindFirstFileA((directory + "/*").c_str(), &file_data)) == INVALID_HANDLE_VALUE)
+	if ((dir = FindFirstFileA((directory + "/*.*").c_str(), &file_data)) == INVALID_HANDLE_VALUE)
 	{
-		// Invalid directory
+		std::cout << "invalid dir";
 	}
-
+	
 	while (FindNextFileA(dir, &file_data)) {
 		file_name = file_data.cFileName;
 		if (strcmp(file_data.cFileName, ".") != 0 && strcmp(file_data.cFileName, "..") != 0)
@@ -408,6 +419,46 @@ void GetFilesInDirectory(std::vector<std::string> &out, const std::string &direc
 				out.push_back(file_name);
 			}
 		}
+	}
+	closedir(dir);
+#endif
+}
+
+void CleanupDirectory(const std::string & directory)
+{
+#ifdef WIN32
+	HANDLE dir;
+	WIN32_FIND_DATAA file_data;
+	std::string  file_name;
+	if ((dir = FindFirstFileA((directory + "/*.*").c_str(), &file_data)) == INVALID_HANDLE_VALUE)
+	{
+		std::cout << "invalid dir";
+	}
+
+	while (FindNextFileA(dir, &file_data)) {
+		remove(file_data.cFileName);
+	}
+	FindClose(dir);
+#else
+	DIR *dir;
+	class dirent *ent;
+	class stat st;
+
+	dir = opendir(directory.c_str());
+	while ((ent = readdir(dir)) != NULL) {
+		const std::string file_name = ent->d_name;
+
+		if (file_name[0] == '.')
+			continue;
+
+		if (stat(full_file_name.c_str(), &st) == -1)
+			continue;
+
+		const bool is_directory = (st.st_mode & S_IFDIR) != 0;
+
+		if (is_directory)
+			continue;
+		remove(file_name);
 	}
 	closedir(dir);
 #endif
