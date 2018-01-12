@@ -3,7 +3,7 @@ Mini-Projet de programmation en langage C++ : Router Placement, Round Final Goog
 
 
 # Equipe : 
-____________________
+----------
 - Nicolas Ehresmann (Arbitre)
 - Mehdi Haddad (Stratégie)
 - Arthur Outhier (Stratégie)
@@ -12,7 +12,7 @@ ____________________
 
 
 # Contexte :
-____________________
+------------
 L'objectif de ce projet est d'optimiser le placement de routeurs sur une carte donnée, pour faire
 en sorte de couvrir un maximum de cellules cibles, le tout avec un budget donné.
 Cependant, il vaut veiller à respecter quelques règles : 
@@ -34,12 +34,12 @@ Pr : Prix d'un routeur
 
 
 # Découpage du projet
-_______________________
+---------------------
 Pour ce projet, nous devions travailler sur une partie Arbitre et une partie Stratégie.
 Ci-dessous est repris le découpage que nous avons effectué pour définir les 2 parties.
 
 ## Partie Arbitre
-____________________
+-----------------
 __***Vérification cohérence de l'output :***__
 - 0 <= nombre de cellules connectées à l'antenne < nombre de lignes * nombre de colonnes
 - lignes en-dessous:
@@ -71,7 +71,7 @@ __***Si plusieurs fichiers output en entrée, affichage :***__
 	- budget
 
 ## Partie Stratégie
-____________________
+-------------------
 __***Vérification cohérence de l'input :***__
 - 1ere ligne
 	- 1 <= 1er nombre <= 1000 : nombre de lignes
@@ -86,9 +86,10 @@ __***Vérification cohérence de l'input :***__
 	- 0 <= 2eme nombre < nombre de colonnes: coordonnées Y de l'antenne
 
 # Meilleurs scores obtenus
-__________________________
-Charleston_road : 21 962 856 
-Rue_de_londres : 58 356 153 
-Opera : 174 527 508 
-Lets_go_higher : 290 192 787
+--------------------------
+- Charleston_road : 21 962 856 
+- Rue_de_londres : 58 356 153 
+- Opera : 174 527 508 
+- Lets_go_higher : 290 192 787
+
 Total : 545 039 304
