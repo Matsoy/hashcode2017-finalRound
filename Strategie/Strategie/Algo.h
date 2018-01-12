@@ -3,6 +3,9 @@
 #include "Matrix.h"
 #include "IO.h"
 
+/*
+* Classe qui gere les algorithmes
+*/
 class Algo
 {
 private:
