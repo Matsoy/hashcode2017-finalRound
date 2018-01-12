@@ -1,5 +1,8 @@
 #include "IO.h"
 
+/*
+* Constructeur
+*/
 IO::IO()
 {
 }
