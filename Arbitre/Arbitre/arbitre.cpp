@@ -8,6 +8,8 @@
 #endif
 
 
+//exemple d'utilisation : Arbitre ..\..\executables charleston_road
+
 int testmain()
 {
 	//Changer les 3 parametres en fonction de la methode, de la map et du timestamp
@@ -78,7 +80,9 @@ int main(int argc, char* argv[]) {
 	std::ofstream outputS;
 	outputS.open(outffull); //creation fichier out
 	for (const auto& result : results) {
-		std::cout << "executable :" << result.second.second << " temps moyen: " << result.second.first << " score: " << result.first << "\n";
+		std::string write = "executable :"+ result.second.second+ " temps moyen: " + std::to_string(result.second.first) + " score: " + std::to_string(result.first)+ "\n";
+		
+		outputS << write;
 	}
 	return 0;
 }
