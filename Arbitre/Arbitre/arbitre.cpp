@@ -1,10 +1,16 @@
 #include "arbitre.h"
-#include "copyofdirent.h"
-//using namespace std;
+#include <sys/stat.h>
+#ifdef _WIN32
+#include <windows.h>
+#include <atlstr.h>
+#else
+#include <dirent.h>
+#endif
 
-int main()
+
+int testmain()
 {
-	//Changer les 3 paramËtres en fonction de la mÈthode, de la map et du timestamp
+	//Changer les 3 parametres en fonction de la methode, de la map et du timestamp
 	std::string method = "random";
 	std::string map = "opera";
 	std::string extension = "1512154692";
@@ -12,36 +18,62 @@ int main()
 	checkSolution("../../solutions/" + map + "/" + method + "-" + map + "-" + extension + ".out");
 	return(EXIT_SUCCESS);
 }
-//commented as it won't compile yet
-/*
-int tempmain(const std::string& dir, const std::string& outfile) {
-std::vector<std::string> inputlist = ...;
-std::vector<std::string> outputlist = ...;
-int iterate = 0;
-std::map<int, std::pair<float, std::string>> results;
-float sumtimes;
-for (auto &s : filevec) {
-int testcount = 0;
-sumtimes = 0;
-while (testcount <= 5) {
 
-clock_t t1, t2;
-t1 = clock();
-system("curfile inputlist[iterate] outputlist[iterate]");
-t2 = clock();
-float secondsdiff = (float)t2 - (float)t1;
-sumtimes += secondsdiff;
-}
-int score = checkSolution(intputlist[iterate], outputlist[iterate]);
-results[score] = std::make_pair(sumtimes/5,s);
-}
-std::ofstream outputS;
-outputS.open(outfile);
-for (const auto& result : results) {
-std::cout << "executable :" << result.second.second << " temps moyen: " << result.second.first << " score: " << result.first << "\n";
-}
-}
+/*
+* code executable de l'arbitre. Test une map dont le nom est donne en outfile avec chaque solutions.
+* renvoie score (0) si solution non conforme + temps moyen d'execution pour chaque.
+* @param dir repertoire qui contient les executables des strategies elaborees.
+* @param outfile nom du fichier de sorti qui est aussi nom de la map que l'on souhaite tester.
 */
+
+
+
+int main(int argc, char* argv[]) {
+	std::string dir = argv[1];
+	std::cout << "un arg:" << dir << "\n";
+	std::string outf = argv[2];
+	std::cout << "deux arg: "<<outf<<"\n";
+	std::cout << "test";
+
+	std::vector<std::string> execlist;
+	GetFilesInDirectory(execlist,dir,"");
+	std::map<int, std::pair<float, std::string>> results;
+	float sumtimes;
+	for (auto &s : execlist) { //pour chaque strat
+		std::cout << s << "\n";
+		int maxscore = 0;
+		int testcount = 0;
+		sumtimes = 0;
+		while (testcount <= 5) {
+			clock_t t1, t2;
+			std::string temp_concat = s +" "+ outf+" "+s+"-"+outf;
+			const char* fullcommand = temp_concat.c_str();  //commande a lancer
+			std::cout << fullcommand << "\n";
+			t1 = clock();
+			system(fullcommand);  //test strat avec appel systeme
+			t2 = clock();
+			float secondsdiff = (float)t2 - (float)t1;
+			sumtimes += secondsdiff;
+		}
+		std::string soldir = "../../solutions/" + outf;
+		std::vector<std::string>solutions;
+		GetFilesInDirectory(solutions, soldir,s);  //scan fichiers sortis
+		for(auto &s2:solutions){
+			int score = checkSolution(s2);  //verif solution valide
+			if (score > maxscore) maxscore = score;
+		}
+		results[maxscore] = std::make_pair(sumtimes / 5, s);  //stockage resultats de chaque strat apres 5 tests.
+	}
+	std::string outffull = outf+".txt";
+	std::ofstream outputS;
+	outputS.open(outffull); //creation fichier out
+	for (const auto& result : results) {
+		std::cout << "executable :" << result.second.second << " temps moyen: " << result.second.first << " score: " << result.first << "\n";
+	}
+	return 0;
+>>>>>>> origin/arbitre
+}
+
 std::vector<int> infoMap(const std::string & mapName)
 {
 	std::vector<int> data;
@@ -96,7 +128,11 @@ std::vector<std::vector<int>> parseMap(const std::string & mapName, const int & 
 	std::ifstream file(mapName);
 	std::string line = "";	//ligne courante
 
+<<<<<<< HEAD
 							//Il faut passer les 3 premiËres lignes pour ensuite lire la map
+=======
+	//Il faut passer les 3 premieres lignes pour ensuite lire la map
+>>>>>>> origin/arbitre
 	for (int i = 1; i < 4; i++)
 	{
 		getline(file, line);
@@ -152,8 +188,8 @@ int scoreRouter(std::vector<std::vector<int>>& map, const std::vector<std::pair<
 
 bool wallPresence(const std::vector<std::vector<int>>& map, const int & xRouter, const int & yRouter, const int & xCell, const int & yCell)
 {
-	//Selon si le routeur est plus haut ou bas, plus ‡ gauche ou ‡ droite, alors il faudra aller dans un sens ou un autre.
-	//C'est pour cela qu'il y a la condition d'arrÍt et l'incrÈmentation/dÈcrÈmentation avec les conditions ternaires.
+	//Selon si le routeur est plus haut ou bas, plus ÅEgauche ou ÅEdroite, alors il faudra aller dans un sens ou un autre.
+	//C'est pour cela qu'il y a la condition d'arret et l'incrementation/decrementation avec les conditions ternaires.
 	for (int i = xRouter; ((xRouter - xCell) < 0) ? i <= xCell : i >= xCell; ((xRouter - xCell) < 0) ? i++ : i--)
 	{
 		for (int j = yRouter; ((yRouter - yCell) < 0) ? j <= yCell : j >= yCell; ((yRouter - yCell) < 0) ? j++ : j--)
@@ -175,7 +211,7 @@ int checkSolution(const std::string & solutionFile)
 	std::cout << "Test de la solution : " << solutionFile.substr(16) << std::endl;
 	std::cout << "Sur la map : " << mapFile.substr(13) << std::endl << std::endl;
 
-	std::vector<int> data = infoMap(mapFile);	//Contient les informations liÈes ‡ la map
+	std::vector<int> data = infoMap(mapFile);	//Contient les informations liees ÅEla map
 	const int row = data[0];
 	const int column = data[1];
 	const int radius = data[2];
@@ -243,7 +279,8 @@ int checkSolution(const std::string & solutionFile)
 
 			if ((nbCable * cableCost + nbRouters * routerCost) > budget)	//Test du budget
 			{
-				throw std::exception("Le budget a ete depasse");
+				std::cout << "Le budget a ete depasse";
+				return 0;
 			}
 
 			if (0 <= nbRouters && nbRouters < row*column)
@@ -259,7 +296,7 @@ int checkSolution(const std::string & solutionFile)
 						{
 							if (cablesMatrix[a][b] == true && map[a][b] != Cell::Wall)
 							{
-								routerCoord.push_back(std::pair<int, int>(a, b));	//AjoutÈ car pas sur un mur et cablÈ
+								routerCoord.push_back(std::pair<int, int>(a, b));	//AjoutÅEcar pas sur un mur et cablÅE
 							}
 							else
 							{
@@ -310,33 +347,39 @@ int checkSolution(const std::string & solutionFile)
 		return 0;
 	}
 }
+std::string remove_extension(const std::string& filename) {
+	size_t lastdot = filename.find_last_of(".");
+	if (lastdot == std::string::npos) return filename;
+	return filename.substr(0, lastdot);
+}
 
 
-/* plagiat mdr */
 
-void GetFilesInDirectory(std::vector<std::string> &out, const std::string &directory)
+void GetFilesInDirectory(std::vector<std::string> &out, const std::string &directory, const std::string filter)
 {
-#ifdef WINDOWS
+#ifdef WIN32
 	HANDLE dir;
-	WIN32_FIND_DATA file_data;
+	WIN32_FIND_DATAA file_data;
+	std::string  file_name;
+	if ((dir = FindFirstFileA((directory + "/*").c_str(), &file_data)) == INVALID_HANDLE_VALUE)
+	{
+		// Invalid directory
+	}
 
-	if ((dir = FindFirstFile((directory + "/*").c_str(), &file_data)) == INVALID_HANDLE_VALUE)
-		return; /* No files found */
-
-	do {
-		const string file_name = file_data.cFileName;
-		const string full_file_name = directory + "/" + file_name;
-		const bool is_directory = (file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
-
-		if (file_name[0] == '.')
-			continue;
-
-		if (is_directory)
-			continue;
-
-		out.push_back(full_file_name);
-	} while (FindNextFile(dir, &file_data));
-
+	while (FindNextFileA(dir, &file_data)) {
+		file_name = file_data.cFileName;
+		if (strcmp(file_data.cFileName, ".") != 0 && strcmp(file_data.cFileName, "..") != 0)
+		{
+			if (filter == "") {
+				out.push_back(file_name);
+			}
+			else {
+				if (file_name.find(filter)) {
+					out.push_back(file_name);
+				}
+			}
+		}
+	}
 	FindClose(dir);
 #else
 	DIR *dir;
@@ -346,7 +389,6 @@ void GetFilesInDirectory(std::vector<std::string> &out, const std::string &direc
 	dir = opendir(directory.c_str());
 	while ((ent = readdir(dir)) != NULL) {
 		const std::string file_name = ent->d_name;
-		const std::string full_file_name = directory + "/" + file_name;
 
 		if (file_name[0] == '.')
 			continue;
@@ -358,9 +400,15 @@ void GetFilesInDirectory(std::vector<std::string> &out, const std::string &direc
 
 		if (is_directory)
 			continue;
-
-		out.push_back(full_file_name);
+		if (filter == "") {
+			out.push_back(file_name);
+		}
+		else {
+			if (file_name.find(filter)) {
+				out.push_back(file_name);
+			}
+		}
 	}
 	closedir(dir);
 #endif
-} // GetFilesInDirectory
+}
