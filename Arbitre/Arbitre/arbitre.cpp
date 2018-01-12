@@ -19,38 +19,54 @@ int testmain()
 	return(EXIT_SUCCESS);
 }
 
-int main(const char* &dir, const char* & outfile) {
-	
-	std::string outf = outfile;
+/*
+* code executable de l'arbitre. Test une map dont le nom est donne en outfile avec chaque solutions.
+* renvoie score (0) si solution non conforme + temps moyen d'execution pour chaque.
+* @param dir repertoire qui contient les executables des strategies elaborees.
+* @param outfile nom du fichier de sorti qui est aussi nom de la map que l'on souhaite tester.
+*/
+
+
+
+int main(int argc, char* argv[]) {
+	std::string dir = argv[1];
+	std::cout << "un arg:" << dir << "\n";
+	std::string outf = argv[2];
+	std::cout << "deux arg: "<<outf<<"\n";
+	std::cout << "test";
+
 	std::vector<std::string> execlist;
 	GetFilesInDirectory(execlist,dir,"");
 	std::map<int, std::pair<float, std::string>> results;
 	float sumtimes;
-	for (auto &s : execlist) {
+	for (auto &s : execlist) { //pour chaque strat
+		std::cout << s << "\n";
 		int maxscore = 0;
 		int testcount = 0;
 		sumtimes = 0;
 		while (testcount <= 5) {
 			clock_t t1, t2;
-			std::string temp_concat = s +" "+ outfile+" "+s+"-"+outfile;
-			const char* fullcommand = temp_concat.c_str();
+			std::string temp_concat = s +" "+ outf+" "+s+"-"+outf;
+			const char* fullcommand = temp_concat.c_str();  //commande a lancer
+			std::cout << fullcommand << "\n";
 			t1 = clock();
-			system(fullcommand);
+			system(fullcommand);  //test strat avec appel systeme
 			t2 = clock();
 			float secondsdiff = (float)t2 - (float)t1;
 			sumtimes += secondsdiff;
 		}
 		std::string soldir = "../../solutions/" + outf;
 		std::vector<std::string>solutions;
-		GetFilesInDirectory(solutions, soldir, s);
+		GetFilesInDirectory(solutions, soldir,s);  //scan fichiers sortis
 		for(auto &s2:solutions){
-			int score = checkSolution(s2);
+			int score = checkSolution(s2);  //verif solution valide
 			if (score > maxscore) maxscore = score;
-		} 
-		results[maxscore] = std::make_pair(sumtimes / 5, s);
+		}
+		results[maxscore] = std::make_pair(sumtimes / 5, s);  //stockage resultats de chaque strat apres 5 tests.
 	}
+	std::string outffull = outf+".txt";
 	std::ofstream outputS;
-	outputS.open(outfile);
+	outputS.open(outffull); //creation fichier out
 	for (const auto& result : results) {
 		std::cout << "executable :" << result.second.second << " temps moyen: " << result.second.first << " score: " << result.first << "\n";
 	}
@@ -130,7 +146,7 @@ std::vector<std::vector<int>> parseMap(const std::string & mapName, const int & 
 			{
 				mapMatrix[coordX][coordY] = Cell::Void;
 			}
-			else if (charElement == '.') 
+			else if (charElement == '.')
 			{
 				mapMatrix[coordX][coordY] = Cell::Wireless;
 			}
@@ -199,7 +215,7 @@ int checkSolution(const std::string & solutionFile)
 	const int budget = data[5];
 	const int xBackbone = data[6];
 	const int yBackbone = data[7];
-	
+
 	std::ifstream solution(solutionFile, std::ios::in);
 	if (solution)	//On test si le fichier est bien ouvert
 	{
@@ -332,34 +348,34 @@ std::string remove_extension(const std::string& filename) {
 	return filename.substr(0, lastdot);
 }
 
-/* Returns a list of files in a directory (except the ones that begin with a dot) */
 
-void GetFilesInDirectory(std::vector<std::string> &out, const std::string &directory, const char* filter)
+
+void GetFilesInDirectory(std::vector<std::string> &out, const std::string &directory, const std::string filter)
 {
 #ifdef WIN32
-		HANDLE dir;
-		WIN32_FIND_DATAA file_data;
-		std::string  file_name, full_file_name;
-		if ((dir = FindFirstFileA((directory + "/*").c_str(), &file_data)) == INVALID_HANDLE_VALUE)
-		{
-			// Invalid directory
-		}
+	HANDLE dir;
+	WIN32_FIND_DATAA file_data;
+	std::string  file_name;
+	if ((dir = FindFirstFileA((directory + "/*").c_str(), &file_data)) == INVALID_HANDLE_VALUE)
+	{
+		// Invalid directory
+	}
 
-		while (FindNextFileA(dir, &file_data)) {
-			file_name = file_data.cFileName;
-			if (strcmp(file_data.cFileName, ".") != 0 && strcmp(file_data.cFileName, "..") != 0)
-			{
-				if (filter == "") {
+	while (FindNextFileA(dir, &file_data)) {
+		file_name = file_data.cFileName;
+		if (strcmp(file_data.cFileName, ".") != 0 && strcmp(file_data.cFileName, "..") != 0)
+		{
+			if (filter == "") {
+				out.push_back(file_name);
+			}
+			else {
+				if (file_name.find(filter)) {
 					out.push_back(file_name);
-				}
-				else {
-					if (strstr(file_data.cFileName, filter)) {
-						out.push_back(file_name);
-					}
 				}
 			}
 		}
-		FindClose(dir);
+	}
+	FindClose(dir);
 #else
 	DIR *dir;
 	class dirent *ent;
@@ -383,11 +399,11 @@ void GetFilesInDirectory(std::vector<std::string> &out, const std::string &direc
 			out.push_back(file_name);
 		}
 		else {
-			if (strstr(file_data.cFileName, filter)) {
+			if (file_name.find(filter)) {
 				out.push_back(file_name);
 			}
 		}
 	}
 	closedir(dir);
 #endif
-} // GetFilesInDirectory
+}
