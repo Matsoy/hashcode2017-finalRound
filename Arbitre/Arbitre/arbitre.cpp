@@ -8,7 +8,7 @@
 #endif
 
 
-int main()
+int testmain()
 {
 	//Changer les 3 parametres en fonction de la methode, de la map et du timestamp
 	std::string method = "random";
@@ -18,25 +18,21 @@ int main()
 	checkSolution("../../solutions/" + map + "/" + method + "-" + map + "-" + extension + ".out");
 	return(EXIT_SUCCESS);
 }
-//commented as it won't compile yet
 
-int tempmain(const char* &dir, const char* & outfile) {
+int main(const char* &dir, const char* & outfile) {
 	
-	std::vector<std::string> inputlist;
-	GetFilesInDirectory(inputlist,"../../inputs/");
-	std::vector<std::string> solutionslist;
-	GetFilesInDirectory(solutionslist,dir);
-	int iterate = 0;
+	std::string outf = outfile;
+	std::vector<std::string> execlist;
+	GetFilesInDirectory(execlist,dir,"");
 	std::map<int, std::pair<float, std::string>> results;
 	float sumtimes;
-	for (auto &s : solutionslist) {
+	for (auto &s : execlist) {
 		int maxscore = 0;
 		int testcount = 0;
 		sumtimes = 0;
-		std::string fileout = remove_extension(inputlist[iterate]);
 		while (testcount <= 5) {
 			clock_t t1, t2;
-			std::string temp_concat = solutionslist[iterate] +" "+ fileout;
+			std::string temp_concat = s +" "+ outfile+" "+s+"-"+outfile;
 			const char* fullcommand = temp_concat.c_str();
 			t1 = clock();
 			system(fullcommand);
@@ -44,13 +40,13 @@ int tempmain(const char* &dir, const char* & outfile) {
 			float secondsdiff = (float)t2 - (float)t1;
 			sumtimes += secondsdiff;
 		}
-		std::string search = "../../solutions/" + fileout + "/" + s + "-" + fileout+"*";
-		WIN32_FIND_DATAA fd;
-		HANDLE hfdind = FindFirstFileA(search.c_str(), &fd);
-		do {
-			int score = checkSolution(fd.cFileName);
+		std::string soldir = "../../solutions/" + outf;
+		std::vector<std::string>solutions;
+		GetFilesInDirectory(solutions, soldir, s);
+		for(auto &s2:solutions){
+			int score = checkSolution(s2);
 			if (score > maxscore) maxscore = score;
-		} while (FindNextFileA(hfdind, &fd) != 0);
+		} 
 		results[maxscore] = std::make_pair(sumtimes / 5, s);
 	}
 	std::ofstream outputS;
@@ -338,7 +334,7 @@ std::string remove_extension(const std::string& filename) {
 
 /* Returns a list of files in a directory (except the ones that begin with a dot) */
 
-void GetFilesInDirectory(std::vector<std::string> &out, const std::string &directory)
+void GetFilesInDirectory(std::vector<std::string> &out, const std::string &directory, const char* filter)
 {
 #ifdef WIN32
 		HANDLE dir;
@@ -351,11 +347,16 @@ void GetFilesInDirectory(std::vector<std::string> &out, const std::string &direc
 
 		while (FindNextFileA(dir, &file_data)) {
 			file_name = file_data.cFileName;
-			full_file_name = directory + file_name;
 			if (strcmp(file_data.cFileName, ".") != 0 && strcmp(file_data.cFileName, "..") != 0)
 			{
-				
-				out.push_back(full_file_name);
+				if (filter == "") {
+					out.push_back(file_name);
+				}
+				else {
+					if (strstr(file_data.cFileName, filter)) {
+						out.push_back(file_name);
+					}
+				}
 			}
 		}
 		FindClose(dir);
@@ -367,7 +368,6 @@ void GetFilesInDirectory(std::vector<std::string> &out, const std::string &direc
 	dir = opendir(directory.c_str());
 	while ((ent = readdir(dir)) != NULL) {
 		const std::string file_name = ent->d_name;
-		const std::string full_file_name = directory + "/" + file_name;
 
 		if (file_name[0] == '.')
 			continue;
@@ -379,8 +379,14 @@ void GetFilesInDirectory(std::vector<std::string> &out, const std::string &direc
 
 		if (is_directory)
 			continue;
-
-		out.push_back(full_file_name);
+		if (filter == "") {
+			out.push_back(file_name);
+		}
+		else {
+			if (strstr(file_data.cFileName, filter)) {
+				out.push_back(file_name);
+			}
+		}
 	}
 	closedir(dir);
 #endif
