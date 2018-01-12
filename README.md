@@ -1,5 +1,45 @@
-# Partie Arbitre
-____________________
+Mini-Projet de programmation en langage C++ : Router Placement, Round Final Google Hash 2017
+============================================================================================
+
+
+# Equipe : 
+----------
+- Nicolas Ehresmann (Arbitre)
+- Mehdi Haddad (Stratégie)
+- Arthur Outhier (Stratégie)
+- Neil Rittner (Arbitre)
+- Mathieu Soyer (Stratégie)
+
+
+# Contexte :
+------------
+L'objectif de ce projet est d'optimiser le placement de routeurs sur une carte donnée, pour faire
+en sorte de couvrir un maximum de cellules cibles, le tout avec un budget donné.
+Cependant, il vaut veiller à respecter quelques règles : 
+- Tous les routeurs doivent être connectés au Backbone donné.
+- Tous les routeurs doivent être placés sur des cellules connectées (c'est à dire câblées).
+- Les routeurs ne doivent pas être posés sur des murs.
+- La Wifi ne traverse pas les murs.
+- Veiller à ce que les routeurs et les câbles soient bien posés dans les limites de la carte.
+
+Enfin, le calcul du score respecte l'équation suivante:
+Score = 1000 * T + (B - (N * Pb + M * Pr))
+Avec : 
+T : Nombre de cellules cibles couvertes.
+B : Budget initial
+N : Nombre de câbles construits
+Pb : Prix d'un câble
+M : Nombre de routeurs placés
+Pr : Prix d'un routeur
+
+
+# Découpage du projet
+---------------------
+Pour ce projet, nous devions travailler sur une partie Arbitre et une partie Stratégie.
+Ci-dessous est repris le découpage que nous avons effectué pour définir les 2 parties.
+
+## Partie Arbitre
+-----------------
 __***Vérification cohérence de l'output :***__
 - 0 <= nombre de cellules connectées à l'antenne < nombre de lignes * nombre de colonnes
 - lignes en-dessous:
@@ -30,8 +70,8 @@ __***Si plusieurs fichiers output en entrée, affichage :***__
 	- nombre de câbles
 	- budget
 
-# Partie Stratégie
-____________________
+## Partie Stratégie
+-------------------
 __***Vérification cohérence de l'input :***__
 - 1ere ligne
 	- 1 <= 1er nombre <= 1000 : nombre de lignes
@@ -44,3 +84,12 @@ __***Vérification cohérence de l'input :***__
 - 3eme ligne
 	- 0 <= 1er nombre < nombre de lignes : coordonnées X de l'antenne
 	- 0 <= 2eme nombre < nombre de colonnes: coordonnées Y de l'antenne
+
+# Meilleurs scores obtenus
+--------------------------
+- Charleston_road : 21 962 856 
+- Rue_de_londres : 58 356 153 
+- Opera : 174 527 508 
+- Lets_go_higher : 290 192 787
+
+Total : 545 039 304
