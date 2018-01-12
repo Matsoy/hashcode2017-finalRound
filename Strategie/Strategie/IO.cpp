@@ -1,5 +1,8 @@
 #include "IO.h"
 
+/*
+* Constructeur
+*/
 IO::IO()
 {
 }
@@ -198,8 +201,10 @@ int IO::initializeMapFromSolution(Matrix & m, std::string solutionFile, std::vec
 }
 
 /*
-*Genere le fichier output, en provocant le premier appel de la methode recursive ioBrowser
-*et enregistre le resultat dans un fichier donne en parametre.
+* Genere le fichier output, en provocant le premier appel de la methode recursive ioBrowser et enregistre le resultat dans un fichier donne en parametre.
+*
+* @param mapRouteurs la matrice contenant les routeurs et les cables
+* @param pathBeginning le debut du nom du fichier d'output qui va etre genere
 */
 void IO::generateOutput(Matrix & mapRouteurs, std::string pathBeginning)
 {
@@ -218,8 +223,7 @@ void IO::generateOutput(Matrix & mapRouteurs, std::string pathBeginning)
 	time(&timev);
 	std::stringstream timess;
 	timess << timev;
-	//chemin du fichier d'output de type ../solutions/<map>-<methode>-timestamp.out
-	std::string filePath = pathBeginning + "-" + timess.str() + ".out";
+	std::string filePath = pathBeginning;
 	//Ecrase le fichier s'il existe
 	std::remove(filePath.c_str());
 	//Creer le fichier
@@ -231,12 +235,16 @@ void IO::generateOutput(Matrix & mapRouteurs, std::string pathBeginning)
 	//##################################
 	//##################################
 
-	std::cout << std::endl;
-	std::cout << "  " << filePath << "\n" << std::endl;
+	//std::cout << std::endl;
+	//std::cout << "  " << filePath << "\n" << std::endl;
 }
 
 /*
 * Parcours les chemins cables de maniere recursive pour retenir l'ordre et l'emplacement des cables et routeurs
+*
+* @param mapRouteurs la matrice avec les routeurs et les cables
+* @param x coordonnee x du cable ou du routeur
+* @param y coordonnee y du cable ou du routeur
 */
 void IO::ioBrowser(Matrix & mapRouteurs, int x, int y)
 {

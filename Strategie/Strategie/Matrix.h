@@ -1,33 +1,70 @@
 #pragma once
 #include "Header.h"
 
+/*
+* Classe qui imite l'utilisation d'une matrice depuis un vecteur d'entiers
+*/
 class Matrix
 {
 private:
-	int mRows;
-	int mCols;
-	std::vector<int> mData;
+	int mRows; // nombre de lignes de la matrice
+	int mCols; // nombre de colonnes de la matrice
+	std::vector<int> mData; // vecteurs
 
 public:
+	/*
+	* Constructeur
+	*/
 	Matrix(int rows, int cols);
 	int& operator()(int i, int j);
 	int operator()(int i, int j) const;
 	int& operator()(int k);
 	int operator()(int k) const;
 
-	// accesseurs
+	/*
+	* Accesseurs
+	*/
 	int getRows() const;
 	int getCols() const;
 
-	// mutateurs
+	/*
+	* Mutateurs
+	*/
 	void setRows(int r);
 	void setCols(int c);
 
+	/*
+	* test si la matrice est vide
+	*
+	* @return true si la matrice remplie de 0
+	*			false sinon
+	*/
 	bool isEmpty() const;
+	/*
+	* calcule la somme des valeurs de la matrice
+	*
+	* @return la somme des valeurs de la matrice
+	*/
 	int sum() const;
+	/*
+	* renvoie la coordonnees matrix[x][y] correspondant au vector[z]
+	*
+	* @param z index dans le vecteur
+	* @return matrix[x][x] <==> vector[z]
+	*/
 	int * xy(int z);
+	/*
+	* retourne les entrees dans chaque colonne dans le sens haut / bas.
+	* Les lignes sont conservees, mais apparaissent dans un ordre different de celui d'avant.
+	*/
 	void reverse();
-
+	/*
+	* Pour afficher une matrice
+	*
+	* @param os l'objet ostream
+	* @param mat l'objet matrice
+	* @return une reference sur un objet ostream contenant les informations de la matrice mat
+	*/
 	friend std::ostream & operator<<(std::ostream &os, const Matrix &mat);
 };
 

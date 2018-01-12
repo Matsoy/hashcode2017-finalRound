@@ -1,11 +1,16 @@
 #include "Header.h"
 #include "Matrix.h"
 
+/*
+* Constructeurs
+*/
 Matrix::Matrix(int rows, int cols) : mRows(rows), mCols(cols), mData(rows * cols)
 {
 }
 
-// mutateurs
+/*
+* Mutateurs
+*/
 void Matrix::setRows(int r)
 {
 	mRows = r;
@@ -90,7 +95,13 @@ void Matrix::reverse()
 	}
 }
 
-//Pour afficher une matrice
+/*
+* Pour afficher une matrice
+*
+* @param os l'objet ostream
+* @param mat l'objet matrice
+* @return une reference sur un objet ostream contenant les informations de la matrice mat
+*/
 std::ostream & operator<<(std::ostream & os, const Matrix &mat)
 {
 	int m = 0, n = 0, cpt = 0;
