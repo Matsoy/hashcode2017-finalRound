@@ -1,16 +1,31 @@
 ﻿#include "Algo.h"
 
+/*
+* constructeur
+*/
 Algo::Algo(std::string method, std::string mapName, Matrix & map, Matrix & mapSolution, int rayonRouteurs, int prixCable, int prixRouteur, int budget, int budgetOriginal, int * xyBackbone) : aMethod(method), aMapName(mapName), aMap(map), aMapSolution(mapSolution), aRayonRouteurs(rayonRouteurs), aPrixCable(prixCable), aPrixRouteur(prixRouteur), aBudget(budget), aBudgetOriginal(budgetOriginal), aBackbone(xyBackbone)
 {
 }
 
-// mutateurs
+/*
+* Mutateur
+* Modifie aMapSolution
+*
+* @param mapSolution une instance de la classe Matrix
+*/
 void Algo::setMapSolution(Matrix & mapSolution)
 {
 	aMapSolution = mapSolution;
 }
 
-//Pour afficher une vecteur de int sous forme de matrice
+
+/*
+* Pour afficher une vecteur de int sous forme de matrice
+*
+* @param vect un vecteur d'entier
+* @param h hauteur de la matrice a afficher
+* @param w largeur de la matrice a afficher
+*/
 void Algo::displayVector(const std::vector<int> &vect, const int h, const int w) const
 {
 	std::string out;
@@ -38,7 +53,13 @@ void Algo::displayVector(const std::vector<int> &vect, const int h, const int w)
 	}
 }
 
-//Pour afficher une vecteur de float sous forme de matrice
+/*
+* Pour afficher une vecteur de float sous forme de matrice
+*
+* @param vect un vecteur de float
+* @param h hauteur de la matrice a afficher
+* @param w largeur de la matrice a afficher
+*/
 void Algo::displayVector(const std::vector<float> &vect, const int h, const int w) const
 {
 	std::string out;
@@ -67,8 +88,12 @@ void Algo::displayVector(const std::vector<float> &vect, const int h, const int 
 }
 
 
-
-// affiche le score realise
+/*
+* Affiche le score realise apres cablage de la solution en faisant des barycentres
+*
+* @param targetCells la matrice contenant l'information des cellules couvertes 
+* @param nbRouters le nombre de routeurs
+*/
 void Algo::displayScoreAfterCentroids(const Matrix & targetCells, const int nbRouters) const
 {
 	// nombre de cellules non couvertes
@@ -112,6 +137,12 @@ void Algo::displayScoreAfterCentroids(const Matrix & targetCells, const int nbRo
 	}
 }
 
+/*
+* Affiche le score realise
+*
+* @param targetCells la matrice contenant l'information des cellules couvertes
+* @param nbRouters le nombre de routeurs
+*/
 void Algo::displayScore(const Matrix & targetCells, const int nbRouters) const
 {
 	// nombre de cellules non couvertes
@@ -139,7 +170,14 @@ void Algo::displayScore(const Matrix & targetCells, const int nbRouters) const
 }
 
 
-
+/*
+* renvoie le nombre de cellules couvertes apres l'ajout d'un routeur
+*
+* @param xRouter coordonnee x du nouveau routeur
+* @param yRouter coordonnee y du nouveau routeur
+* @param targetCells la matrice contenant l'information des cellules couvertes
+* @return le nombre de cellules couvertes
+*/
 int Algo::nbNewCoveredCells(const int xRouter, const int yRouter, const Matrix & targetCells) const
 {
 	// recuperation du masque du perimetre du routeur
@@ -168,6 +206,14 @@ int Algo::nbNewCoveredCells(const int xRouter, const int yRouter, const Matrix &
 }
 
 
+/*
+* renvoie le nombre de cellules non couvertes dans les bordures du rayon d'un routeur
+*
+* @param xRouter coordonnee x du routeur
+* @param yRouter coordonnee y du routeur
+* @param targetCells la matrice contenant l'information des cellules couvertes
+* @return le nombre de cellules non couvertes dans les bordures du rayon d'un routeur
+*/
 int Algo::nbNotTargetCellsAround(const int xRouter, const int yRouter, const Matrix & targetCells) const
 {
 	int nbNotTargetCellsAround = 0;
@@ -196,6 +242,17 @@ int Algo::nbNotTargetCellsAround(const int xRouter, const int yRouter, const Mat
 	return nbNotTargetCellsAround;
 }
 
+/*
+* Effectue une convolution: convolvedMat = mat**kernel
+* Ainsi, grace a convolvedMat, on pourra recuperer les cellules cibles les plus eloignees des murs, des cellules vides ou des cellules deja couvertes. 
+* Cela est une maniere de recuperer des positions + ou - pertinentes pour y placer un routeur
+*
+* @param convolvedMat la matrice resultante de la convolution
+* @param mat la matrice a convoluer avec le kenel du flou gaussien, matrice avec les cellules cibles a 1 et le reste a -1
+* @param deadMat la matrice contenant les cellule qui n'auront aucun impact sur la convolution (on n'aura alors pas besoin de faire le produit de convolution qui est couteux)
+* @param kernel matrice du noyau du flou gaussien 
+* @param w dimension du kernel 
+*/
 void Algo::convolve(std::vector<float> & convolvedMat, const Matrix & mat, Matrix & deadMat, const std::vector<float> kernel, const int w) const
 {
 	const int kernelHalfDim = w / 2;
@@ -245,12 +302,12 @@ void Algo::convolve(std::vector<float> & convolvedMat, const Matrix & mat, Matri
 }
 
 /*
-* Renvoie l'indice la valeur minimale
+* Renvoie l'indice de la valeur minimale dans un tableau d'entiers
 * En cas d'occurrences multiples des valeurs minimales, l'indice correspondant a la premiere occurrence est renvoyee.
 *
 * @param tab tableau d'entiers
 * @param size la taille du tableau
-* @return argmin
+* @return l'indice de la valeur minimale
 */
 int Algo::argMin(const int * tab, const int size) const
 {
@@ -272,7 +329,7 @@ int Algo::argMin(const int * tab, const int size) const
 /*
 * renvoie le pourcentage de cellules cibles couvertes. i.e. les '.' du fichier d'input
 *
-* @param targetCells matrice avec les cellules cibles restante
+* @param targetCells matrice avec les cellules cibles restantes
 * @return le pourcentage de cellules cibles couvertes
 */
 int Algo::cellsCoveredPercentage(const Matrix & targetCells) const
@@ -293,6 +350,12 @@ int Algo::cellsCoveredPercentage(const Matrix & targetCells) const
 }
 
 
+/*
+* Renvoie le noyau du filtre gaussien, selon le parametre sigma genere aleatoirement entre 2 bornes
+*
+* @param kernel vecteur de float qui sera rempli par les valeurs du kernel gaussien
+* @param w largeur de la matrice du kernel
+*/
 void Algo::gaussianKernel(std::vector<float> & kernel, const int w) const
 {
 
@@ -334,7 +397,7 @@ void Algo::gaussianKernel(std::vector<float> & kernel, const int w) const
 /*
 * renvoie le nombre de cellules couvertes
 *
-* @param targetCells matrice avec les cellules cibles restante
+* @param targetCells matrice avec les cellules cibles restantes
 * @return le nombre de cellules couvertes
 */
 int Algo::nbCellsCovered(const Matrix & targetCells) const
@@ -354,6 +417,14 @@ int Algo::nbCellsCovered(const Matrix & targetCells) const
 	return aNbCellsOriginal - nbCellsNotCovered;
 }
 
+
+/*
+* Ajoute dans vertices le point a l'intersection des 2 droites diagonales necessaires pour cabler Routerfrom a RouterTo
+*
+* @param Routerfrom routeur 1
+* @param Routerfrom routeur 2
+* @param vertices vecteur de pointeurs d'entiers contenant les sommets de l'arbre couvrant minimal
+*/
 void Algo::addIntersectInVertices(const int * Routerfrom, const int * RouterTo, std::vector<int *> & vertices) const
 {
 	int distX = abs(Routerfrom[0] - RouterTo[0]);
@@ -467,6 +538,13 @@ void Algo::addIntersectInVertices(const int * Routerfrom, const int * RouterTo, 
 	}
 }
 
+/*
+* Ajoute dans le vecteur cables les cables reliant Routerfrom a RouterTo comme sur un echiquier (diagonal, horizontal et vertical)
+*
+* @param Routerfrom routeur de depart
+* @param Routerfrom routeur de destination
+* @param cables vecteur de pointeurs d'entiers contenant les positions des cables
+*/
 void Algo::findChessConnection(const int * Routerfrom, const int * RouterTo, std::vector<int *> & cables) const
 {
 
@@ -548,6 +626,13 @@ void Algo::findChessConnection(const int * Routerfrom, const int * RouterTo, std
 }
 
 
+/*
+* Ajoute dans le vecteur cables les cables reliant Routerfrom a RouterTo en ne suivant que des diagonales
+*
+* @param Routerfrom routeur de depart
+* @param Routerfrom routeur de destination
+* @param cables vecteur de pointeurs d'entiers contenant les positions des cables
+*/
 void Algo::findDiagonalConnection(const int * Routerfrom, const int * RouterTo, std::vector<int *> & cables) const
 {
 	int distX = abs(Routerfrom[0] - RouterTo[0]);
@@ -841,14 +926,6 @@ void Algo::findDiagonalConnection(const int * Routerfrom, const int * RouterTo, 
 			}
 		}
 	}
-
-	//delete from1;
-	//delete to1;
-
-	// on insert les elements du vecteur cablesTmp dans le vecteur cables
-	//cables.insert(std::end(cables), std::begin(cablesTmp), std::end(cablesTmp));
-
-
 }
 
 
@@ -911,7 +988,7 @@ bool Algo::routerOnBackbone(const std::vector<int *> & routeurs) const
 /*
 * trouve le sommet avec la valeur de cle minimale, a partir de l'ensemble des sommets non encore inclus dans le mst
 *
-* @param keyvecteur des cles utilisees pour selectionner l'arete de poids minimum
+* @param key vecteur des cles utilisees pour selectionner l'arete de poids minimum
 * @param mstSet vecteur de booleens pour representer un ensemble de sommets non encore inclus dans MST
 * @param dim la dimension de la matrice
 * @return le sommet avec la valeur de cle minimale
@@ -1005,7 +1082,14 @@ void Algo::toMinimumSpanningTree(const Matrix & mat, Matrix & mst) const
 }
 
 
-
+/*
+* Modifie aMap en en y placant les cables et les routeurs pour pouvoir generer le fichier d'output
+*
+* @param routeurs vecteurs des routeurs
+* @param idx vecteur des x
+* @param idy vecteur des y
+* @param idy vecteur des distances
+*/
 void Algo::placeMstPaths(const std::vector<int *> & routeurs, const std::vector<int> & idx, const std::vector<int> & idy, const std::vector<int> & dists)
 {
 	const int dim = routeurs.size();
@@ -1078,6 +1162,14 @@ void Algo::placeMstPaths(const std::vector<int *> & routeurs, const std::vector<
 
 }
 
+/*
+* Modifie aMap en en y placant les cables et les routeurs pour pouvoir generer le fichier d'output
+*
+* @param routeurs vecteurs des routeurs
+* @param idx vecteur des x
+* @param idy vecteur des y
+* @param idy vecteur des distances
+*/
 void Algo::placeMstPaths_2(const std::vector<int *> & routeurs, const std::vector<int> & idx, const std::vector<int> & idy, const std::vector<int> & dists)
 
 {
@@ -1146,6 +1238,12 @@ void Algo::placeMstPaths_2(const std::vector<int *> & routeurs, const std::vecto
 }
 
 
+/*
+* Modifie aMap en en y placant les cables et les routeurs pour pouvoir generer le fichier d'output
+*
+* @param cables vecteurs des cables
+* @param vertices des sommets de l'arbre courant minimal
+*/
 void Algo::placeMstPaths_3(const std::vector<int *> & cables, const std::vector<int *> & vertices)
 {
 
@@ -1179,6 +1277,16 @@ void Algo::placeMstPaths_3(const std::vector<int *> & cables, const std::vector<
 
 }
 
+/*
+* Renvoie la distance entre le nouveau routeur et le routeur le plus proche.
+*
+* @param newRouteurs la position du nouveau routeur a essayer de placer 
+* @param routeurs vecteur des routeurs deja places
+* @param idx vecteur des x
+* @param idy vecteur des y
+* @param idy vecteur des distances
+* @return la distance entre le nouveau routeur et le routeur le plus proche
+*/
 int Algo::getApproximateCost(const int * newRouteurs, const std::vector<int *> routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists) const
 {
 	int distMin = INT_MAX;
@@ -1199,6 +1307,21 @@ int Algo::getApproximateCost(const int * newRouteurs, const std::vector<int *> r
 	return distMin;
 }
 
+
+/*
+* MaJ le budget approximatif qui sera majore, suite au placement d'un nouveau routeur, sans avoir besoin utiliser Kruskal (qui est couteux).
+* Cela permet de gagner du temps pour les premiers tours de l'algorithme.
+* Quand ce budge approximatif sera > au budget total, alors on fera Kruskal pour connaitre precisement le budget restant
+*
+* @see getApproximateCost
+* @param newRouteurs la position du nouveau routeur a essayer de placer
+* @param routeurs vecteur des routeurs deja places
+* @param idx vecteur des x
+* @param idy vecteur des y
+* @param idy vecteur des distances
+* @param approximateCost vecteur des distances
+* @return la distance entre le nouveau routeur et le routeur le plus proche
+*/
 void Algo::updateApproximateCost(const int * newRouteurs, const std::vector<int *> routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, int & approximateCost) const
 {
 	int distMin = INT_MAX;
@@ -1227,9 +1350,11 @@ void Algo::updateApproximateCost(const int * newRouteurs, const std::vector<int 
 
 
 /*
-* @param m la matrice de la carte
-* @param newRouteurs tableau contenant les coordonnees du routeur a placer
-* @param newRouteurs tableau contenant les coordonnees des routeurs places
+* Effectue l'algorithme de Kruskal permettant de connaitre l'arbre minimal couvrant les routeurs.
+* On saura alors si l'ajout de ce nouveau routeur depassera ou non le budget
+*
+* @param newRouteurs tableau contenant les coordonnees du nouveau routeur a placer
+* @param routeurs tableau contenant les coordonnees des routeurs places
 * @param idx tableau des x
 * @param idy tableau des y
 * @param dist tableau d'entier des distance inter-routeurs
@@ -1242,7 +1367,6 @@ void Algo::updateApproximateCost(const int * newRouteurs, const std::vector<int 
 void Algo::kruskal(int * newRouteurs, std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, bool & succ, int & cost) const
 {
 
-	
 	const int new_id = routeurs.size();
 
 	int cpt = 0;
@@ -1282,12 +1406,18 @@ void Algo::kruskal(int * newRouteurs, std::vector<int *> & routeurs, std::vector
 
 	succ = cost <= aBudgetOriginal; // si on ne depasse par le budget
 }
+
+
 /*
+* Rempli le masque de la couverture d'un routeur place en (x, y). 
+* 0 si il a au moins 1 mur, 
+* 1 sinon.
+* Applique a postiori sur la carte. On pourra savoir si telle ou telle cellules est couverte par le routeur ou inaccessible a cause d'un mur 
+*
 * @param x du routeur
 * @param y du routeur
-* @param radius rayon du routeur
 * @param mat la matrice de la carte
-* @return la matrice masque
+* @param mask masque de la couverture du routeur
 */
 void Algo::wirelessAccess(const int x, const int y, const Matrix & mat, Matrix & mask) const
 {
@@ -1376,6 +1506,9 @@ void Algo::wirelessAccess(const int x, const int y, const Matrix & mat, Matrix &
 
 }
 
+/*
+* TODO
+*/
 int Algo::gainPoints(int x, int y, int radius, const Matrix & mat, Matrix & mask)
 {
 	int count = 0;
@@ -1466,8 +1599,14 @@ int Algo::gainPoints(int x, int y, int radius, const Matrix & mat, Matrix & mask
 
 }
 
-// routeurs seuls
-// nb de cellules couvertes
+/*
+* solution post-solution: on tente de rajouter un ou plusieurs routeurs apres avec reussi a degager du budget depuis un fichier d'output
+*
+* @param vertices verteurs des sommet de l'arbre courant minimal
+* @param idx tableau des x
+* @param idy tableau des y
+* @param dist tableau d'entier des distance inter-routeurs
+*/
 void Algo::addLastRouters(std::vector<int *> & vertices, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists)
 {
 	int nbRouters = 0;
@@ -1924,6 +2063,19 @@ void Algo::addLastRouters(std::vector<int *> & vertices, std::vector<int> & idx,
 	displayScoreAfterCentroids(targetCells, routers.size());
 }
 
+
+/*
+* Apres avoir recupere la position du barycentre du triangle forme par 3 points, on regarde si ajouter ce sommet permet d'utiliser moins de cables en utilisant Kruskal
+*
+* @param center le point barycentre
+* @param vertices vecteur des sommets
+* @param idx tableau des x
+* @param idy tableau des y
+* @param dist tableau d'entier des distance inter-routeurs
+* @param nbCablesBefore nombre de cables necessaire avant d'inserer le point center en tant que sommet dans l'arbre couvrant minimal
+* @param intermediateCsrMat contiendra la matric CSR si il l'ajout du point center ets valide
+* @return la difference entre le nombre de cables avant et apres ajout de ce point center. Si diff > 0, on validera l'ajout de ce nouveau point
+*/
 int Algo::centerIsBetter(int * center, std::vector<int *> & vertices, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, const int nbCablesBefore, Matrix & intermediateCsrMat)
 {
 	std::vector<int> idxTmp = idx;
@@ -1981,6 +2133,16 @@ int Algo::centerIsBetter(int * center, std::vector<int *> & vertices, std::vecto
 }
 
 
+/*
+* Soit le triangle ABC, on renvoie le point D qui composera le triangle equilateral ABD.
+* On choisira le D le plus eloigne de C
+*
+* @see getCentroid
+* @param A le point A du triangle ABC
+* @param B le point B du triangle ABC
+* @param C le point C du triangle ABC
+* @return un pointeur de float contenant les coordonnees (x, y) de ce point D
+*/
 float * Algo::get3rdPointEquilateral(const int * A, const int * B, const int * C) const
 {
 	const float PI = 3.14159265;
@@ -2005,12 +2167,14 @@ float * Algo::get3rdPointEquilateral(const int * A, const int * B, const int * C
 }
 
 /*
-* renvoie la barycentre d'un triangle
+* renvoie le barycentre (point de Fermat) du triangle ABC si celui-ci est calculable (si tous les angles sont < 120° ),
+*			le centre de gravite sinon
 *
-* @param pt1 le 1er point du triangle
-* @param pt2 le 2eme point du triangle
-* @param pt3 le 3eme point du triangle
-* @return le point representant le centre de gravite
+* @param A le 1er point du triangle
+* @param B le 2eme point du triangle
+* @param C le 3eme point du triangle
+* @return le barycentre (point de Fermat) du triangle ABC si celui-ci est calculable,
+*			le centre de gravite sinon
 */
 int * Algo::getCentroid(const int * A, const int * B, const int * C) const
 {
@@ -2102,6 +2266,12 @@ int * Algo::getCentroid(const int * A, const int * B, const int * C) const
 }
 
 
+/*
+* Fonction principale qui ameliore un fichier solution et qui tente de mieux placer les cables pour degager du budget et si possible de rajouter des routeurs pour couvrair + de cellules
+*
+* @param routeurs vecteur des routeurs
+* @param pathBeginning debut du nom du fichier solution qui sera cree a dans la classe IO a la fin de cette fonction
+*/
 void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBeginning)
 {
 
@@ -2580,7 +2750,8 @@ void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBegi
 }
 
 /*
-* defini aleatoirement la position des routeurs
+* Algorithme
+* Prend aléatoirement une cellules non couverte et place un routeur dessus
 */
 void Algo::random()
 {
@@ -2743,6 +2914,9 @@ void Algo::random()
 	// #################################################################################
 }
 
+/*
+* TODO
+*/
 void Algo::bigCase()
 {
 	// nb max de routeurs possibles
@@ -2915,7 +3089,8 @@ void Algo::bigCase()
 }
 
 /*
-* defini aleatoirement la position des routeurs
+* Algorithme
+* Effectue un flou gaussien sur la carte pour en deduire les cellules cibles les plus loins des murs, des cellules vides et des cellules dea couvertes
 */
 void Algo::gaussianBlur()
 {
@@ -3235,6 +3410,11 @@ void Algo::gaussianBlur()
 	
 }
 
+/*
+* Lance l'algorithme donne par le main 
+* 
+* @param bestScore le meilleur score correspond a la carte lancee. Permettant de voir apres l'algorithme si on a battu le meilleur score
+*/
 void Algo::run(int bestScore)
 {
 	std::cout << "  Algo\t\t\t" << aMethod << "\n" << std::endl;
