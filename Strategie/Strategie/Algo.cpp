@@ -67,6 +67,7 @@ void Algo::displayVector(const std::vector<float> &vect, const int h, const int 
 }
 
 
+
 // affiche le score realise
 void Algo::displayScoreAfterCentroids(const Matrix & targetCells, const int nbRouters) const
 {
@@ -83,7 +84,6 @@ void Algo::displayScoreAfterCentroids(const Matrix & targetCells, const int nbRo
 	{
 		if (aMap(i) == Cell::Cable) nbCables++;
 	}
-	std::cout << "\n\n  NB CABLES =\t\t" << nbCables << std::endl;
 
 	int score = 1000 * (aNbCellsOriginal - nbCellsNotCovered) + (aBudgetOriginal - nbRouters * aPrixRouteur - nbCables * aPrixCable);
 	std::cout << "Nb de cellules couvertes = " << (aNbCellsOriginal - nbCellsNotCovered) << std::endl;
@@ -127,7 +127,6 @@ void Algo::displayScore(const Matrix & targetCells, const int nbRouters) const
 	{
 		if (aMap(i) == Cell::Cable) nbCables++;
 	}
-	std::cout << "\n\n  NB CABLES =\t\t" << nbCables << std::endl;
 
 	int score = 1000 * (aNbCellsOriginal - nbCellsNotCovered) + (aBudgetOriginal - nbRouters * aPrixRouteur - nbCables * aPrixCable);
 
@@ -171,7 +170,6 @@ int Algo::nbNewCoveredCells(const int xRouter, const int yRouter, const Matrix &
 
 int Algo::nbNotTargetCellsAround(const int xRouter, const int yRouter, const Matrix & targetCells) const
 {
-	//std::cout << "ENTREE nbNotTargetCellsAround" << std::endl;
 	int nbNotTargetCellsAround = 0;
 
 	const int xTopBorder = xRouter - aRayonRouteurs - 1;
@@ -195,7 +193,6 @@ int Algo::nbNotTargetCellsAround(const int xRouter, const int yRouter, const Mat
 		if (targetCells(xBottomBorder, yTargetCell)) nbNotTargetCellsAround++;
 	}
 
-	//std::cout << "SORTIE nbNotTargetCellsAround : " << nbNotTargetCellsAround << std::endl;
 	return nbNotTargetCellsAround;
 }
 
@@ -359,7 +356,6 @@ int Algo::nbCellsCovered(const Matrix & targetCells) const
 
 void Algo::addIntersectInVertices(const int * Routerfrom, const int * RouterTo, std::vector<int *> & vertices) const
 {
-	//std::cout << "." << std::endl;
 	int distX = abs(Routerfrom[0] - RouterTo[0]);
 	int distY = abs(Routerfrom[1] - RouterTo[1]);
 
@@ -371,7 +367,6 @@ void Algo::addIntersectInVertices(const int * Routerfrom, const int * RouterTo, 
 	// ##########################################
 	if (distX + 1 < distY)
 	{
-		//std::cout << "on passe par le haut" << std::endl;
 		// du routeur le + a gauche vers le routeur le + a droite
 		if (Routerfrom[1] > RouterTo[1])
 		{
@@ -381,8 +376,6 @@ void Algo::addIntersectInVertices(const int * Routerfrom, const int * RouterTo, 
 		// par le haut
 		if (((from1[0] - (distY / 2)) >= 0) && ((to1[0] - (distY / 2)) >= 0))
 		{
-			//std::cout << "-----par le haut" << std::endl;
-
 			int currentX = from1[0] - 1;
 			int currentY = from1[1] + 1;
 
@@ -557,7 +550,6 @@ void Algo::findChessConnection(const int * Routerfrom, const int * RouterTo, std
 
 void Algo::findDiagonalConnection(const int * Routerfrom, const int * RouterTo, std::vector<int *> & cables) const
 {
-	//std::cout << "." << std::endl;
 	int distX = abs(Routerfrom[0] - RouterTo[0]);
 	int distY = abs(Routerfrom[1] - RouterTo[1]);
 
@@ -573,7 +565,6 @@ void Algo::findDiagonalConnection(const int * Routerfrom, const int * RouterTo, 
 	// ##########################################
 	if (distX + 1 < distY)
 	{
-		//std::cout << "on passe par le haut" << std::endl;
 		// du routeur le + a gauche vers le routeur le + a droite
 		if (Routerfrom[1] > RouterTo[1])
 		{
@@ -583,27 +574,19 @@ void Algo::findDiagonalConnection(const int * Routerfrom, const int * RouterTo, 
 		// par le haut
 		if (((from1[0] - (distY / 2)) >= 0) && ((to1[0] - (distY / 2)) >= 0))
 		{
-			//std::cout << "-----par le haut" << std::endl;
-
 			int currentX = from1[0] - 1;
 			int currentY = from1[1] + 1;
 
 			// on monte
 			while (true)
 			{
-				//std::cout << "on monte" << std::endl;
-				//std::cout << "currentX" << currentX << std::endl;
-				//std::cout << "currentY" << currentY << std::endl;
 
 				cables.push_back(new int[2]{ currentX , currentY });
 
 				// si on doit changer de sens
-				//std::cout << abs((to1[1] - currentY) - (to1[0] - currentX)) << std::endl;
 
 				if (abs(abs(to1[1] - currentY) - abs(to1[0] - currentX)) <= 1) 
 				{
-					//std::cout << "on BREAK" << std::endl;
-
 					break;
 				}
 				currentX--;
@@ -616,7 +599,6 @@ void Algo::findDiagonalConnection(const int * Routerfrom, const int * RouterTo, 
 			// on descend
 			while (true)
 			{
-				//std::cout << "on descend" << std::endl;
 				cables.push_back(new int[2]{ currentX , currentY });
 
 				// si on est voisin du routeur de destination
@@ -632,26 +614,18 @@ void Algo::findDiagonalConnection(const int * Routerfrom, const int * RouterTo, 
 		// par le bas
 		else
 		{
-			//std::cout << "-----par le bas" << std::endl;
 			int currentX = from1[0] + 1;
 			int currentY = from1[1] + 1;
 
 			// on descend
 			while (true)
 			{
-				//std::cout << "on descend" << std::endl;
-				//std::cout << "currentX" << currentX << std::endl;
-				//std::cout << "currentY" << currentY << std::endl;
-				//std::cout << "to1[0]" << to1[0] << std::endl;
-				//std::cout << "to1[1]" << to1[1] << std::endl;
 
 				cables.push_back(new int[2]{ currentX , currentY });
 
 				// si on doit changer de sens
 				if (abs(abs(to1[1] - currentY) - abs(to1[0] - currentX)) <= 1)
 				{
-					//std::cout << "on BREAK" << std::endl;
-
 					break;
 				}
 				currentX++;
@@ -664,7 +638,6 @@ void Algo::findDiagonalConnection(const int * Routerfrom, const int * RouterTo, 
 			// on monte
 			while (true)
 			{
-				//std::cout << "on monte" << std::endl;
 				cables.push_back(new int[2]{ currentX , currentY });
 
 				// si on est voisin du routeur de destination
@@ -693,18 +666,12 @@ void Algo::findDiagonalConnection(const int * Routerfrom, const int * RouterTo, 
 		// par la gauche
 		if (((from1[1] - (distX / 2)) >= 0) && ((to1[1] - (distX / 2)) >= 0))
 		{
-			//std::cout << "-----par la gauche" << std::endl;
-			//std::cout << "-----FROM" << from1[0] << "," << from1[1] << std::endl;
-			//std::cout << "-----TO" << to1[0] << "," << to1[1] << std::endl;
 			int currentX = from1[0] + 1;
 			int currentY = from1[1] - 1;
 
 			// on va a gauche
 			while (true)
 			{
-				//std::cout << "gauche" << std::endl;
-				//std::cout << "currentX" << currentX << std::endl;
-				//std::cout << "currentY" << currentY << std::endl;
 				cables.push_back(new int[2]{ currentX , currentY });
 				
 				// si on doit changer de sens
@@ -722,7 +689,6 @@ void Algo::findDiagonalConnection(const int * Routerfrom, const int * RouterTo, 
 			// on va a droite
 			while (true)
 			{
-				//std::cout << "droite" << std::endl;
 				cables.push_back(new int[2]{ currentX , currentY });
 
 				// si on est voisin du routeur de destination
@@ -738,16 +704,12 @@ void Algo::findDiagonalConnection(const int * Routerfrom, const int * RouterTo, 
 		// par la droite
 		else
 		{
-			//std::cout << "-----par la droite" << std::endl;
 			int currentX = from1[0] + 1;
 			int currentY = from1[1] + 1;
 
 			// on va a droite
 			while (true)
 			{
-				//std::cout << "droite" << std::endl;
-				//std::cout << "currentX" << currentX << std::endl;
-				//std::cout << "currentY" << currentY << std::endl;
 				cables.push_back(new int[2]{ currentX , currentY });
 
 				// si on doit changer de sens
@@ -765,7 +727,6 @@ void Algo::findDiagonalConnection(const int * Routerfrom, const int * RouterTo, 
 			// on va a gauche
 			while (true)
 			{
-				//std::cout << "gauche" << std::endl;
 				cables.push_back(new int[2]{ currentX , currentY });
 
 				// si on est voisin du routeur de destination
@@ -887,7 +848,6 @@ void Algo::findDiagonalConnection(const int * Routerfrom, const int * RouterTo, 
 	// on insert les elements du vecteur cablesTmp dans le vecteur cables
 	//cables.insert(std::end(cables), std::begin(cablesTmp), std::end(cablesTmp));
 
-	//std::cout << "       sortie findDiagonalConnection" << std::endl;
 
 }
 
@@ -971,7 +931,6 @@ int Algo::minKey(const std::vector<int> key, const std::vector<bool> mstSet, con
 		}
 	}
 
-	//std::cout << "min_index -> " << min_index << std::endl;
 	return min_index;
 }
 
@@ -991,7 +950,6 @@ int Algo::minKey(const std::vector<int> key, const std::vector<bool> mstSet, con
 */
 void Algo::toMinimumSpanningTree(const Matrix & mat, Matrix & mst) const
 {
-	//std::cout << "                           entree toMinimumSpanningTree" << std::endl;
 
 
 	// dimension de la matrice
@@ -1020,7 +978,6 @@ void Algo::toMinimumSpanningTree(const Matrix & mat, Matrix & mst) const
 	{
 		// on choisie le sommet de cle minimum de l'ensemble des sommets par encore inclus dans le mst
 		int u = minKey(key, mstSet, dim);
-		//std::cout << "+ petit sommet = " << u << std::endl;
 
 		// Ajoute le sommet selectionne au mst
 		mstSet[u] = true;
@@ -1029,14 +986,12 @@ void Algo::toMinimumSpanningTree(const Matrix & mat, Matrix & mst) const
 		// on ne considere que les sommets qui ne sont pas encore inclus dans le mst
 		for (int v = 0; v < dim; v++)
 		{
-			//std::cout << "on regarde mat(" << u << "," << v << ")" << std::endl;
 			if (mat(u, v) // mat[u][v] != 0 uniquement pour les sommets adjacents de m
 				&& mstSet[v] == false // mstSet[v] == false pour les sommets non encore inclus dans MST
 				&& mat(u, v) < key[v]) // maj la cle ssi mat[u][v] < key[v]
 			{
 				parent[v] = u;
 				key[v] = mat(u, v);
-				//std::cout << "on maj la cle pour v = " << v << std::endl;
 			}
 		}
 	}
@@ -1044,7 +999,6 @@ void Algo::toMinimumSpanningTree(const Matrix & mat, Matrix & mst) const
 	// remplissage de la matrice mst en ne gardant que les arcs de poids minimum
 	for (int i = 1; i < dim; i++)
 	{
-		//std::cout << "mat(" <<parent[i] << "," << i <<") = " << mat(parent[i], i) << std::endl;
 
 		mst(parent[i], i) = mat(parent[i], i);
 	}
@@ -1054,22 +1008,16 @@ void Algo::toMinimumSpanningTree(const Matrix & mat, Matrix & mst) const
 
 void Algo::placeMstPaths(const std::vector<int *> & routeurs, const std::vector<int> & idx, const std::vector<int> & idy, const std::vector<int> & dists)
 {
-	//std::cout << "________________dans placeMstPaths________________" << std::endl;
 	const int dim = routeurs.size();
 	// calcul du mst
 	Matrix csrMat(dim, dim);
 	toCsrMatrix(csrMat, dists, idx, idy, dim);
-
-	//std::cout << "csrMat" << std::endl;
-	//std::cout << csrMat << std::endl;
 
 	// arbre couvrant minimal
 	// i.e.  un graphe constitue du sous-ensemble d'aretes qui relient ensemble tous les noeuds connectes, tout en minimisant la somme totale des poids sur les aretes.
 	Matrix mstMat(dim, dim);
 	toMinimumSpanningTree(csrMat, mstMat);
 
-	//std::cout << "mstMat" << std::endl;
-	//std::cout << mstMat << std::endl;
 	const int rows = mstMat.getRows();
 	const int cols = mstMat.getCols();
 	// algo calcul distance entre les routeurs. Parcours de l'arbre couvrant minimal
@@ -1128,29 +1076,22 @@ void Algo::placeMstPaths(const std::vector<int *> & routeurs, const std::vector<
 		}
 	}
 
-	std::cout << "--------> nbRouters dans placeMstPaths = " << nbRouters << std::endl;
 }
 
 void Algo::placeMstPaths_2(const std::vector<int *> & routeurs, const std::vector<int> & idx, const std::vector<int> & idy, const std::vector<int> & dists)
 
 {
 
-	std::cout << "________________dans placeMstPaths_2_______________" << std::endl;
 	const int dim = routeurs.size();
 	// calcul du mst
 	Matrix csrMat(dim, dim);
 	toCsrMatrix(csrMat, dists, idx, idy, dim);
-
-	//std::cout << "csrMat" << std::endl;
-	//std::cout << csrMat << std::endl;
 
 	// arbre couvrant minimal
 	// i.e.  un graphe constitue du sous-ensemble d'aretes qui relient ensemble tous les noeuds connectes, tout en minimisant la somme totale des poids sur les aretes.
 	Matrix mstMat(dim, dim);
 	toMinimumSpanningTree(csrMat, mstMat);
 
-	//std::cout << "mstMat" << std::endl;
-	//std::cout << mstMat << std::endl;
 	const int rows = mstMat.getRows();
 	const int cols = mstMat.getCols();
 
@@ -1300,7 +1241,7 @@ void Algo::updateApproximateCost(const int * newRouteurs, const std::vector<int 
 */
 void Algo::kruskal(int * newRouteurs, std::vector<int *> & routeurs, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists, bool & succ, int & cost) const
 {
-	//std::cout << "sortie kruskal" << std::endl;
+
 	
 	const int new_id = routeurs.size();
 
@@ -1329,9 +1270,6 @@ void Algo::kruskal(int * newRouteurs, std::vector<int *> & routeurs, std::vector
 														   // [0 0 x 7]
 														   // [0 0 0 2]
 
-														   //std::cout << "csrMat" << std::endl;
-														   //std::cout << csrMat << std::endl;
-
 														   // arbre couvrant minimal
 	Matrix mstMat(dim, dim);
 	toMinimumSpanningTree(csrMat, mstMat);
@@ -1339,15 +1277,10 @@ void Algo::kruskal(int * newRouteurs, std::vector<int *> & routeurs, std::vector
 	// poids de l'arbre couvrant minimum. i.e le nombre d'aretes
 	const int mstMatWeight = mstMat.sum();
 
-	//std::cout << "mstMat" << std::endl;
-	//std::cout << mstMat << std::endl;
 
 	cost = mstMatWeight * aPrixCable + (new_id) * aPrixRouteur; // routeur - 1 car on interprete le backbone comme un routeur dans l'algorithme
 
 	succ = cost <= aBudgetOriginal; // si on ne depasse par le budget
-
-									//std::cout << mstMatWeight << " * " << aPrixCable << " + " << " (" << routeurs.size() << " - " << 1 << " ) * " << aPrixRouteur << " = " << cost << "  sur " << aBudgetOriginal << std::endl;
-									//std::cout << succ << std::endl;
 }
 /*
 * @param x du routeur
@@ -1537,9 +1470,6 @@ int Algo::gainPoints(int x, int y, int radius, const Matrix & mat, Matrix & mask
 // nb de cellules couvertes
 void Algo::addLastRouters(std::vector<int *> & vertices, std::vector<int> & idx, std::vector<int> & idy, std::vector<int> & dists)
 {
-
-	std::cout << "addLastRouters" << std::endl;
-
 	int nbRouters = 0;
 	int nbCables = 0;
 
@@ -1551,16 +1481,12 @@ void Algo::addLastRouters(std::vector<int *> & vertices, std::vector<int> & idx,
 	Matrix csrMat(dim, dim);
 	toCsrMatrix(csrMat, dists, idx, idy, dim);
 
-	//std::cout << "csrMat" << std::endl;
-	//std::cout << csrMat << std::endl;
 
 	// arbre couvrant minimal
 	// i.e.  un graphe constitue du sous-ensemble d'aretes qui relient ensemble tous les noeuds connectes, tout en minimisant la somme totale des poids sur les aretes.
 	Matrix mstMat(dim, dim);
 	toMinimumSpanningTree(csrMat, mstMat);
 
-	//std::cout << "mstMat" << std::endl;
-	//std::cout << mstMat << std::endl;
 	const int rows = mstMat.getRows();
 	const int cols = mstMat.getCols();
 
@@ -1610,12 +1536,8 @@ void Algo::addLastRouters(std::vector<int *> & vertices, std::vector<int> & idx,
 
 	nbCables = cablesMap.sum();
 
-	std::cout << "nbCables" << nbCables << std::endl;
-
-
 	// budget restant
 	int remainingBudget = aBudgetOriginal - nbRouters * aPrixRouteur - nbCables * aPrixCable;
-	std::cout << "remainingBudget" << remainingBudget << std::endl;
 
 
 	// ###########################################################################################################
@@ -1624,9 +1546,6 @@ void Algo::addLastRouters(std::vector<int *> & vertices, std::vector<int> & idx,
 	
 	// nb max de routeurs possibles
 	const int maxNumRouters = remainingBudget / aPrixRouteur;
-
-	std::cout << "maxNumRouters" << maxNumRouters << std::endl;
-
 
 	// matrice avec les cellules cibles a 1 et le reste a -1
 	Matrix targetCellsForConvolution(aMapRows, aMapCols);
@@ -1712,7 +1631,6 @@ void Algo::addLastRouters(std::vector<int *> & vertices, std::vector<int> & idx,
 			return; // et on sort de l'algo
 		}
 
-		//std::cout << "convolution" << std::endl;
 		std::vector<float> convolvedMat(aMapSize);
 
 		// on convolue la matrice de cellules cibles avec le flou gaussien
@@ -1727,12 +1645,6 @@ void Algo::addLastRouters(std::vector<int *> & vertices, std::vector<int> & idx,
 				convolvedMat[iConv] = -kernelSize; // pour ne pas reprendre cette position dans la matrice convoluee
 			}
 		}
-
-
-		//displayVector(convolvedMat, aMap.getRows(), aMap.getCols());
-		//std::cout << "apres convolution" << std::endl;
-
-		//std::cout << "____________________________________________" << std::endl;
 
 		int * xyNewRouter = new int[2];
 
@@ -1847,7 +1759,6 @@ void Algo::addLastRouters(std::vector<int *> & vertices, std::vector<int> & idx,
 			const int random_integer = uni(rng) % maxCornersVect.size();
 			int xRouter = (maxCornersVect[random_integer] / aMapCols);
 			int yRouter = (maxCornersVect[random_integer] - xRouter * aMapCols);
-			//std::cout << "random_integer. On prend maxIndexs[" << random_integer << "] --> [" << xRouteur << ", " << yRouteur << "] --> " <<  convolvedMat[maxIndexs[random_integer]] << std::endl;
 			xyNewRouter[0] = xRouter;
 			xyNewRouter[1] = yRouter;
 
@@ -1904,9 +1815,6 @@ void Algo::addLastRouters(std::vector<int *> & vertices, std::vector<int> & idx,
 												   // [0 0 x 7]
 												   // [0 0 0 2]
 
-												   //std::cout << "csrMat" << std::endl;
-												   //std::cout << csrMat << std::endl;
-
 												   // arbre couvrant minimal
 		Matrix mstMat(dim, dim);
 		toMinimumSpanningTree(csrMat, mstMat);
@@ -1958,7 +1866,6 @@ void Algo::addLastRouters(std::vector<int *> & vertices, std::vector<int> & idx,
 			const int yFrom = xyNewRouter[1] - aRayonRouteurs;
 			const int yTo = xyNewRouter[1] + aRayonRouteurs;
 
-			std::cout << "Nouveau routeur" << std::endl;
 			// dans la matrice targetCells, on met a 1 les cellules qui sont dans le perimetre du routeur, et on laisse a 0 les autres ou celles qui sont cachees pas un mur
 			for (int xTargetCell = xFrom; xTargetCell <= xTo; xTargetCell++)
 			{
@@ -2070,11 +1977,6 @@ int Algo::centerIsBetter(int * center, std::vector<int *> & vertices, std::vecto
 		vertices = verticesTmp;
 		intermediateCsrMat = csrMat;
 	}
-
-	//std::cout << "center[" << center[0] << "," << center[1] << "]" << std::endl;
-	//std::cout << "nbCablesBefore = " << nbCablesBefore << std::endl;
-	//std::cout << "mstMatWeight = " << mstMatWeight << std::endl;
-	//std::cout << "diff = " << diff << std::endl;
 	return diff;
 }
 
@@ -2112,12 +2014,6 @@ float * Algo::get3rdPointEquilateral(const int * A, const int * B, const int * C
 */
 int * Algo::getCentroid(const int * A, const int * B, const int * C) const
 {
-	/*std::cout << "     -----     " << std::endl;
-	std::cout << "     -----     " << std::endl;
-	std::cout << "     -----     " << std::endl;
-	std::cout << "A=" << A[0] << "," << A[1] << std::endl;
-	std::cout << "B=" << B[0] << "," << B[1] << std::endl;
-	std::cout << "C=" << C[0] << "," << C[1] << std::endl;*/
 
 	int centerX = 0;
 	int centerY = 0;
@@ -2127,9 +2023,6 @@ int * Algo::getCentroid(const int * A, const int * B, const int * C) const
 	int distAB = sqrt(pow((A[0] * 1000 - B[0] * 1000), 2) + (pow((A[1] * 1000 - B[1] * 1000), 2)));
 	int distBC = sqrt(pow((B[0] * 1000 - C[0] * 1000), 2) + (pow((B[1] * 1000 - C[1] * 1000), 2)));
 	int distCA = sqrt(pow((A[0] * 1000 - C[0] * 1000), 2) + (pow((A[1] * 1000 - C[1] * 1000), 2)));
-	/*std::cout << "distAB=" << distAB << std::endl;
-	std::cout << "distBC=" << distBC << std::endl;
-	std::cout << "distCA=" << distCA << std::endl;*/
 
 	// calcule des angles du triangle ABC
 	float angle_ABC = acos((pow(distAB, 2) + pow(distBC, 2) - pow(distCA, 2)) / (2 * distAB*distBC)) * (180 / PI);
@@ -2137,17 +2030,10 @@ int * Algo::getCentroid(const int * A, const int * B, const int * C) const
 	float angle_CAB = acos((pow(distCA, 2) + pow(distAB, 2) - pow(distBC, 2)) / (2 * distCA*distAB)) * (180 / PI);
 
 
-	/*float angle_ABC = (atan2(A[1] - C[1], A[0] - C[0]) + PI) * (180 / PI);
-	float angle_BCA = (atan2(B[1] - A[1], B[0] - A[0]) + PI)  * (180 / PI);
-	float angle_CAB =( atan2(C[1] - B[1], C[0] - B[0]) + PI)  * (180 / PI);
-	std::cout << "angle_ABC=" << angle_ABC << std::endl;
-	std::cout << "angle_BCA=" << angle_BCA << std::endl;
-	std::cout << "angle_CAB=" << angle_CAB << std::endl;*/
 
 	// si tous les angles sont < 120° 
 	if (angle_ABC < 120 && angle_BCA < 120 && angle_CAB < 120)
 	{
-		//std::cout << "fermat"<< std::endl;
 
 		// on calcule le point de Fermat
 		// soit ABC un triangle dont les angles sont inferieurs à 120°. Il existe un et un seul point I, dont la somme IA + IB + IC des distances aux trois sommets est minimale.
@@ -2167,8 +2053,6 @@ int * Algo::getCentroid(const int * A, const int * B, const int * C) const
 
 		// le point de Fermat est le point a l'intersection entre les droites [AD] et [BE]
 
-		//std::cout << "D=" << D[0] << "," << D[1] << std::endl;
-		//std::cout << "E=" << E[0] << "," << E[1] << std::endl;
 
 
 		std::vector<float> vectC(3);
@@ -2209,13 +2093,10 @@ int * Algo::getCentroid(const int * A, const int * B, const int * C) const
 	// sinon, on prend le point barycentre equilibrant la masse du triangle
 	else
 	{
-		//std::cout << "masse" << std::endl;
-
 		centerX = std::round((A[0] + B[0] + C[0]) / 3);
 		centerY = std::round((A[1] + B[1] + C[1]) / 3);
 	}
 
-	//std::cout << "  I=" << centerX << "," << centerY << std::endl;
 
 	return new int[2]{ centerX, centerY };
 }
@@ -2223,9 +2104,6 @@ int * Algo::getCentroid(const int * A, const int * B, const int * C) const
 
 void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBeginning)
 {
-	//std::cout << "#######################################################################################" << std::endl;
-	//std::cout << "remplissage de idx, idy et dists pour les prochains Kruskal" << std::endl;
-	//std::cout << "#######################################################################################" << std::endl;
 
 	// vecteur des sommets du graphe. Au debut, il n'y a que le backbone + les routeurs
 	std::vector<int *> vertices;
@@ -2300,8 +2178,6 @@ void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBegi
 		availableVerticesIndexs[index] = cpt;
 		cpt++;
 	}
-
-	//std::cout << "--------------------------originalWeight = " << originalWeight << std::endl;
 	
 	while (availableVerticesIndexs.size())
 	{
@@ -2313,8 +2189,6 @@ void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBegi
 		auto random_integer = uni(rng) % availableVerticesIndexs.size();
 		int indexVertice = random_integer;
 
-		//std::cout << std::endl;
-		//std::cout << "-----------indexVertice = " << indexVertice << std::endl;
 		int distToA = INT_MAX;
 		int distToB = INT_MAX;
 		int indexVerticeA;
@@ -2343,9 +2217,6 @@ void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBegi
 			}
 		}
 
-		//std::cout << "----indexVerticeA = " << indexVerticeA << std::endl;
-		//std::cout << "----indexVerticeB = " << indexVerticeB << std::endl;
-
 
 		// on recupere la position du barycentre du triangle forme par ces 3 points
 		//int * center = getCentroid(new int[2]{ 2,5 }, new int[2]{ 1,1 }, new int[2]{ 3,3 });
@@ -2358,7 +2229,6 @@ void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBegi
 		{
 			// on maj le nombre de cables courant
 			newDistSum -= diffNbCables;
-			//std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! newNbCables = " << newDistSum << std::endl;
 		}
 		
 		// on supprime le sommet du vecteur
@@ -2376,7 +2246,7 @@ void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBegi
 	//if (originalWeight > newDistSum)
 	if (true)
 	{
-		std::cout << "on gagne" << std::endl;
+
 		// #######################################################################################
 		// affichage du nombre de cables
 		// #######################################################################################
@@ -2499,10 +2369,6 @@ void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBegi
 		}
 
 
-
-		std::cout << nbCables << " cables" << std::endl;
-
-
 /*
 		Matrix aMapTmp = aMap;
 		placeMstPaths_2(routeurs, idx, idy, dists);
@@ -2533,7 +2399,6 @@ void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBegi
 
 		nbCables2 = cablesMap2.sum();
 
-		std::cout << "nbCables2 -------> "<< nbCables2 << std::endl;
 		std::vector<int *> updatedVertices;
 		updatedVertices = vertices;
 		int indexRout = nbRouteurs+1;
@@ -2544,7 +2409,6 @@ void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBegi
 		while(indexRout < updatedVertices.size())
 		{
 
-			//std::cout << indexRout << "sur" << updatedVertices.size() << std::endl;
 			std::vector<int *> updatedVerticesTmp;
 			updatedVerticesTmp = updatedVertices;
 
@@ -2626,12 +2490,6 @@ void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBegi
 
 			if (newNbCables < nbCables2)
 			{
-				std::cout << indexRout << "sur" << updatedVertices.size() << std::endl;
-
-				/*std::cout << "Suppression de " << updatedVertices[indexRout][0] << "," << updatedVertices[indexRout][1] << std::endl;
-				std::cout << "nbCables2 : " << nbCables2 << std::endl;
-				std::cout << "newNbCables : " << newNbCables << std::endl;*/
-
 				nbCables2 = newNbCables;
 				updatedVertices = updatedVerticesTmp;
 				allCables2 = allCables3;
@@ -2643,16 +2501,11 @@ void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBegi
 		}
 
 
-
-
-
-		std::cout << "nbRouteurs" << nbRouteurs << std::endl;
 		placeMstPaths_3(allCables2, onlyRouters);
 		
 	}
 	else
 	{
-		std::cout << "FIN" << std::endl;
 
 
 		// #######################################################################################
@@ -2672,10 +2525,7 @@ void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBegi
 												   // [0 0 x 7]
 												   // [0 0 0 2]
 
-												   //std::cout << "csrMat" << std::endl;
-												   //std::cout << csrMat << std::endl;
-
-												   // arbre couvrant minimal
+		// arbre couvrant minimal
 		Matrix mstMat2(size, size);
 		toMinimumSpanningTree(csrMat2, mstMat2);
 
@@ -2714,27 +2564,11 @@ void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBegi
 			}
 		}
 
-		std::cout << " ####################################" << std::endl;
-		std::cout << cablesM.sum() << " cables" << std::endl;
-		std::cout << " ####################################" << std::endl;
-
-		if (aMapName == "charleston_road" && cablesM.sum() < 896)
-		{
-			std::cout << "-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_" << std::endl;
-			std::cout << "-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_--_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-__-_-_" << std::endl;
-			std::cout << "-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_" << std::endl;
-			std::cout << "-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_" << std::endl;
-			std::cout << "-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_" << std::endl;
-			std::cout << "-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_" << std::endl;
-			std::cout << "-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_" << std::endl;
-		}
-
 		// si c'est une map ou il est impossible de couvrir 100% des cellules cibles
 		// l'optimisation du cablage a pu liberer du budget
 		// on essaie donc d'ajouter d'autres routeurs pour couvrir davantage de cellules
 		if (aMapName == "rue_de_londres" || aMapName == "opera")
 		{
-			std::cout << "on peut p-e pouvoi placer des routeurs supplementaires" << std::endl;
 			addLastRouters(vertices, idx, idy, dists);
 		}
 		else
@@ -2752,11 +2586,6 @@ void Algo::random()
 {
 	// nb max de routeurs possibles
 	int maxNumRouters = aBudget / aPrixRouteur;
-	std::cout << "  Budget / prix d'un routeur = \t" << maxNumRouters << " routeurs\n" << std::endl;
-	std::cout << "  --------------------------------------------------------------------------------------------------------------------" << std::endl;
-	std::cout << "  Routeurs\t\t|\t\t% budget utilise\t\t|\t\t% cellules couvertes" << std::endl;
-	std::cout << "  --------------------------------------------------------------------------------------------------------------------" << std::endl;
-
 
 	// matrice avec les cellules cibles a 0 et le reste a 1
 	Matrix targetCells(aMap.getRows(), aMap.getCols());
@@ -2789,7 +2618,6 @@ void Algo::random()
 
 	for (int currentRouterId = 0; currentRouterId < maxNumRouters; currentRouterId++)
 	{
-		//std::cout << currentRouterId +1 << " routeurs" << std::endl;
 		// vecteur des coordonnees des cellules cibles n'ayant pas encore de routeur place dessus
 		std::vector<int *> targetCellsCoords;
 		int condition2 = targetCells.getRows() * targetCells.getCols();
@@ -2804,7 +2632,6 @@ void Algo::random()
 		// si il n'y a pas de position dispo pour le prochain routeur
 		if (targetCellsCoords.size() == 0)
 		{
-			//std::cout << "il n'y a plus de place pour placer de routeurs" << std::endl;
 
 			// on tire les cables
 			placeMstPaths(routeurs, idx, idy, dists);
@@ -2856,12 +2683,10 @@ void Algo::random()
 			kruskal(xyNewRouter, routeurs, idx, idy, dists, succ, cost); // modifie cost, succ, routeurs, idx, idy et dists
 		}
 
-		//std::cout << "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Nouveau routeur en [" << xyNewRouter[0] << "," << xyNewRouter[1] << "]" << std::endl;
 
 		// si encore du budget
 		if (succ)
 		{
-			//std::cout << "entree if (succ)" << std::endl;
 			// recuperation du masque du perimetre du routeur
 			Matrix mask(2 * aRayonRouteurs + 1, 2 * aRayonRouteurs + 1);
 
@@ -2893,8 +2718,6 @@ void Algo::random()
 		}
 		else // plus de budget, on enleve le routeur en trop
 		{
-			//std::cout << "\n\n\nPlus de budget !" << std::endl;
-			//std::cout << "succ == false" << std::endl;
 
 			// on retabli l'etat de la case dans la carte
 			aMap(xyNewRouter[0], xyNewRouter[1]) = safeguardingInfo;
@@ -2924,11 +2747,6 @@ void Algo::bigCase()
 {
 	// nb max de routeurs possibles
 	int maxNumRouters = aBudget / aPrixRouteur;
-	std::cout << "  Budget / prix d'un routeur = \t" << maxNumRouters << " routeurs\n" << std::endl;
-	std::cout << "  --------------------------------------------------------------------------------------------------------------------" << std::endl;
-	std::cout << "  Routeurs\t\t|\t\t% budget utilise\t\t|\t\t% cellules couvertes" << std::endl;
-	std::cout << "  --------------------------------------------------------------------------------------------------------------------" << std::endl;
-
 
 	// matrice avec les cellules cibles a 0 et le reste a 1
 	Matrix targetCells(aMap.getRows(), aMap.getCols());
@@ -2999,7 +2817,6 @@ void Algo::bigCase()
 		// si il n'y a pas de position dispo pour le prochain routeur
 		if (targetCellsCoords.size() == 0)
 		{
-			//std::cout << "il n'y a plus de place pour placer de routeurs" << std::endl;
 
 			// on tire les cables
 			placeMstPaths(routeurs, idx, idy, dists);
@@ -3043,12 +2860,9 @@ void Algo::bigCase()
 			kruskal(theChosenOne, routeurs, idx, idy, dists, succ, cost); // modifie cost, succ, routeurs, idx, idy et dists
 		}
 
-		//std::cout << "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Nouveau routeur en [" << xyNewRouter[0] << "," << xyNewRouter[1] << "]" << std::endl;
-
 		// si encore du budget
 		if (succ)
 		{
-			//std::cout << "entree if (succ)" << std::endl;
 			// recuperation du masque du perimetre du routeur
 			Matrix mask(2 * aRayonRouteurs + 1, 2 * aRayonRouteurs + 1);
 
@@ -3080,9 +2894,6 @@ void Algo::bigCase()
 		}
 		else // plus de budget, on enleve le routeur en trop
 		{
-			//std::cout << "\n\n\nPlus de budget !" << std::endl;
-			//std::cout << "succ == false" << std::endl;
-
 			// on retabli l'etat de la case dans la carte
 			aMap(theChosenOne[0], theChosenOne[1]) = safeguardingInfo;
 
@@ -3148,8 +2959,6 @@ void Algo::gaussianBlur()
 		}
 	}
 
-	//std::cout << "targetCellsForConvolution" << std::endl;
-	//std::cout << targetCellsForConvolution << std::endl;
 
 	// vecteur de float representant un vrai noyau de filtre gaussien. On le manipule comme une matrice
 	const int kernelDim = 2 * aRayonRouteurs + 1;
@@ -3158,7 +2967,6 @@ void Algo::gaussianBlur()
 	std::vector<float> kernel(kernelSize);
 	gaussianKernel(kernel, kernelDim);
 
-	//std::cout << "kernel" << std::endl;
 	//displayVector(kernel, 2 * aRayonRouteurs + 1, 2 * aRayonRouteurs + 1);
 
 	std::vector<int *> routeurs;
@@ -3180,7 +2988,6 @@ void Algo::gaussianBlur()
 		// si il n'y a pas de position dispo pour le prochain routeur
 		if (nbTargetCells == 0)
 		{
-			//std::cout << "il n'y a plus de place pour placer de routeurs" << std::endl;
 
 			// on tire les cables
 			placeMstPaths(routeurs, idx, idy, dists);
@@ -3190,7 +2997,6 @@ void Algo::gaussianBlur()
 			return; // et on sort de l'algo
 		}
 
-		//std::cout << "convolution" << std::endl;
 		std::vector<float> convolvedMat(aMapSize);
 
 		// on convolue la matrice de cellules cibles avec le flou gaussien
@@ -3205,12 +3011,6 @@ void Algo::gaussianBlur()
 				convolvedMat[iConv] = -kernelSize; // pour ne pas reprendre cette position dans la matrice convoluee
 			}
 		}
-
-
-		//displayVector(convolvedMat, aMap.getRows(), aMap.getCols());
-		//std::cout << "apres convolution" << std::endl;
-
-		//std::cout << "____________________________________________" << std::endl;
 
 		int * xyNewRouter = new int[2];
 
@@ -3324,7 +3124,6 @@ void Algo::gaussianBlur()
 			const int random_integer = uni(rng) % maxCornersVect.size();
 			int xRouter = (maxCornersVect[random_integer] / aMapCols);
 			int yRouter = (maxCornersVect[random_integer] - xRouter * aMapCols);
-			//std::cout << "random_integer. On prend maxIndexs[" << random_integer << "] --> [" << xRouteur << ", " << yRouteur << "] --> " <<  convolvedMat[maxIndexs[random_integer]] << std::endl;
 			xyNewRouter[0] = xRouter;
 			xyNewRouter[1] = yRouter;
 
@@ -3365,12 +3164,10 @@ void Algo::gaussianBlur()
 		}
 		else kruskal(xyNewRouter, routeurs, idx, idy, dists, succ, cost); // modifie cost, succ, routeurs, idx, idy et dists
 
-																				//std::cout << "_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-Nouveau routeur en [" << xyNewRouter[0] << "," << xyNewRouter[1] << "]" << std::endl;
 
-																				// si encore du budget
+		// si encore du budget
 		if (succ)
 		{
-			//std::cout << "entree if (succ)" << std::endl;
 			// recuperation du masque du perimetre du routeur
 			Matrix mask(2 * aRayonRouteurs + 1, 2 * aRayonRouteurs + 1);
 
@@ -3407,8 +3204,6 @@ void Algo::gaussianBlur()
 		}
 		else // plus de budget, on enleve le routeur en trop
 		{
-			//std::cout << "succ == false" << std::endl;
-
 			// on retabli l'etat de la case dans la carte
 			aMap(xyNewRouter[0], xyNewRouter[1]) = safeguardingInfo;
 
