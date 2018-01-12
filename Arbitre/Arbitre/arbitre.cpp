@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
 		std::string outputdirmap = outputdir + outf;
 		while (testcount <= 5) {
 			clock_t t1, t2;
-			
+
 			std::string temp_concat = "..\\..\\executables\\"+stratname +" "+inputdir+outf+".in"+" "+outputdirmap+"\\"+outf+"-"+stratname+std::to_string(testcount)+".out";
 
 			const char* fullcommand = temp_concat.c_str();  //commande a lancer
@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
 	}
 	return 0;
 }
-
+//Cette fonction va permettre de tirer les informations sur la map (contenues dans les 3 premieres lignes)
 std::vector<int> infoMap(const std::string & mapName)
 {
 	std::vector<int> data;
@@ -102,6 +102,8 @@ std::vector<int> infoMap(const std::string & mapName)
 	return data;
 }
 
+//Cette fonction va permette de determiner si deux points sont a une distance superieure
+//ou inferieure ou egale √† 1 selon la norme infinie
 
 bool distInf1(const int & xCable, const int & yCable, const int & xConnected, const int & yConnected)
 {
@@ -112,9 +114,11 @@ bool distInf1(const int & xCable, const int & yCable, const int & xConnected, co
 	return false;
 }
 
-
+//Cette fonction va permettre de tirer les informations sur la map (contenues dans les 3 premieres lignes)
 bool cableOrdered(const int & xCable, const int & yCable, const std::vector<std::vector<bool>>& cablesVector)
-{
+{//Avec ces 2 boucles, on va juste verifier si, pour un cable donne, un des voisins (en 8-connexite)
+	//est deja relie au backbone (donc est deja connecte)
+
 	for (int i = xCable - 1; i < xCable + 2; i++)
 	{
 		for (int j = yCable - 1; j < yCable + 2; j++)
@@ -128,6 +132,8 @@ bool cableOrdered(const int & xCable, const int & yCable, const std::vector<std:
 	return false;
 }
 
+//Cette fonction va permettre de parser la map contenue dans le fichier .in, pour savoir ou se situe
+//les murs, les cellules cibles, et les cellules vides (pour ensuite utiliser ces informations).
 
 std::vector<std::vector<int>> parseMap(const std::string & mapName, const int & row, const int & column)
 {
@@ -138,7 +144,7 @@ std::vector<std::vector<int>> parseMap(const std::string & mapName, const int & 
 	std::string line = "";	//ligne courante
 
 
-							//Il faut passer les 3 premiËres lignes pour ensuite lire la map
+							//Il faut passer les 3 premiÔøΩres lignes pour ensuite lire la map
 
 	//Il faut passer les 3 premieres lignes pour ensuite lire la map
 
@@ -172,6 +178,8 @@ std::vector<std::vector<int>> parseMap(const std::string & mapName, const int & 
 	return mapMatrix;
 }
 
+//Cette fonction va permettre de calculer le score lie au .out donne.
+//Cette fonction ne sera appele que si le fichier est valide
 
 int scoreRouter(std::vector<std::vector<int>>& map, const std::vector<std::pair<int, int>>& routerCoord, const int & routerRadius, const int & row, const int & column)
 {
@@ -194,10 +202,12 @@ int scoreRouter(std::vector<std::vector<int>>& map, const std::vector<std::pair<
 	return score;
 }
 
+//Cette fonction va permettre de d√©tecter si il y a un mur entre une cellule
+//Elle retourne vraie si il y a un mur entre la cellule et le routeur
 
 bool wallPresence(const std::vector<std::vector<int>>& map, const int & xRouter, const int & yRouter, const int & xCell, const int & yCell)
 {
-	//Selon si le routeur est plus haut ou bas, plus ÅEgauche ou ÅEdroite, alors il faudra aller dans un sens ou un autre.
+	//Selon si le routeur est plus haut ou bas, plus ÔøΩEgauche ou ÔøΩEdroite, alors il faudra aller dans un sens ou un autre.
 	//C'est pour cela qu'il y a la condition d'arret et l'incrementation/decrementation avec les conditions ternaires.
 	for (int i = xRouter; ((xRouter - xCell) < 0) ? i <= xCell : i >= xCell; ((xRouter - xCell) < 0) ? i++ : i--)
 	{
@@ -214,7 +224,8 @@ bool wallPresence(const std::vector<std::vector<int>>& map, const int & xRouter,
 
 
 int checkSolution(const std::string & solutionFile)
-{	
+{
+
 	
 	std::string sdir = "..\\..\\solutions\\"+solutionFile.substr(0,solutionFile.find("-"))+"\\";
 	std::cout << sdir+solutionFile + "\n";
@@ -222,7 +233,7 @@ int checkSolution(const std::string & solutionFile)
 	std::cout << "Test de la solution : " << solutionFile.substr(16) << std::endl;
 	std::cout << "Sur la map : " << mapFile.substr(13) << std::endl << std::endl;
 
-	std::vector<int> data = infoMap(mapFile);	//Contient les informations liees ÅEla map
+	std::vector<int> data = infoMap(mapFile);	//Contient les informations liees ÔøΩEla map
 	const int row = data[0];
 	const int column = data[1];
 	const int radius = data[2];
@@ -307,7 +318,7 @@ int checkSolution(const std::string & solutionFile)
 						{
 							if (cablesMatrix[a][b] == true && map[a][b] != Cell::Wall)
 							{
-								routerCoord.push_back(std::pair<int, int>(a, b));	//AjoutÅEcar pas sur un mur et cablÅE
+								routerCoord.push_back(std::pair<int, int>(a, b));	//AjoutÔøΩEcar pas sur un mur et cablÔøΩE
 							}
 							else
 							{
@@ -376,7 +387,7 @@ void GetFilesInDirectory(std::vector<std::string> &out, const std::string &direc
 	{
 		std::cout << "invalid dir";
 	}
-	
+
 	while (FindNextFileA(dir, &file_data)) {
 		file_name = file_data.cFileName;
 		if (strcmp(file_data.cFileName, ".") != 0 && strcmp(file_data.cFileName, "..") != 0)
