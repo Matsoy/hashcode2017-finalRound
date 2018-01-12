@@ -223,8 +223,7 @@ void IO::generateOutput(Matrix & mapRouteurs, std::string pathBeginning)
 	time(&timev);
 	std::stringstream timess;
 	timess << timev;
-	//chemin du fichier d'output de type ../solutions/<map>-<methode>-timestamp.out
-	std::string filePath = pathBeginning + "-" + timess.str() + ".out";
+	std::string filePath = pathBeginning;
 	//Ecrase le fichier s'il existe
 	std::remove(filePath.c_str());
 	//Creer le fichier
@@ -236,8 +235,8 @@ void IO::generateOutput(Matrix & mapRouteurs, std::string pathBeginning)
 	//##################################
 	//##################################
 
-	std::cout << std::endl;
-	std::cout << "  " << filePath << "\n" << std::endl;
+	//std::cout << std::endl;
+	//std::cout << "  " << filePath << "\n" << std::endl;
 }
 
 /*

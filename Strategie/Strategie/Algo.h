@@ -10,7 +10,6 @@ class Algo
 {
 private:
 	std::string aMethod; // nom de l'algorithme utilise
-	std::string aMapName; // nom de la carte sur laquelle est lance l'algorithme
 	Matrix & aMap; /* matrice d'entiers selon 		-2 --> emetteur
 													-1 --> vide
 													0 --> mur
@@ -33,7 +32,7 @@ public:
 	/*
 	* constructeur
 	*/
-	Algo(std::string method, std::string mapName, Matrix & map, Matrix & mapSolution,int rayonRouteurs, int prixCable, int prixRouteur, int budget, int budgetOriginal, int * backbone);
+	Algo(std::string method, Matrix & map, Matrix & mapSolution,int rayonRouteurs, int prixCable, int prixRouteur, int budget, int budgetOriginal, int * backbone);
 
 	/*
 	* Acesseurs
@@ -57,10 +56,8 @@ public:
 	void setMapSolution(Matrix & mapSolution);
 	/*
 	* Lance l'algorithme donne par le main
-	*
-	* @param bestScore le meilleur score correspond a la carte lancee. Permettant de voir apres l'algorithme si on a battu le meilleur score
 	*/
-	void run(int bestScore);
+	void run();
 	/*
 	* Effectue l'algorithme de Kruskal permettant de connaitre l'arbre minimal couvrant les routeurs.
 	* On saura alors si l'ajout de ce nouveau routeur depassera ou non le budget

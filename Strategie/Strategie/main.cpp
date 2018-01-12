@@ -3,13 +3,17 @@
 #include "IO.h"
 #include "Algo.h"
 
-int main()
+int main(int argc, char* argv[])
 {
+	std::string inputFile = argv[1];
+	std::string outputFile = argv[2];
+
+
 	int nbSimulations = 1;
 
 	// affichage des meilleurs scores
 
-	int bestScore1 = 21962856;
+	/*int bestScore1 = 21962856;
 	int bestScore2 = 58356153;
 	int bestScore3 = 174527508;
 	int bestScore4 = 290192787;
@@ -19,7 +23,7 @@ int main()
 	int bestScore2WithoutCentroids = 58095015;
 	int bestScore3WithoutCentroids = 172792103;
 	int bestScore4WithoutCentroids = 290177232;
-	int scoreTotalWithoutCentroids = bestScore1WithoutCentroids + bestScore2WithoutCentroids + bestScore3WithoutCentroids + bestScore4WithoutCentroids;
+	int scoreTotalWithoutCentroids = bestScore1WithoutCentroids + bestScore2WithoutCentroids + bestScore3WithoutCentroids + bestScore4WithoutCentroids;*/
 
 	/*std::cout << "  Meilleurs scores SANS barycentres";
 	std::cout << "\t\tcharleston_road\t\t" << bestScore1WithoutCentroids << std::endl;
@@ -29,7 +33,7 @@ int main()
 	std::cout << "\t\t\t\t\t\t---------------------------------" << std::endl;
 	std::cout << "\t\t\t\t\t\ttotal\t\t\t" << scoreTotalWithoutCentroids << "\n" << std::endl;*/
 
-	std::cout << "  Meilleurs scores";
+	/*std::cout << "  Meilleurs scores";
 	std::cout << "\tcharleston_road\t\t" << bestScore1 << std::endl;
 	std::cout << "\t\t\true_de_londres\t\t" << bestScore2 << std::endl;
 	std::cout << "\t\t\topera\t\t\t" << bestScore3 << std::endl;
@@ -39,23 +43,22 @@ int main()
 
 	//Nom de la carte
 	std::string mapName = "charleston_road";
-	std::string method = "gaussian_blur";
+	std::string method = "gaussian_blur";*/
 
 
 	for (int i = 1; i <= nbSimulations; i++)
 	{
-		std::cout << i << std::endl;
+		//std::cout << i << std::endl;
 
-		clock_t tStart = clock();
+		//clock_t tStart = clock();
 
 		try {
-			std::cout << "  Carte\t\t\t" << mapName << std::endl;
+			//std::cout << "  Carte\t\t\t" << mapName << std::endl;
 
 			//Chemins
-			std::string pathInput = "../../inputs/";
-			std::string pathOutput = "../../solutions/" + mapName + "/";
+			//std::string pathInput = "../../inputs/";
+			//std::string pathOutput = "../../solutions/" + mapName + "/";
 
-			std::string inputFile = pathInput + mapName + ".in"; // fichier d'input
 
 			IO io; // objet pour les I/O
 
@@ -69,12 +72,10 @@ int main()
 
 				int * xyBackbone = new int[2]{ datas[6], datas[7] };
 
-				Algo algo(method, mapName, map, mapSolution, datas[2], datas[3], datas[4], datas[5], datas[5], xyBackbone); // type, rayonRouteurs, prixCable, prixRouteur, budgetMax, budgetOriginal, [xBackbone, yBackbone]
+				Algo algo("bigcase", map, mapSolution, datas[2], datas[3], datas[4], datas[5], datas[5], xyBackbone); // rayonRouteurs, prixCable, prixRouteur, budgetMax, budgetOriginal, [xBackbone, yBackbone]
 
 				// remplissage de la matrice
 				io.initializeMap(map, inputFile);
-
-
 
 				
 				// ###################### CABLAGE SUR SOLUTION ######################
@@ -86,25 +87,10 @@ int main()
 				algo.centroid(routeurs, io, pathOutput + algo.getMethod());*/
 				// ##################################################################
 				
-
-				
-				
-				// lancement de l'algo en lui fournissant le meilleur score de la carte correspondante
-				if (mapName == "charleston_road") algo.run(bestScore1WithoutCentroids);
-				else if (mapName == "rue_de_londres") algo.run(bestScore2WithoutCentroids);
-				else if (mapName == "opera") algo.run(bestScore3WithoutCentroids);
-				else if (mapName == "lets_go_higher") algo.run(bestScore4WithoutCentroids);
-				else if (mapName == "simple_example") algo.run(10000000);				
-
-				// impression du temps ecoule
-				printf("  Temps d'execution:\t %.2fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
-
-				
+				algo.run();
 
 				// ###################### CREATION OUTPUT ######################
-				std::cout << std::endl;
-				std::string pathBeginning = pathOutput + algo.getMethod();
-				io.generateOutput(map, pathBeginning);
+				io.generateOutput(map, outputFile);
 
 				
 				

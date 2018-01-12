@@ -3,7 +3,7 @@
 /*
 * constructeur
 */
-Algo::Algo(std::string method, std::string mapName, Matrix & map, Matrix & mapSolution, int rayonRouteurs, int prixCable, int prixRouteur, int budget, int budgetOriginal, int * xyBackbone) : aMethod(method), aMapName(mapName), aMap(map), aMapSolution(mapSolution), aRayonRouteurs(rayonRouteurs), aPrixCable(prixCable), aPrixRouteur(prixRouteur), aBudget(budget), aBudgetOriginal(budgetOriginal), aBackbone(xyBackbone)
+Algo::Algo(std::string method, Matrix & map, Matrix & mapSolution, int rayonRouteurs, int prixCable, int prixRouteur, int budget, int budgetOriginal, int * xyBackbone) : aMethod(method), aMap(map), aMapSolution(mapSolution), aRayonRouteurs(rayonRouteurs), aPrixCable(prixCable), aPrixRouteur(prixRouteur), aBudget(budget), aBudgetOriginal(budgetOriginal), aBackbone(xyBackbone)
 {
 }
 
@@ -44,7 +44,7 @@ void Algo::displayVector(const std::vector<int> &vect, const int h, const int w)
 		if ((n == w - 1))
 		{
 			out += std::to_string(vect[j]) + " ]";
-			std::cout << out << std::endl;
+			//std::cout << out << std::endl;
 			out.clear();
 		}
 		else out += std::to_string(vect[j]) + ", ";
@@ -78,7 +78,7 @@ void Algo::displayVector(const std::vector<float> &vect, const int h, const int 
 		if ((n == w - 1))
 		{
 			out += std::to_string(vect[j]) + " ]";
-			std::cout << out << std::endl;
+			//std::cout << out << std::endl;
 			out.clear();
 		}
 		else out += std::to_string(vect[j]) + ", ";
@@ -111,13 +111,13 @@ void Algo::displayScoreAfterCentroids(const Matrix & targetCells, const int nbRo
 	}
 
 	int score = 1000 * (aNbCellsOriginal - nbCellsNotCovered) + (aBudgetOriginal - nbRouters * aPrixRouteur - nbCables * aPrixCable);
-	std::cout << "Nb de cellules couvertes = " << (aNbCellsOriginal - nbCellsNotCovered) << std::endl;
-	std::cout << "nbRouters = " << nbRouters << std::endl;
-	std::cout << "score = " << score << std::endl;
+	//std::cout << "Nb de cellules couvertes = " << (aNbCellsOriginal - nbCellsNotCovered) << std::endl;
+	//std::cout << "nbRouters = " << nbRouters << std::endl;
+	//std::cout << "score = " << score << std::endl;
 
-	std::cout << "\n\n  Score =\t\t" << score << std::endl;
+	//std::cout << "\n\n  Score =\t\t" << score << std::endl;
 
-	if (aMapName == "charleston_road" && score > 21962821)
+	/*if (aMapName == "charleston_road" && score > 21962821)
 	{
 		for (int i = 0; i < 5; i++) std::cout << "\t\t\t---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
 		std::cout << "\t\t\t|\t\tMEILLEUR SCORE\t\t\t|" << std::endl;
@@ -134,7 +134,7 @@ void Algo::displayScoreAfterCentroids(const Matrix & targetCells, const int nbRo
 		for (int i = 0; i < 5; i++) std::cout << "\t\t\t---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
 		std::cout << "\t\t\t|\t\tMEILLEUR SCORE\t\t\t|" << std::endl;
 		for (int i = 0; i < 5; i++) std::cout << "\t\t\t---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
-	}
+	}*/
 }
 
 /*
@@ -161,12 +161,12 @@ void Algo::displayScore(const Matrix & targetCells, const int nbRouters) const
 
 	int score = 1000 * (aNbCellsOriginal - nbCellsNotCovered) + (aBudgetOriginal - nbRouters * aPrixRouteur - nbCables * aPrixCable);
 
-	std::cout << "\n\n  Score =\t\t" << score << std::endl;
-	if (aBestScore < score) {
+	//std::cout << "\n\n  Score =\t\t" << score << std::endl;
+	/*if (aBestScore < score) {
 		for (int i = 0; i < 5; i++) std::cout << "\t\t\t---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
-		std::cout << "\t\t\t|\t\tMEILLEUR SCORE\t\t\t|" << std::endl;
+		//std::cout << "\t\t\t|\t\tMEILLEUR SCORE\t\t\t|" << std::endl;
 		for (int i = 0; i < 5; i++) std::cout << "\t\t\t---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
-	}
+	}*/
 }
 
 
@@ -366,7 +366,7 @@ void Algo::gaussianKernel(std::vector<float> & kernel, const int w) const
 
 	const float sigma = uni(rng);
 	//float sigma = 0.01;
-	std::cout << "sigma = " << sigma << std::endl;
+	//std::cout << "sigma = " << sigma << std::endl;
 
 
 	//float sigma = 10; // + sigma est grand, + le flou gaussien est fort, + les valeur du kernel gaussien seront proches
@@ -2747,7 +2747,7 @@ void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBegi
 		// si c'est une map ou il est impossible de couvrir 100% des cellules cibles
 		// l'optimisation du cablage a pu liberer du budget
 		// on essaie donc d'ajouter d'autres routeurs pour couvrir davantage de cellules
-		if (aMapName == "rue_de_londres" || aMapName == "opera")
+		/*if (aMapName == "rue_de_londres" || aMapName == "opera")
 		{
 			addLastRouters(vertices, idx, idy, dists);
 		}
@@ -2755,7 +2755,7 @@ void Algo::centroid(std::vector<int *> & routeurs, IO & io, std::string pathBegi
 		{
 			aMap = aMapSolution;
 			placeMstPaths_2(routeurs, idx, idy, dists);
-		}
+		}*/
 	}
 }
 
@@ -2817,8 +2817,8 @@ void Algo::random()
 			// on tire les cables
 			placeMstPaths(routeurs, idx, idy, dists);
 
-			std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << (useKruskal ? cost : approximateCost) << " / " << aBudgetOriginal << " = " << ((useKruskal ? cost : approximateCost) * 100) / aBudgetOriginal << "%" << (useKruskal ? "\t" : "") << "\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
-			std::cout << '\r';
+			//std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << (useKruskal ? cost : approximateCost) << " / " << aBudgetOriginal << " = " << ((useKruskal ? cost : approximateCost) * 100) / aBudgetOriginal << "%" << (useKruskal ? "\t" : "") << "\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
+			//std::cout << '\r';
 
 			return; // et on sort de l'algo
 		}
@@ -2892,8 +2892,8 @@ void Algo::random()
 
 			if (((routeurs.size() - 1) % 1) == 0)
 			{
-				std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << (useKruskal ? cost : approximateCost) << " / " << aBudgetOriginal << " = " << ((useKruskal ? cost : approximateCost) * 100) / aBudgetOriginal << "%" << (useKruskal ? "\t" : "") << "\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
-				std::cout << '\r';
+				//std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << (useKruskal ? cost : approximateCost) << " / " << aBudgetOriginal << " = " << ((useKruskal ? cost : approximateCost) * 100) / aBudgetOriginal << "%" << (useKruskal ? "\t" : "") << "\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
+				//std::cout << '\r';
 
 			}
 		}
@@ -2911,8 +2911,8 @@ void Algo::random()
 
 			// on tire les cables
 			placeMstPaths(routeurs, idxTmp, idyTmp, distsTmp);
-			std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << costTmp << " / " << aBudgetOriginal << " = " << (costTmp * 100) / aBudgetOriginal << "%" << "\t\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
-			std::cout << '\r';
+			//std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << costTmp << " / " << aBudgetOriginal << " = " << (costTmp * 100) / aBudgetOriginal << "%" << "\t\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
+			//std::cout << '\r';
 
 			return;
 
@@ -3007,8 +3007,8 @@ void Algo::bigCase()
 			// on tire les cables
 			placeMstPaths(routeurs, idx, idy, dists);
 
-			std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << (useKruskal ? cost : approximateCost) << " / " << aBudgetOriginal << " = " << ((useKruskal ? cost : approximateCost) * 100) / aBudgetOriginal << "%" << (useKruskal ? "\t" : "") << "\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
-			std::cout << '\r';
+			//std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << (useKruskal ? cost : approximateCost) << " / " << aBudgetOriginal << " = " << ((useKruskal ? cost : approximateCost) * 100) / aBudgetOriginal << "%" << (useKruskal ? "\t" : "") << "\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
+			//std::cout << '\r';
 
 			return; // et on sort de l'algo
 		}
@@ -3073,8 +3073,8 @@ void Algo::bigCase()
 
 			if (((routeurs.size() - 1) % 1) == 0)
 			{
-				std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << (useKruskal ? cost : approximateCost) << " / " << aBudgetOriginal << " = " << ((useKruskal ? cost : approximateCost) * 100) / aBudgetOriginal << "%" << (useKruskal ? "\t" : "") << "\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
-				std::cout << '\r';
+				//std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << (useKruskal ? cost : approximateCost) << " / " << aBudgetOriginal << " = " << ((useKruskal ? cost : approximateCost) * 100) / aBudgetOriginal << "%" << (useKruskal ? "\t" : "") << "\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
+				//std::cout << '\r';
 
 			}
 		}
@@ -3091,8 +3091,8 @@ void Algo::bigCase()
 
 			// on tire les cables
 			placeMstPaths(routeurs, idxTmp, idyTmp, distsTmp);
-			std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << costTmp << " / " << aBudgetOriginal << " = " << (costTmp * 100) / aBudgetOriginal << "%" << "\t\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
-			std::cout << '\r';
+			//std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << costTmp << " / " << aBudgetOriginal << " = " << (costTmp * 100) / aBudgetOriginal << "%" << "\t\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
+			//std::cout << '\r';
 
 			return;
 
@@ -3112,9 +3112,9 @@ void Algo::gaussianBlur()
 	const int aMapRows = aMap.getRows();
 	const int aMapCols = aMap.getCols();
 	const int aMapSize = aMapRows*aMapCols;
-	std::cout << "  --------------------------------------------------------------------------------------------------------------------" << std::endl;
-	std::cout << "  Routeurs\t\t|\t\t% budget utilise\t\t|\t\t% cellules couvertes" << std::endl;
-	std::cout << "  --------------------------------------------------------------------------------------------------------------------" << std::endl;
+	//std::cout << "  --------------------------------------------------------------------------------------------------------------------" << std::endl;
+	//std::cout << "  Routeurs\t\t|\t\t% budget utilise\t\t|\t\t% cellules couvertes" << std::endl;
+	//std::cout << "  --------------------------------------------------------------------------------------------------------------------" << std::endl;
 
 
 	// matrice avec les cellules cibles a 1 et le reste a -1
@@ -3178,8 +3178,8 @@ void Algo::gaussianBlur()
 
 			// on tire les cables
 			placeMstPaths(routeurs, idx, idy, dists);
-			std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << approximateCost << " / " << aBudgetOriginal << " = " << (approximateCost * 100) / aBudgetOriginal << "%" << "\t\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
-			std::cout << '\r';
+			//std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << approximateCost << " / " << aBudgetOriginal << " = " << (approximateCost * 100) / aBudgetOriginal << "%" << "\t\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
+		//	std::cout << '\r';
 			displayScore(targetCells, routeurs.size() - 1);
 			return; // et on sort de l'algo
 		}
@@ -3384,8 +3384,8 @@ void Algo::gaussianBlur()
 
 			if (((routeurs.size() - 1) % 1) == 0)
 			{
-				std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << (useKruskal ? cost : approximateCost) << " / " << aBudgetOriginal << " = " << ((useKruskal ? cost : approximateCost) * 100) / aBudgetOriginal << "%" << (useKruskal ? "\t" : "") << "\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
-				std::cout << '\r';
+				//std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << (useKruskal ? cost : approximateCost) << " / " << aBudgetOriginal << " = " << ((useKruskal ? cost : approximateCost) * 100) / aBudgetOriginal << "%" << (useKruskal ? "\t" : "") << "\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
+				//std::cout << '\r';
 
 			}
 		}
@@ -3402,8 +3402,8 @@ void Algo::gaussianBlur()
 
 			// on tire les cables
 			placeMstPaths(routeurs, idxTmp, idyTmp, distsTmp);
-			std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << costTmp << " / " << aBudgetOriginal << " = " << (costTmp * 100) / aBudgetOriginal << "%" << "\t\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
-			std::cout << '\r';
+		//	std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << costTmp << " / " << aBudgetOriginal << " = " << (costTmp * 100) / aBudgetOriginal << "%" << "\t\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
+			//std::cout << '\r';
 			displayScore(targetCells, routeurs.size() - 1);
 			return;
 
@@ -3416,21 +3416,18 @@ void Algo::gaussianBlur()
 	// peut etre a enlever pr les grosses map
 	placeMstPaths(routeurs, idx, idy, dists);
 	// #################################################################################
-	std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << cost << " / " << aBudgetOriginal << " = " << (cost * 100) / aBudgetOriginal << "%" << "\t\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
-	std::cout << '\r';
+	//std::cout << "  " << routeurs.size() - 1 << "\t\t\t|\t\t" << (useKruskal ? "" : "env. ") << cost << " / " << aBudgetOriginal << " = " << (cost * 100) / aBudgetOriginal << "%" << "\t\t|\t\t" << nbCellsCovered(targetCells) << " / " << getNbCellsOriginal() << " = " << cellsCoveredPercentage(targetCells) << "%";
+	//std::cout << '\r';
 	displayScore(targetCells, routeurs.size() - 1);
 
 }
 
 /*
 * Lance l'algorithme donne par le main
-*
-* @param bestScore le meilleur score correspond a la carte lancee. Permettant de voir apres l'algorithme si on a battu le meilleur score
 */
-void Algo::run(int bestScore)
+void Algo::run()
 {
-	std::cout << "  Algo\t\t\t" << aMethod << "\n" << std::endl;
-	aBestScore = bestScore;
+	//std::cout << "  Algo\t\t\t" << aMethod << "\n" << std::endl;
 	if (aMethod == "random")
 	{
 		random();
