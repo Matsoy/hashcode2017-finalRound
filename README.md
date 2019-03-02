@@ -91,8 +91,8 @@ Ci-dessous est repris le découpage que nous avons effectué pour définir les 2
 | Carte           | Score    
 | --------------- | ----------
 | Charleston_road | 21 962 856
-| Rue_de_londres  | 21 962 856
-| Opera           | 21 962 856
-| Lets_go_higher  | 21 962 856
+| Rue_de_londres  | 58 356 153
+| Opera           | 174 527 508
+| Lets_go_higher  | 290 192 787
 
 **Total** : :boom: 545 039 304 :boom:
