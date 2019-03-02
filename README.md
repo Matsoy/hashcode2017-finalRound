@@ -1,6 +1,7 @@
-Mini-Projet de programmation en langage C++ : Router Placement, Round Final Google Hash 2017
-============================================================================================
+Hash Code 2017, Final Round - Router placement
+===========
 
+*Given a building plan, decide where to put wireless routers and how to connect them to the fiber backbone to maximize coverage and minimize cost.*
 
 # Equipe : 
 ----------
