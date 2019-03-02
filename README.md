@@ -24,14 +24,13 @@ Cependant, il vaut veiller à respecter quelques règles :
 - Veiller à ce que les routeurs et les câbles soient bien posés dans les limites de la carte.
 
 Enfin, le calcul du score respecte l'équation suivante:
-Score = 1000 * T + (B - (N * Pb + M * Pr))
-Avec : 
-T : Nombre de cellules cibles couvertes.
-B : Budget initial
-N : Nombre de câbles construits
-Pb : Prix d'un câble
-M : Nombre de routeurs placés
-Pr : Prix d'un routeur
+`Score = 1000 * T + (B - (N * Pb + M * Pr))`. Avec : 
+- `T` : Nombre de cellules cibles couvertes.
+- `B` : Budget initial
+- `N` : Nombre de câbles construits
+- `Pb` : Prix d'un câble
+- `M` : Nombre de routeurs placés
+- `Pr` : Prix d'un routeur
 
 
 # Découpage du projet
@@ -41,7 +40,7 @@ Ci-dessous est repris le découpage que nous avons effectué pour définir les 2
 
 ## Partie Arbitre
 -----------------
-__***Vérification cohérence de l'output :***__
+***Vérification cohérence de l'output :***
 - 0 <= nombre de cellules connectées à l'antenne < nombre de lignes * nombre de colonnes
 - lignes en-dessous:
 	- 0 <= 1er nombre < nombre de lignes : coordonnées X de la cellule connectée
@@ -51,13 +50,13 @@ __***Vérification cohérence de l'output :***__
 	- 0 <= 1er nombre < nombre de lignes : coordonnées X du routeur
 	- 0 <= 2eme nombre < nombre de colonnes: coordonnées Y du routeur
 
-__***+ :***__
+***+ :***
 - pas de routeur sur un mur
 - les routeurs sont bien connectés à l'antenne 
 - les câbles sont donnés dans l'ordre, en partant de l'antenne
 - budget pas dépassé
 
-__***Si plusieurs fichiers output en entrée, affichage :***__
+***Si plusieurs fichiers output en entrée, affichage :***
 - pourcentage max de couvertures
 - score max
 - score min
@@ -73,7 +72,7 @@ __***Si plusieurs fichiers output en entrée, affichage :***__
 
 ## Partie Stratégie
 -------------------
-__***Vérification cohérence de l'input :***__
+***Vérification cohérence de l'input :***
 - 1ere ligne
 	- 1 <= 1er nombre <= 1000 : nombre de lignes
 	- 1 <= 2eme nombre <= 1000 : nombre de colonnes
@@ -88,9 +87,12 @@ __***Vérification cohérence de l'input :***__
 
 # Meilleurs scores obtenus
 --------------------------
-- Charleston_road : 21 962 856 
-- Rue_de_londres : 58 356 153 
-- Opera : 174 527 508 
-- Lets_go_higher : 290 192 787
 
-Total : 545 039 304
+| Carte           | Score    
+| --------------- | ----------
+| Charleston_road | 21 962 856
+| Rue_de_londres  | 21 962 856
+| Opera           | 21 962 856
+| Lets_go_higher  | 21 962 856
+
+**Total** : :boom: 545 039 304 :boom:
